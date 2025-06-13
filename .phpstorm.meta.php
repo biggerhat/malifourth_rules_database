@@ -2255,7 +2255,7 @@ namespace PHPSTORM_META {
 'tinker.commands','tinker.alias','tinker.dont_alias',);
         registerArgumentsSet('middleware', 
 'web','api',);
-        registerArgumentsSet('routes', 'home','dashboard','profile.edit',
+        registerArgumentsSet('routes', 'index','dashboard','profile.edit',
 'profile.update','profile.destroy','password.edit','password.update','appearance',
 'register','login','password.request',
 'password.email','password.reset','password.store','verification.notice','verification.verify',

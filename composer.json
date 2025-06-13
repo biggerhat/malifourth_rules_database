@@ -20,6 +20,7 @@
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.5",
         "fakerphp/faker": "^1.23",
+        "larastan/larastan": "^3.0",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.18",
         "laravel/sail": "^1.41",
@@ -27,7 +28,8 @@
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "pestphp/pest": "^3.8",
-        "pestphp/pest-plugin-laravel": "^3.2"
+        "pestphp/pest-plugin-laravel": "^3.2",
+        "phpstan/phpstan": "^2.1"
     },
     "autoload": {
         "psr-4": {
@@ -80,9 +82,13 @@
         "pint": [
             "@composer lint"
         ],
+        "stan": [
+            "./vendor/bin/phpstan analyse --memory-limit=-1"
+        ],
         "prepush": [
             "APP_ENV=testing php artisan key:generate",
             "@composer ide-generate",
+            "@composer stan",
             "@composer lint",
             "@php -d memory_limit=-1 -d opcache.enable_cli=1 artisan test --parallel --processes=4",
             "sed -i 's/APP_KEY=.*/APP_KEY=/g' .env.testing"

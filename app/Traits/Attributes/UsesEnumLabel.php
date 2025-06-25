@@ -17,7 +17,7 @@ trait UsesEnumLabel
         );
 
         if (! count($attributes)) {
-            return Str::headline($this->name);
+            return Str::headline($this->value);
         }
 
         return $attributes[0]->newInstance()->label;

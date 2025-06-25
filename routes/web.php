@@ -8,7 +8,7 @@ Route::get('/', function () {
 })->name('index');
 
 Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('Index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/admin.php';

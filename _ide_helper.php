@@ -22817,6 +22817,26 @@ namespace Illuminate\Http {
         }
 
             }
+    /**
+     * 
+     *
+     */
+    class RedirectResponse {
+        /**
+         * 
+         *
+         * @see \App\Providers\AppServiceProvider::register()
+         * @param string $message
+         * @param string|null $messageTitle
+         * @param \App\Enums\MessageTypeEnum|null $messageType
+         * @static 
+         */
+        public static function withMessage($message, $messageTitle = null, $messageType = \App\Enums\MessageTypeEnum::default)
+        {
+            return \Illuminate\Http\RedirectResponse::withMessage($message, $messageTitle, $messageType);
+        }
+
+            }
     }
 
 namespace Illuminate\Routing {

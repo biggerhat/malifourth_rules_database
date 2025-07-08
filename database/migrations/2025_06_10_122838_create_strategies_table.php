@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('strategies', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->string('slug')->index();
             $table->string('suit')->nullable();
             $table->foreignId('season_id')->constrained('seasons', 'id')->cascadeOnDelete();
-            $table->json('setup')->nullable();
-            $table->json('rules')->nullable();
-            $table->json('scoring')->nullable();
-            $table->json('additional')->nullable();
+            $table->longText('setup')->nullable();
+            $table->longText('rules')->nullable();
+            $table->longText('scoring')->nullable();
+            $table->longText('additional')->nullable();
+            $table->longText('searchable_text')->nullable();
             $table->string('front_image');
             $table->string('back_image')->nullable();
             $table->string('combination_image')->nullable();
@@ -28,7 +30,7 @@ return new class extends Migration
             $table->foreignId('previous')->nullable()->constrained('strategies', 'id');
             $table->foreignId('original')->nullable()->constrained('strategies', 'id');
             $table->dateTime('published_at')->nullable();
-            $table->foreignId('published_by')->constrained('users', 'id');
+            $table->foreignId('published_by')->nullable()->constrained('users', 'id');
             $table->timestamps();
             $table->softDeletes();
         });

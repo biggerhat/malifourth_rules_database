@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Interfaces\HasPublisher;
 use App\Traits\UsesApproval;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,9 +25,19 @@ class Batch extends Model implements HasPublisher
 
     protected $guarded = ['id'];
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function publishedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'published_by', 'id');
+    }
+
+    public function scopeUnpublished(Builder $query): Builder
+    {
+        return $query->whereNull('published_at');
     }
 
     public function createdBy(): BelongsTo

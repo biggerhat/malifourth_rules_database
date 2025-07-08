@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\IndexTypeEnum;
 use App\Interfaces\HasBatching;
 use App\Interfaces\HasPublisher;
+use App\Observers\IndexObserver;
 use App\Traits\UsesVersionControl;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -13,6 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 /**
  * @mixin IdeHelperIndex
  */
+#[ObservedBy(IndexObserver::class)]
 class Index extends Model implements HasBatching, HasPublisher
 {
     /** @use HasFactory<\Database\Factories\IndexFactory> */
@@ -22,6 +26,15 @@ class Index extends Model implements HasBatching, HasPublisher
     use UsesVersionControl;
 
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'type' => IndexTypeEnum::class,
+    ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 
     public function getActivityLogOptions(): LogOptions
     {

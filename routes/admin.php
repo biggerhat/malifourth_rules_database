@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\BatchAdminController;
+use App\Http\Controllers\Admin\IndexAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 
@@ -20,5 +22,19 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/store', 'store')->name('store');
         Route::post('/update/{role}', 'update')->name('update');
         Route::post('/delete/{role}', 'delete')->name('delete');
+    });
+
+    Route::controller(BatchAdminController::class)->prefix('batches')->name('batches.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::get('/edit/{batch}', 'edit')->name('edit');
+        Route::post('/store', 'store')->name('store');
+        Route::post('/update/{batch}', 'update')->name('update');
+        Route::post('/delete/{batch}', 'delete')->name('delete');
+    });
+
+    Route::controller(IndexAdminController::class)->prefix('indices')->name('indices.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/list', 'list')->name('list');
     });
 });

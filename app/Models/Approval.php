@@ -31,37 +31,37 @@ class Approval extends Model
 
     public function batches(): MorphToMany
     {
-        return $this->morphedByMany(Batch::class, 'approveable', 'approvals');
+        return $this->morphedByMany(Batch::class, 'approvable', 'approvals');
     }
 
     public function pages(): MorphToMany
     {
-        return $this->morphedByMany(Page::class, 'approveable', 'approvals');
+        return $this->morphedByMany(Page::class, 'approvable', 'approvals');
     }
 
     public function indices(): MorphToMany
     {
-        return $this->morphedByMany(Index::class, 'approveable', 'approvals');
+        return $this->morphedByMany(Index::class, 'approvable', 'approvals');
     }
 
     public function schemes(): MorphToMany
     {
-        return $this->morphedByMany(Scheme::class, 'approveable', 'approvals');
+        return $this->morphedByMany(Scheme::class, 'approvable', 'approvals');
     }
 
     public function seasons(): MorphToMany
     {
-        return $this->morphedByMany(Season::class, 'approveable', 'approvals');
+        return $this->morphedByMany(Season::class, 'approvable', 'approvals');
     }
 
     public function sections(): MorphToMany
     {
-        return $this->morphedByMany(Section::class, 'approveable', 'approvals');
+        return $this->morphedByMany(Section::class, 'approvable', 'approvals');
     }
 
     public function strategies(): MorphToMany
     {
-        return $this->morphedByMany(Strategy::class, 'approveable', 'approvals');
+        return $this->morphedByMany(Strategy::class, 'approvable', 'approvals');
     }
 
     public function getActivityLogOptions(): LogOptions

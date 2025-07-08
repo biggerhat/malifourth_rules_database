@@ -9,6 +9,6 @@ trait UsesApproval
 {
     public function approval(): MorphToMany
     {
-        return $this->morphToMany(Approval::class, 'approveable');
+        return $this->morphToMany(Approval::class, 'approvable');
     }
 }

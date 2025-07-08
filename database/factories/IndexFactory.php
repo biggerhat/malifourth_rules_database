@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\IndexTypeEnum;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +18,13 @@ class IndexFactory extends Factory
      */
     public function definition(): array
     {
+        $user = User::factory()->create();
+
         return [
-            //
+            'title' => $this->faker->text(50),
+            'type' => $this->faker->randomElement(IndexTypeEnum::cases()),
+            'published_by' => $user,
+            'created_by' => $user,
         ];
     }
 }

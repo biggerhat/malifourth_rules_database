@@ -21,6 +21,13 @@ class Strategy extends Model implements HasBatching, HasPublisher
     use LogsActivity;
     use UsesVersionControl;
 
+    protected $guarded = ['id'];
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function getActivityLogOptions(): LogOptions
     {
         return LogOptions::defaults();

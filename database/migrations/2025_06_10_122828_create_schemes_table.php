@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('schemes', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->string('slug')->index();
             $table->foreignId('season_id')->constrained('seasons', 'id')->cascadeOnDelete();
-            $table->json('prerequisites')->nullable();
-            $table->json('reveal')->nullable();
-            $table->json('scoring')->nullable();
-            $table->json('additional')->nullable();
+            $table->longText('prerequisites')->nullable();
+            $table->longText('reveal')->nullable();
+            $table->longText('scoring')->nullable();
+            $table->longText('additional')->nullable();
+            $table->longText('searchable_text')->nullable();
             $table->string('front_image');
             $table->string('back_image')->nullable();
             $table->string('combination_image')->nullable();
@@ -30,7 +32,7 @@ return new class extends Migration
             $table->foreignId('previous')->nullable()->constrained('schemes', 'id');
             $table->foreignId('original')->nullable()->constrained('schemes', 'id');
             $table->dateTime('published_at')->nullable();
-            $table->foreignId('published_by')->constrained('users', 'id');
+            $table->foreignId('published_by')->nullable()->constrained('users', 'id');
             $table->timestamps();
             $table->softDeletes();
         });

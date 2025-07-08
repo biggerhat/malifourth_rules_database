@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 trait UsesVersionControl
@@ -22,5 +23,10 @@ trait UsesVersionControl
     public function publishedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'published_by', 'id');
+    }
+
+    public function scopeUnpublished(Builder $query): Builder
+    {
+        return $query->whereNull('published_at');
     }
 }

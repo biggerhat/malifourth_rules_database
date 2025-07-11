@@ -3,12 +3,12 @@
 namespace App\Traits;
 
 use App\Models\Approval;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 trait UsesApproval
 {
-    public function approval(): MorphToMany
+    public function approval(): MorphOne
     {
-        return $this->morphToMany(Approval::class, 'approvable');
+        return $this->morphOne(Approval::class, 'approvable');
     }
 }

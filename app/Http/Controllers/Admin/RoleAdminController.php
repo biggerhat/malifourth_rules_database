@@ -63,8 +63,11 @@ class RoleAdminController extends Controller
             'permissions' => ['required', 'array'],
         ]);
 
+        $permissions = Permission::whereIn('name', $validated['permissions'])->get();
+        unset($validated['permissions']);
+
         $role->update($validated);
-        $role->syncPermissions(Permission::whereIn('name', $request->permissions)->get());
+        $role->syncPermissions($permissions);
 
         return to_route('admin.roles.index')->withMessage($role->name.' updated successfully!');
     }

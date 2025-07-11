@@ -31,6 +31,7 @@ return new class extends Migration
             $table->foreignId('batch_id')->nullable()->constrained('batches', 'id');
             $table->foreignId('previous')->nullable()->constrained('schemes', 'id');
             $table->foreignId('original')->nullable()->constrained('schemes', 'id');
+            $table->foreignId('newest')->index()->nullable()->constrained('schemes', 'id');
             $table->dateTime('published_at')->nullable();
             $table->foreignId('published_by')->nullable()->constrained('users', 'id');
             $table->timestamps();

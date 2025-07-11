@@ -13,13 +13,14 @@
 
 namespace App\Models{
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $approvable_type
  * @property int $approvable_id
  * @property string|null $change_notes
- * @property string $internal_notes
+ * @property string|null $searchable_text
+ * @property string|null $internal_notes
  * @property int|null $initiated_by
  * @property string|null $approved_at
  * @property int|null $approved_by
@@ -28,6 +29,7 @@ namespace App\Models{
  * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $approvable
  * @property-read \App\Models\User|null $approvedBy
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Batch> $batches
  * @property-read int|null $batches_count
@@ -47,8 +49,9 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereApproveableId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereApproveableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval unapproved()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereApprovableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereApprovableType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereApprovedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereApprovedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereChangeNotes($value)
@@ -57,6 +60,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereInitiatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereInternalNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereSearchableText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereUpdatedAt($value)
  * @mixin \Eloquent
  */
@@ -66,28 +70,29 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $title
+ * @property string $slug
  * @property string|null $release_notes
+ * @property string|null $searchable_text
  * @property string|null $internal_notes
  * @property string|null $published_at
- * @property int $published_by
+ * @property int|null $published_by
  * @property int $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Approval> $approval
- * @property-read int|null $approval_count
+ * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\User $createdBy
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Index> $indices
  * @property-read int|null $indices_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Page> $pages
  * @property-read int|null $pages_count
- * @property-read \App\Models\User $publishedBy
+ * @property-read \App\Models\User|null $publishedBy
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scheme> $schemes
  * @property-read int|null $schemes_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Season> $seasons
@@ -100,6 +105,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereCreatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereDeletedAt($value)
@@ -108,6 +114,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch wherePublishedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereReleaseNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereSearchableText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereUpdatedAt($value)
  * @mixin \Eloquent
@@ -118,34 +126,36 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $title
- * @property string $type
+ * @property string $slug
+ * @property \App\Enums\IndexTypeEnum $type
  * @property string|null $image
  * @property string|null $content
+ * @property string|null $searchable_text
  * @property string|null $internal_notes
  * @property int|null $batch_id
  * @property int|null $previous
  * @property int|null $original
  * @property string|null $published_at
- * @property int $published_by
+ * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Approval> $approval
- * @property-read int|null $approval_count
+ * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
  * @property-read Index|null $originalVersion
  * @property-read Index|null $previousVersion
- * @property-read \App\Models\User $publishedBy
+ * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\IndexFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Index unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereBatchId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereCreatedAt($value)
@@ -157,6 +167,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index wherePrevious($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index wherePublishedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereSearchableText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereUpdatedAt($value)
@@ -168,32 +180,34 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- *
+ * 
  *
  * @property int $id
  * @property string|null $title
+ * @property string $slug
  * @property string|null $content
+ * @property string|null $searchable_text
  * @property string|null $internal_notes
  * @property int|null $batch_id
  * @property int|null $previous
  * @property int|null $original
  * @property string|null $published_at
- * @property int $published_by
+ * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Approval> $approval
- * @property-read int|null $approval_count
+ * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
  * @property-read Page|null $originalVersion
  * @property-read Page|null $previousVersion
- * @property-read \App\Models\User $publishedBy
+ * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\PageFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereBatchId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereCreatedAt($value)
@@ -204,6 +218,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePrevious($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePublishedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereSearchableText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereUpdatedAt($value)
  * @mixin \Eloquent
@@ -214,15 +230,17 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $title
+ * @property string $slug
  * @property int $season_id
  * @property string|null $prerequisites
  * @property string|null $reveal
  * @property string|null $scoring
  * @property string|null $additional
+ * @property string|null $searchable_text
  * @property string $front_image
  * @property string|null $back_image
  * @property string|null $combination_image
@@ -234,22 +252,22 @@ namespace App\Models{
  * @property int|null $previous
  * @property int|null $original
  * @property string|null $published_at
- * @property int $published_by
+ * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Approval> $approval
- * @property-read int|null $approval_count
+ * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
  * @property-read Scheme|null $originalVersion
  * @property-read Scheme|null $previousVersion
- * @property-read \App\Models\User $publishedBy
+ * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\SchemeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereAdditional($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereBackImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereBatchId($value)
@@ -269,7 +287,9 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme wherePublishedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereReveal($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereScoring($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereSearchableText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereSeasonId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereUpdatedAt($value)
  * @mixin \Eloquent
@@ -280,31 +300,33 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $title
+ * @property string $slug
  * @property string|null $content
+ * @property string|null $searchable_text
  * @property string|null $url
  * @property string|null $internal_notes
  * @property int|null $batch_id
  * @property string|null $published_at
- * @property int $published_by
+ * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Approval> $approval
- * @property-read int|null $approval_count
+ * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
  * @property-read Season|null $originalVersion
  * @property-read Season|null $previousVersion
- * @property-read \App\Models\User $publishedBy
+ * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\SeasonFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Season unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereBatchId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereCreatedAt($value)
@@ -313,6 +335,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereInternalNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season wherePublishedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereSearchableText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereUrl($value)
@@ -324,32 +348,34 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- *
+ * 
  *
  * @property int $id
  * @property string|null $title
+ * @property string $slug
  * @property string|null $content
+ * @property string|null $searchable_text
  * @property string|null $internal_notes
  * @property int|null $batch_id
  * @property int|null $previous
  * @property int|null $original
  * @property string|null $published_at
- * @property int $published_by
+ * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Approval> $approval
- * @property-read int|null $approval_count
+ * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
  * @property-read Section|null $originalVersion
  * @property-read Section|null $previousVersion
- * @property-read \App\Models\User $publishedBy
+ * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\SectionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereBatchId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereCreatedAt($value)
@@ -360,6 +386,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section wherePrevious($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section wherePublishedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereSearchableText($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereUpdatedAt($value)
  * @mixin \Eloquent
@@ -370,16 +398,18 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $title
+ * @property string $slug
  * @property string|null $suit
  * @property int $season_id
  * @property string|null $setup
  * @property string|null $rules
  * @property string|null $scoring
  * @property string|null $additional
+ * @property string|null $searchable_text
  * @property string $front_image
  * @property string|null $back_image
  * @property string|null $combination_image
@@ -388,22 +418,22 @@ namespace App\Models{
  * @property int|null $previous
  * @property int|null $original
  * @property string|null $published_at
- * @property int $published_by
+ * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Approval> $approval
- * @property-read int|null $approval_count
+ * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
  * @property-read Strategy|null $originalVersion
  * @property-read Strategy|null $previousVersion
- * @property-read \App\Models\User $publishedBy
+ * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\StrategyFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereAdditional($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereBackImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereBatchId($value)
@@ -419,8 +449,10 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy wherePublishedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereRules($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereScoring($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereSearchableText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereSeasonId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereSetup($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereSuit($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereUpdatedAt($value)
@@ -432,7 +464,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $name

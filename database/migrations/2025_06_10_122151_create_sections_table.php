@@ -21,10 +21,17 @@ return new class extends Migration
             $table->foreignId('batch_id')->nullable()->constrained('batches', 'id');
             $table->foreignId('previous')->nullable()->constrained('sections', 'id');
             $table->foreignId('original')->nullable()->constrained('sections', 'id');
+            $table->foreignId('newest')->nullable()->index()->constrained('sections', 'id');
             $table->dateTime('published_at')->nullable();
             $table->foreignId('published_by')->nullable()->constrained('users', 'id');
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('sectionables', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('sectionable');
+            $table->foreignId('section_id')->constrained('sections', 'id');
         });
     }
 
@@ -33,6 +40,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('sectionables');
         Schema::dropIfExists('sections');
     }
 };

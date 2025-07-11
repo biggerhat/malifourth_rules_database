@@ -23,10 +23,17 @@ return new class extends Migration
             $table->foreignId('batch_id')->nullable()->constrained('batches', 'id');
             $table->foreignId('previous')->nullable()->constrained('indices', 'id');
             $table->foreignId('original')->nullable()->constrained('indices', 'id');
+            $table->foreignId('newest')->index()->nullable()->constrained('indices', 'id');
             $table->dateTime('published_at')->nullable();
             $table->foreignId('published_by')->nullable()->constrained('users', 'id');
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('indexables', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('indexable');
+            $table->foreignId('index_id')->constrained('indices', 'id');
         });
     }
 
@@ -35,6 +42,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('indexables');
         Schema::dropIfExists('indices');
     }
 };

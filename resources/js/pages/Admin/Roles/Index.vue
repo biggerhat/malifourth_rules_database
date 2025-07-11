@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { valueUpdater } from '@/lib/utils'
 import AdminActions from '@/components/AdminActions.vue';
+import { hasPermission } from "@/composables/hasPermission";
 
 import {
     Table,
@@ -38,7 +39,11 @@ const columns: ColumnDef<Roles>[] = [
         cell: ({ row }) => {
             const role = row.original;
 
-            return h('div', { class: 'relative' }, h(AdminActions, { name: role.name, editRoute: route('admin.roles.edit', role.id), deleteRoute: route('admin.roles.delete', role.id) }))
+            return h('div', { class: 'relative' }, h(AdminActions, {
+                name: role.name,
+                modelName: 'role',
+                editRoute: route('admin.roles.edit', role.id),
+                deleteRoute: route('admin.roles.delete', role.id) }))
         },
     },
 ];
@@ -70,7 +75,7 @@ const table = useVueTable({
             <Input class="max-w-sm" placeholder="Filter Roles"
                    :model-value="table.getColumn('name')?.getFilterValue() as string"
                    @update:model-value=" table.getColumn('name')?.setFilterValue($event)" />
-            <Button @click="router.get(route('admin.roles.create'))">
+            <Button @click="router.get(route('admin.roles.create'))" v-if="hasPermission('add_role')">
                 Create New Role
             </Button>
         </div>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { valueUpdater } from '@/lib/utils'
 import AdminActions from '@/components/AdminActions.vue';
+import { hasPermission } from "@/composables/hasPermission";
 
 import {
     Table,
@@ -52,7 +53,12 @@ const columns: ColumnDef<Users>[] = [
         cell: ({ row }) => {
             const user = row.original;
 
-            return h('div', { class: 'relative' }, h(AdminActions, { name: user.name, editRoute: route('admin.users.edit', user.id), deleteRoute: route('admin.users.delete', user.id) }))
+            return h('div', { class: 'relative' }, h(AdminActions, {
+                name: user.name,
+                modelName: 'user',
+                editRoute: route('admin.users.edit', user.id),
+                deleteRoute: route('admin.users.delete', user.id)
+            }))
         },
     },
 ];
@@ -84,7 +90,7 @@ const table = useVueTable({
             <Input class="max-w-sm" placeholder="Filter Users"
                    :model-value="table.getColumn('name')?.getFilterValue() as string"
                    @update:model-value=" table.getColumn('name')?.setFilterValue($event)" />
-            <Button @click="router.get(route('admin.users.create'))">
+            <Button @click="router.get(route('admin.users.create'))" v-if="hasPermission('add_user')">
                 Create New User
             </Button>
         </div>

@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\PermissionEnum;
+use App\Actions\CreateApprovalAction;
 use App\Http\Controllers\Controller;
 use App\Models\Batch;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Permission;
 
 class BatchAdminController extends Controller
 {
@@ -32,39 +30,21 @@ class BatchAdminController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('batches')],
-            'permissions' => ['required', 'array'],
-        ]);
+        $batch = $this->validateAndSave($request);
 
-        $permissions = Permission::whereIn('name', $request->permissions)->get();
-
-        $batch = Batch::create([
-            'name' => $request->name,
-            'guard_name' => 'web',
-        ]);
-
-        $batch->syncPermissions($permissions);
-
-        return to_route('admin.batches.index')->withMessage($batch->name.' created successfully!');
+        return to_route('admin.batches.index')->withMessage($batch->title.' created successfully!');
     }
 
     public function update(Request $request, Batch $batch)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('batches')->ignore($batch->id)],
-            'permissions' => ['required', 'array'],
-        ]);
+        $batch = $this->validateAndSave($request, $batch);
 
-        $batch->update($validated);
-        $batch->syncPermissions(Permission::whereIn('name', $request->permissions)->get());
-
-        return to_route('admin.batches.index')->withMessage($batch->name.' updated successfully!');
+        return to_route('admin.batches.index')->withMessage($batch->title.' updated successfully!');
     }
 
     public function delete(Request $request, Batch $batch)
     {
-        $name = $batch->name;
+        $name = $batch->title;
 
         $batch->delete();
 
@@ -75,7 +55,19 @@ class BatchAdminController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'release_notes' => ['nullable', 'string'],
+            'internal_notes' => ['nullable', 'string'],
         ]);
 
+        $validated['created_by'] = $request->user()->id;
+
+        if (! $batch) {
+            $batch = Batch::create($validated);
+            CreateApprovalAction::handle($batch, $request->user());
+        } else {
+            $batch->update($validated);
+        }
+
+        return $batch;
     }
 }

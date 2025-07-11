@@ -4,6 +4,7 @@ import AppHeader from '@/components/AppHeader.vue';
 import AppShell from '@/components/AppShell.vue';
 import type { BreadcrumbItemType } from '@/types';
 import AlertMessage from "@/components/AlertMessage.vue";
+import { hasPermission } from "@/composables/hasPermission";
 
 interface Props {
     breadcrumbs?: BreadcrumbItemType[];

@@ -47,6 +47,21 @@ const form = useForm({
     permissions: [],
 });
 
+const allPermissionsOn = ref(false);
+const toggleAllPermissionsOn = () => {
+    props.permissions.forEach((permission) => {
+        if (!form.permissions.includes(permission)) {
+            togglePermission(permission);
+        }
+    })
+    allPermissionsOn.value = true;
+}
+
+const toggleAllPermissionsOff = () => {
+    form.permissions = [];
+    allPermissionsOn.value = false;
+}
+
 const togglePermission = (permission) => {
     for(let i = 0; i < form.permissions.length; i++) {
         if (form.permissions[i] === permission) {
@@ -93,7 +108,7 @@ const submit = () => {
                         <Input id="name" type="text" required autofocus :tabindex="1" autocomplete="name" v-model="form.name" placeholder="Role" />
                         <InputError :message="form.errors.name" />
                     </div>
-                    <div class="grid md:grid-cols-3 w-full">
+                    <div class="grid md:grid-cols-4 w-full">
                         <div v-for="permission in props.permissions" class="flex items-center space-x-2 space-y-2">
                             <Checkbox
                                 :id="permission.value"

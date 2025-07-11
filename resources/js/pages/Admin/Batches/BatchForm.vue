@@ -36,13 +36,13 @@ const form = useForm({
 
 onMounted(() => {
     form.title = props.batch?.title ?? null;
-    form.release_notes = props.batch?.release_notes ?? null;
-    form.internal_notes = props.batch?.internal_notes ?? null;
+    form.release_notes = props.batch?.release_notes ?? '';
+    form.internal_notes = props.batch?.internal_notes ?? '';
 });
 
 const submit = () => {
     if (props.batch) {
-        form.post(route('admin.batches.update', {batch: props.batch.id}));
+        form.post(route('admin.batches.update', {batch: props.batch.slug}));
     } else {
         form.post(route('admin.batches.store', {}));
     }
@@ -67,7 +67,7 @@ const submit = () => {
                         <InputError :message="form.errors.title" />
                     </div>
                     <div class="flex flex-col space-y-1.5">
-                        <RichTextEditor id="release_notes" placeholder="Add Release Notes" label="Release Notes" v-model="form.release_notes" />
+                        <RichTextEditor placeholder="Add Release Notes" label="Release Notes" v-model="form.release_notes" />
                         <InputError :message="form.errors.release_notes" />
                     </div>
                     <div class="flex flex-col space-y-1.5">

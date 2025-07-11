@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -19,6 +21,11 @@ class Approval extends Model
 
     protected $guarded = ['id'];
 
+    public function scopeUnapproved(Builder $query): Builder
+    {
+        return $query->whereNull('approved_at');
+    }
+
     public function initiatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'initiated_by', 'id');
@@ -27,6 +34,11 @@ class Approval extends Model
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by', 'id');
+    }
+
+    public function approvable(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     public function batches(): MorphToMany

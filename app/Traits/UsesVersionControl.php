@@ -20,6 +20,11 @@ trait UsesVersionControl
         return $this->belongsTo(self::class, 'original', 'id');
     }
 
+    public function newest(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'newest', 'id');
+    }
+
     public function publishedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'published_by', 'id');

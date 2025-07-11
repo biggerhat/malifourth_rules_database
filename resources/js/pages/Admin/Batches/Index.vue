@@ -24,6 +24,7 @@ import {
     getFilteredRowModel,
     useVueTable,
 } from '@tanstack/vue-table';
+import {hasPermission} from "@/composables/hasPermission";
 
 const columns: ColumnDef<Batches>[] = [
     {
@@ -33,7 +34,7 @@ const columns: ColumnDef<Batches>[] = [
             return h('div', {}, row.getValue('title'))
         },
     },{
-        accessorKey: 'published',
+        accessorKey: 'published_at',
         header: () => h('div', {}, 'Published'),
         cell: ({ row }) => {
             return h('div', {}, row.getValue('published_at') ? h(Check) : h(Ban))
@@ -51,9 +52,13 @@ const columns: ColumnDef<Batches>[] = [
         enableHiding: false,
         header: () => h('div', {}, 'Actions'),
         cell: ({ row }) => {
-            const role = row.original;
+            const batch = row.original;
 
-            return h('div', { class: 'relative' }, h(AdminActions, { name: role.name, editRoute: route('admin.batches.edit', role.id), deleteRoute: route('admin.batches.delete', role.id) }))
+            return h('div', { class: 'relative' }, h(AdminActions, {
+                name: batch.title,
+                modelName: 'batch',
+                editRoute: route('admin.batches.edit', batch.slug),
+                deleteRoute: route('admin.batches.delete', batch.slug) }))
         },
     },
 ];
@@ -83,9 +88,9 @@ const table = useVueTable({
     <div class="container mx-auto mt-6">
         <div class="flex items-center justify-between py-4">
             <Input class="max-w-sm" placeholder="Filter Batches"
-                   :model-value="table.getColumn('name')?.getFilterValue() as string"
-                   @update:model-value=" table.getColumn('name')?.setFilterValue($event)" />
-            <Button @click="router.get(route('admin.batches.create'))">
+                   :model-value="table.getColumn('title')?.getFilterValue() as string"
+                   @update:model-value=" table.getColumn('title')?.setFilterValue($event)" />
+            <Button @click="router.get(route('admin.batches.create'))" v-if="hasPermission('add_batch')">
                 Create New Batch
             </Button>
         </div>

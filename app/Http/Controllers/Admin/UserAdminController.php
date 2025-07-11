@@ -45,6 +45,9 @@ class UserAdminController extends Controller
         ]);
 
         $role = isset($validated['role']) ? $validated['role']['id'] : null;
+        if (isset($validated['role'])) {
+            unset($validated['role']);
+        }
 
         /** @var User $user */
         $user = User::create([
@@ -66,6 +69,10 @@ class UserAdminController extends Controller
         ]);
 
         $role = isset($validated['role']) ? $validated['role']['id'] : null;
+        if (isset($validated['role'])) {
+            unset($validated['role']);
+        }
+
         $user->update($validated);
         $user->syncRoles([$role]);
 

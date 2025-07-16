@@ -35,17 +35,17 @@ const columns: ColumnDef<Batches>[] = [
         },
     },{
         accessorKey: 'published_at',
-        header: () => h('div', {}, 'Published'),
+        header: () => h('div', {class: 'text-center'}, 'Published'),
         cell: ({ row }) => {
-            return h('div', {}, row.getValue('published_at') ? h(Check) : h(Ban))
+            return h('div', {}, row.getValue('published_at') ? h(Check, {class: 'text-green-500 mx-auto'}) : h(Ban, {class: 'text-red-500 mx-auto'}))
         },
     },{
         accessorKey: 'approved',
-        header: () => h('div', {}, 'Approved'),
+        header: () => h('div', {class: 'text-center'}, 'Approved'),
         cell: ({ row }) => {
             const batch = row.original;
 
-            return h('div', {}, batch.approval?.approved_at ? h(Check) : h(Ban))
+            return h('div', {}, batch.approval?.approved_at ? h(Check, {class: 'text-green-500 mx-auto'}) : h(Ban, {class: 'text-red-500 mx-auto'}))
         },
     },{
         id: 'actions',
@@ -53,12 +53,16 @@ const columns: ColumnDef<Batches>[] = [
         header: () => h('div', {}, 'Actions'),
         cell: ({ row }) => {
             const batch = row.original;
+            const publishable = batch.approval?.approved_at && !batch.published_at;
 
             return h('div', { class: 'relative' }, h(AdminActions, {
                 name: batch.title,
                 modelName: 'batch',
-                editRoute: route('admin.batches.edit', batch.slug),
-                deleteRoute: route('admin.batches.delete', batch.slug) }))
+                editRoute: batch.published_at ? null : route('admin.batches.edit', batch.slug),
+                deleteRoute: batch.published_at ? null : route('admin.batches.delete', batch.slug),
+                approvalRoute: batch.approval?.approved_at ? null : route('admin.approvals.update', batch.approval?.id),
+                publishRoute: publishable ? route('admin.batches.publish', batch.slug) : null,
+            }))
         },
     },
 ];

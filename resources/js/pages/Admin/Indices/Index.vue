@@ -25,6 +25,7 @@ import {
     getFilteredRowModel,
     useVueTable,
 } from '@tanstack/vue-table';
+import IndexView from "@/pages/Rules/IndexView.vue";
 
 const columns: ColumnDef<Indices>[] = [
     {
@@ -48,17 +49,17 @@ const columns: ColumnDef<Indices>[] = [
         },
     },{
         accessorKey: 'published_at',
-        header: () => h('div', {}, 'Published'),
+        header: () => h('div', {class: 'text-center'}, 'Published'),
         cell: ({ row }) => {
-            return h('div', {}, row.getValue('published_at') ? h(Check) : h(Ban))
+            return h('div', {}, row.getValue('published_at') ? h(Check, {class: 'text-green-500 mx-auto'}) : h(Ban, {class: 'text-red-500 mx-auto'}))
         },
     },{
         accessorKey: 'approved',
-        header: () => h('div', {}, 'Approved'),
+        header: () => h('div', {class: 'text-center'}, 'Approved'),
         cell: ({ row }) => {
             const index = row.original;
 
-            return h('div', {}, index.approval?.approved_at ? h(Check) : h(Ban))
+            return h('div', {}, index.approval?.approved_at ? h(Check, {class: 'text-green-500 mx-auto'}) : h(Ban, {class: 'text-red-500 mx-auto'}))
         },
     },{
         id: 'actions',
@@ -66,14 +67,17 @@ const columns: ColumnDef<Indices>[] = [
         header: () => h('div', {}, 'Actions'),
         cell: ({ row }) => {
             const index = row.original;
+            const publishable = index.approval?.approved_at && !index.published_at;
 
             return h('div', { class: 'relative' }, h(AdminActions, {
                 name: index.title,
                 modelName: 'index',
+                viewRoute: route('admin.indices.view', index.slug),
+                viewComponent: IndexView,
                 editRoute: route('admin.indices.edit', index.slug),
-                deleteRoute: route('admin.indices.delete', index.slug),
+                deleteRoute: index.published_at ? null : route('admin.indices.delete', index.slug),
                 approvalRoute: index.approval?.approved_at ? null : route('admin.approvals.update', index.approval?.id),
-                publishRoute: index.published_at ? null : route('admin.indices.publish', index.slug)
+                publishRoute: publishable ? route('admin.indices.publish', index.slug) : null,
             }))
         },
     },

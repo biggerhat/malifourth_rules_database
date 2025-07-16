@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -25,8 +26,18 @@ class Batch extends Model implements HasPublisher
 
     use LogsActivity;
     use UsesApproval;
+    use SoftDeletes;
 
     protected $guarded = ['id'];
+
+    public array $batchables = [
+        'indices',
+        'pages',
+        'sections',
+        'seasons',
+        'schemes',
+        'strategies',
+    ];
 
     public function getRouteKeyName(): string
     {

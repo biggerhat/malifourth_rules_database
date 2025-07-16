@@ -2,85 +2,143 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Approvals\CreateApprovalAction;
+use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SectionListResource;
 use App\Models\Batch;
+use App\Models\Index;
 use App\Models\Section;
+use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Permission;
 
 class SectionAdminController extends Controller
 {
     public function list(Request $request)
     {
-        return Section::orderBy('title', 'ASC')->get()->toJson();
+        return SectionListResource::collection(
+            Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+        )->toArray($request);
+    }
+
+    public function view(Request $request, Section $section)
+    {
+        $section->loadMissing('newestVersion', 'publishedBy');
+
+        $content = (new ContentBuilder($section->content ?? ''))->getFullyHydratedContent();
+
+        return [
+            'title' => $section->title,
+            'content' => $content,
+            'published_at' => $section->published_at?->format('m-d-Y'),
+            'published_by' => $section->publishedBy?->name,
+        ];
     }
 
     public function index(Request $request): \Inertia\Response|\Inertia\ResponseFactory
     {
-        return inertia('Admin/Batches/Index', [
-            'batches' => Batch::with('approval')->orderBy('id', 'DESC')->get(),
+        return inertia('Admin/Sections/Index', [
+            'sections' => Section::with('approval', 'batch')
+                ->orderBy('id', 'DESC')
+                ->orderBy('title', 'ASC')
+                ->get(),
         ]);
     }
 
     public function create(Request $request): \Inertia\Response|\Inertia\ResponseFactory
     {
-        return inertia('Admin/Batches/BatchForm');
-    }
-
-    public function edit(Request $request, Batch $batch)
-    {
-        return inertia('Admin/Batches/BatchForm', [
-            'batch' => $batch,
+        return inertia('Admin/Sections/SectionForm', [
+            'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
         ]);
     }
 
-    public function store(Request $request)
+    public function edit(Request $request, Section $section): \Inertia\Response|\Inertia\ResponseFactory
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('batches')],
-            'permissions' => ['required', 'array'],
+        return inertia('Admin/Sections/SectionForm', [
+            'section' => $section->loadMissing('approval'),
+            'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
         ]);
-
-        $permissions = Permission::whereIn('name', $request->permissions)->get();
-
-        $batch = Batch::create([
-            'name' => $request->name,
-            'guard_name' => 'web',
-        ]);
-
-        $batch->syncPermissions($permissions);
-
-        return to_route('admin.batches.index')->withMessage($batch->name.' created successfully!');
     }
 
-    public function update(Request $request, Batch $batch)
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('batches')->ignore($batch->id)],
-            'permissions' => ['required', 'array'],
-        ]);
+        $section = $this->validateAndSave($request);
 
-        $batch->update($validated);
-        $batch->syncPermissions(Permission::whereIn('name', $request->permissions)->get());
-
-        return to_route('admin.batches.index')->withMessage($batch->name.' updated successfully!');
+        return to_route('admin.sections.index')->withMessage($section->title.' created successfully!');
     }
 
-    public function delete(Request $request, Batch $batch)
+    public function update(Request $request, Section $section): \Illuminate\Http\RedirectResponse
     {
-        $name = $batch->name;
+        $section = $this->validateAndSave($request, $section);
 
-        $batch->delete();
-
-        return to_route('admin.batches.index')->withMessage($name.' has been deleted.');
+        return to_route('admin.sections.index')->withMessage($section->title.' updated successfully!');
     }
 
-    private function validateAndSave(Request $request, ?Batch $batch = null): Batch
+    public function delete(Request $request, Section $section): \Illuminate\Http\RedirectResponse
+    {
+        $name = $section->title;
+
+        $section->delete();
+
+        return to_route('admin.sections.index')->withMessage($name.' has been deleted.');
+    }
+
+    public function publish(Request $request, Section $section): \Illuminate\Http\RedirectResponse
+    {
+        try {
+            $section->publish($request->user());
+        } catch (\Exception $exception) {
+            return redirect()->back()->withMessage($exception->getMessage(), messageType: MessageTypeEnum::destructive);
+        }
+
+        return to_route('admin.sections.index')->withMessage($section->title . ' has been published!');
+    }
+
+    private function validateAndSave(Request $request, ?Section $section = null): Section
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'content' => ['nullable', 'string'],
+            'internal_notes' => ['nullable', 'string'],
+            'change_notes' => ['nullable', 'string'],
+            'batch_id' => ['nullable', 'int', 'exists:batches,id'],
+            'publish_directly' => ['required', 'boolean'],
+            'approve_directly' => ['required', 'boolean'],
         ]);
 
+        $publishDirectly = $validated['publish_directly'];
+        unset($validated['publish_directly']);
+        $approveDirectly = $validated['approve_directly'];
+        unset($validated['approve_directly']);
+        $changeNotes = $validated['change_notes'];
+        unset($validated['change_notes']);
+
+        if (!$section) {
+            $section = Section::create($validated);
+        } else {
+            $section->loadMissing('approval');
+
+            if (!$section->published_at) {
+                $section->update($validated);
+                $section->approval?->delete();
+            } else {
+                $validated['previous'] = $section->id;
+                $validated['original'] = $section->original ?? $section->id;
+                $section = Section::create($validated);
+            }
+        }
+
+        CreateApprovalAction::handle(
+            $section->refresh(),
+            $request->user(),
+            changeNotes: $changeNotes,
+            approveDirectly: $approveDirectly
+        );
+
+        if ($publishDirectly) {
+            self::publish($request, $section->refresh());
+        }
+
+        return $section;
     }
 }

@@ -40,17 +40,17 @@ const columns: ColumnDef<Approvals>[] = [
         },
     },{
         accessorKey: 'published_at',
-        header: () => h('div', {}, 'Published'),
+        header: () => h('div', {class: 'text-center'}, 'Published'),
         cell: ({ row }) => {
-            return h('div', {}, row.getValue('published_at') ? h(Check) : h(Ban))
+            return h('div', {}, row.getValue('published_at') ? h(Check, {class: 'text-green-500 mx-auto'}) : h(Ban, {class: 'text-red-500 mx-auto'}))
         },
     },{
         accessorKey: 'approved',
-        header: () => h('div', {}, 'Approved'),
+        header: () => h('div', {class: 'text-center'}, 'Approved'),
         cell: ({ row }) => {
             const approval = row.original;
 
-            return h('div', {}, approval.approved_at ? h(Check) : h(Ban))
+            return h('div', {}, approval.approved_at ? h(Check, {class: 'text-green-500 mx-auto'}) : h(Ban, {class: 'text-red-500 mx-auto'}))
         },
     },{
         id: 'actions',

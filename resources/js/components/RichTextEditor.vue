@@ -7,6 +7,21 @@ import axios from 'axios';
 import { Check, Search, ChevronsUpDown } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import { Combobox, ComboboxAnchor, ComboboxTrigger, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxItemIndicator, ComboboxList } from '@/components/ui/combobox'
+import MagicalDefense from "@/components/symbols/MagicalDefense.vue";
+import Crow from "@/components/symbols/Crow.vue";
+import Magic from "@/components/symbols/Magic.vue";
+import Mask from "@/components/symbols/Mask.vue";
+import Melee from "@/components/symbols/Melee.vue";
+import Missile from "@/components/symbols/Missile.vue";
+import Negative from "@/components/symbols/Negative.vue";
+import PhysicalDefense from "@/components/symbols/PhysicalDefense.vue";
+import Positive from "@/components/symbols/Positive.vue";
+import Pulse from "@/components/symbols/Pulse.vue";
+import Ram from "@/components/symbols/Ram.vue";
+import SignatureAction from "@/components/symbols/SignatureAction.vue";
+import Soulstone from "@/components/symbols/Soulstone.vue";
+import Tome from "@/components/symbols/Tome.vue";
+import UnusualDefense from "@/components/symbols/UnusualDefense.vue";
 
 import {
     Dialog,
@@ -308,7 +323,7 @@ const underline = () => {
 
 const horizontal = () => {
     const textarea = document.getElementById('text_editor');
-    const replacement = "{{hr}}";
+    const replacement = "{{hr /}}";
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -453,7 +468,7 @@ const insertPageIndex = () => {
         return;
     }
     const textarea = document.getElementById('text_editor');
-    const replacement = "{{index=" + selectedIndex.value.slug + "}}";
+    const replacement = "{{index=" + selectedIndex.value.slug + " /}}";
 
     const start = selectionStart.value;
     const end = selectionEnd.value;
@@ -471,12 +486,28 @@ const insertPageIndex = () => {
     textarea.focus();
 };
 
+const addIcon = (icon) => {
+    const textarea = document.getElementById('text_editor');
+    const replacement = `{{${icon} /}}`;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+
+    // Replace selected text
+    model.value = model.value.substring(0, start)
+        + replacement
+        + model.value.substring(end);
+
+    // Optionally focus the textarea again
+    textarea.focus();
+};
+
 const insertPageSection = () => {
     if (!selectedSection.value) {
         return;
     }
     const textarea = document.getElementById('text_editor');
-    const replacement = "{{section=" + selectedSection.value.slug + "}}";
+    const replacement = "{{section=" + selectedSection.value.slug + " /}}";
 
     const start = selectionStart.value;
     const end = selectionEnd.value;
@@ -500,7 +531,7 @@ const insertSectionLink = () => {
     }
     const textarea = document.getElementById('text_editor');
     const text = sectionText.value.length > 0 ? sectionText.value : selectedSection.value.title;
-    const replacement = "{{link=" + selectedSection.value.slug + " type='section'}}" + text + "{{/link}}";
+    const replacement = "{{sectionLink=" + selectedSection.value.slug + "}}" + text + "{{/sectionLink}}";
 
     const start = selectionStart.value;
     const end = selectionEnd.value;
@@ -531,7 +562,7 @@ const insertPageLink = () => {
     }
     const textarea = document.getElementById('text_editor');
     const text = pageText.value.length > 0 ? pageText.value : selectedPage.value.title;
-    const replacement = "{{link=" + selectedPage.value.slug + " type='page'}}" + text + "{{/link}}";
+    const replacement = "{{pageLink=" + selectedPage.value.slug + "}}" + text + "{{/pageLink}}";
 
     const start = selectionStart.value;
     const end = selectionEnd.value;
@@ -858,6 +889,24 @@ const insertPageLink = () => {
             </Dialog>
         </div>
         <Button type="button" variant="default" @click="horizontal" class="p-2">Horizontal Split</Button>
+    </div>
+    <div class="flex gap-1">
+        <div class="my-auto">Icons: </div>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('crow')"><Crow class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('magic')"><Magic class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('magicaldefense')"><MagicalDefense class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('mask')"><Mask class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('melee')"><Melee class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('missile')"><Missile class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('negative')"><Negative class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('physicaldefense')"><PhysicalDefense class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('positive')"><Positive class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('pulse')"><Pulse class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('ram')"><Ram class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('signatureaction')"><SignatureAction class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('soulstone')"><Soulstone class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('tome')"><Tome class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('unusualdefense')"><UnusualDefense class-name="h-6" enforce-black /></Button>
     </div>
     <Textarea class="min-h-75" id="text_editor" v-model="model" :placeholder="props.placeholder" />
 </template>

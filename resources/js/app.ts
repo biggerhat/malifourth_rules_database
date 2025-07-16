@@ -2,7 +2,7 @@ import '../css/app.css';
 
 import { createInertiaApp, Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { createApp, h } from 'vue';
+import { createApp, h } from 'vue/dist/vue.esm-bundler';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
 

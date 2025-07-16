@@ -26,7 +26,7 @@ namespace App\Models{
  * @property int|null $approved_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $approvable
@@ -48,6 +48,7 @@ namespace App\Models{
  * @property-read int|null $strategies_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval unapproved()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereApprovableId($value)
@@ -62,6 +63,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereInternalNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereSearchableText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Approval withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -83,7 +86,7 @@ namespace App\Models{
  * @property int $created_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Approval|null $approval
@@ -104,6 +107,7 @@ namespace App\Models{
  * @method static \Database\Factories\BatchFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereCreatedAt($value)
@@ -118,6 +122,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Batch withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -139,21 +145,25 @@ namespace App\Models{
  * @property int|null $batch_id
  * @property int|null $previous
  * @property int|null $original
- * @property string|null $published_at
+ * @property int|null $newest
+ * @property \Illuminate\Support\Carbon|null $published_at
  * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
+ * @property-read Index|null $newestVersion
  * @property-read Index|null $originalVersion
  * @property-read Index|null $previousVersion
  * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\IndexFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Index onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Index published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereBatchId($value)
@@ -163,6 +173,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereInternalNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereNewest($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereOriginal($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index wherePrevious($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index wherePublishedAt($value)
@@ -172,6 +183,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Index whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Index withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Index withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -185,43 +198,56 @@ namespace App\Models{
  * @property int $id
  * @property string|null $title
  * @property string $slug
- * @property string|null $content
+ * @property string|null $left_column
+ * @property string|null $right_column
  * @property string|null $searchable_text
  * @property string|null $internal_notes
+ * @property int $page_number
+ * @property string|null $book_page_numbers
  * @property int|null $batch_id
  * @property int|null $previous
  * @property int|null $original
- * @property string|null $published_at
+ * @property int|null $newest
+ * @property \Illuminate\Support\Carbon|null $published_at
  * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
+ * @property-read Page|null $newestVersion
  * @property-read Page|null $originalVersion
  * @property-read Page|null $previousVersion
  * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\PageFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereBatchId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereBookPageNumbers($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereInternalNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereLeftColumn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereNewest($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereOriginal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePageNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePrevious($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePublishedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereRightColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereSearchableText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -251,21 +277,25 @@ namespace App\Models{
  * @property int|null $batch_id
  * @property int|null $previous
  * @property int|null $original
+ * @property int|null $newest
  * @property string|null $published_at
  * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
+ * @property-read Scheme|null $newestVersion
  * @property-read Scheme|null $originalVersion
  * @property-read Scheme|null $previousVersion
  * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\SchemeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereAdditional($value)
@@ -277,6 +307,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereFrontImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereInternalNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereNewest($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereNextScheme1($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereNextScheme2($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereNextScheme3($value)
@@ -292,6 +323,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Scheme withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -314,17 +347,20 @@ namespace App\Models{
  * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
+ * @property-read Season|null $newestVersion
  * @property-read Season|null $originalVersion
  * @property-read Season|null $previousVersion
  * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\SeasonFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Season onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Season published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereBatchId($value)
@@ -340,6 +376,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Season whereUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Season withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Season withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -359,21 +397,25 @@ namespace App\Models{
  * @property int|null $batch_id
  * @property int|null $previous
  * @property int|null $original
- * @property string|null $published_at
+ * @property int|null $newest
+ * @property \Illuminate\Support\Carbon|null $published_at
  * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
+ * @property-read Section|null $newestVersion
  * @property-read Section|null $originalVersion
  * @property-read Section|null $previousVersion
  * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\SectionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereBatchId($value)
@@ -382,6 +424,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereInternalNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereNewest($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereOriginal($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section wherePrevious($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section wherePublishedAt($value)
@@ -390,6 +433,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]
@@ -417,21 +462,25 @@ namespace App\Models{
  * @property int|null $batch_id
  * @property int|null $previous
  * @property int|null $original
+ * @property int|null $newest
  * @property string|null $published_at
  * @property int|null $published_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $deleted_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Approval|null $approval
  * @property-read \App\Models\Batch|null $batch
+ * @property-read Strategy|null $newestVersion
  * @property-read Strategy|null $originalVersion
  * @property-read Strategy|null $previousVersion
  * @property-read \App\Models\User|null $publishedBy
  * @method static \Database\Factories\StrategyFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy published()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereAdditional($value)
@@ -443,6 +492,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereFrontImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereInternalNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereNewest($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereOriginal($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy wherePrevious($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy wherePublishedAt($value)
@@ -456,6 +506,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereSuit($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Strategy withoutTrashed()
  * @mixin \Eloquent
  */
 	#[\AllowDynamicProperties]

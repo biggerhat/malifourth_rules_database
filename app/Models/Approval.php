@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -16,6 +17,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Approval extends Model
 {
     use LogsActivity;
+    use SoftDeletes;
 
     protected $table = 'approvals';
 

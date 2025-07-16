@@ -36,7 +36,7 @@ class ApprovalAdminController extends Controller
                 'internal_notes' => $validated['internal_notes'] ?? null,
             ]);
 
-            return to_route('admin.approvals.index')->withMessage($title.' has been approved and is ready to be published!');
+            return redirect()->back()->withMessage($title.' has been approved and is ready to be published!');
         }
 
         return to_route('admin.approvals.index');

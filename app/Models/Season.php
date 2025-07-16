@@ -7,6 +7,7 @@ use App\Interfaces\HasPublisher;
 use App\Traits\UsesVersionControl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -19,6 +20,7 @@ class Season extends Model implements HasBatching, HasPublisher
     use HasFactory;
 
     use LogsActivity;
+    use SoftDeletes;
     use UsesVersionControl;
 
     protected $guarded = ['id'];

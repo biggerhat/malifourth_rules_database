@@ -67,6 +67,18 @@ defineProps<Props>();
                 Indexes
             </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true" v-if="hasPermission('view_section')">
+            <Link class="block w-full" :href="route('admin.sections.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                Sections
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true" v-if="hasPermission('view_page')">
+            <Link class="block w-full" :href="route('admin.pages.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                Pages
+            </Link>
+        </DropdownMenuItem>
     </DropdownMenuGroup>
     <DropdownMenuSeparator />
     <DropdownMenuItem :as-child="true">

@@ -22827,13 +22827,12 @@ namespace Illuminate\Http {
          *
          * @see \App\Providers\AppServiceProvider::register()
          * @param string $message
-         * @param string|null $messageTitle
-         * @param \App\Enums\MessageTypeEnum|null $messageType
+         * @param \App\Enums\MessageTypeEnum $messageType
          * @static 
          */
-        public static function withMessage($message, $messageTitle = null, $messageType = \App\Enums\MessageTypeEnum::default)
+        public static function withMessage($message, $messageType = \App\Enums\MessageTypeEnum::default)
         {
-            return \Illuminate\Http\RedirectResponse::withMessage($message, $messageTitle, $messageType);
+            return \Illuminate\Http\RedirectResponse::withMessage($message, $messageType);
         }
 
             }

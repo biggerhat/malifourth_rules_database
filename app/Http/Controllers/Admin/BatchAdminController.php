@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\CreateApprovalAction;
+use App\Actions\Approvals\CreateApprovalAction;
+use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Batch;
+use App\Models\Index;
 use Illuminate\Http\Request;
 
 class BatchAdminController extends Controller
@@ -51,6 +53,37 @@ class BatchAdminController extends Controller
         return to_route('admin.batches.index')->withMessage($name.' has been deleted.');
     }
 
+    public function publish(Request $request, Batch $batch)
+    {
+        $batch->loadMissing(['approval', ...$batch->batchables]);
+        if (!$batch->approval?->approved_at) {
+            return redirect()->back()->withMessage($batch->title.' must be approved before it can be published.', messageType: MessageTypeEnum::destructive);
+        }
+
+        $itemNeedsApproval = false;
+        foreach ($batch->batchables as $batchable) {
+            $batch->$batchable->each(function ($batchable) use ($request, &$itemNeedsApproval) {
+                $batchable->loadMissing('approval');
+                if (!$batchable->approval?->approved_at) {
+                    $itemNeedsApproval = true;
+                } else {
+                    $batchable->publish($request->user());
+                }
+            });
+        }
+
+        if ($itemNeedsApproval) {
+            return to_route('admin.batches.index')->withMessage("All Batch Items Must Be Approved Before Publishing", messageType: MessageTypeEnum::destructive);
+        }
+
+        $batch->update([
+            'published_at' => now(),
+            'published_by' => $request->user()->id,
+        ]);
+
+        return to_route('admin.batches.index')->withMessage($batch->title . ' has been published!');
+    }
+
     private function validateAndSave(Request $request, ?Batch $batch = null): Batch
     {
         $validated = $request->validate([
@@ -66,6 +99,8 @@ class BatchAdminController extends Controller
             CreateApprovalAction::handle($batch, $request->user());
         } else {
             $batch->update($validated);
+            $batch->approval?->delete();
+            CreateApprovalAction::handle($batch->refresh(), $request->user());
         }
 
         return $batch;

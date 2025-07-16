@@ -1,7 +1,13 @@
 <?php
 
+use App\Http\Controllers\CommandController;
+use App\Http\Controllers\Rules\IndexController;
+use App\Http\Controllers\Rules\PageController;
+use App\Http\Controllers\Rules\SectionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+Route::get('/command', CommandController::class)->name('command');
 
 Route::get('/', function () {
     return Inertia::render('Index');
@@ -10,6 +16,13 @@ Route::get('/', function () {
 Route::get('dashboard', function () {
     return Inertia::render('Index');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::prefix('rules')->name('rules.')->group(function () {
+    Route::get('/', [PageController::class, 'index'])->name('index');
+    Route::get('/{page}', [PageController::class, 'view'])->name('page.view')->withTrashed();
+    Route::get('/indices/{index}', [IndexController::class, 'view'])->name('index.view')->withTrashed();
+    Route::get('/sections/{section}', [SectionController::class, 'view'])->name('section.view')->withTrashed();
+});
 
 require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';

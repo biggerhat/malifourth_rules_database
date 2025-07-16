@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
-import { Pencil, Trash2, CheckCheckIcon } from "lucide-vue-next";
+import {Pencil, Trash2, CheckCheckIcon, Send, Eye, Component} from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { hasPermission } from "@/composables/hasPermission";
 import {
@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/dialog'
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
+import axios from 'axios';
 
 const props = defineProps({
     name: {
@@ -66,6 +67,19 @@ const props = defineProps({
         default() {
             return null;
         }
+    },
+    viewRoute: {
+        type: String,
+        required: false,
+        default() {
+            return null;
+        }
+    },
+    viewComponent: {
+        required: false,
+        default() {
+            return null;
+        }
     }
 })
 
@@ -76,7 +90,16 @@ const permissionName = computed(() => {
         .replace(/\s+/g, '_')
         .replace(/-+/g, '_')
         .toLowerCase();
-})
+});
+
+const viewData = ref(null);
+
+const fetchViewData = () => {
+    axios.get(props.viewRoute).then((response) => {
+        console.log(response.data);
+        viewData.value = response.data;
+    });
+}
 
 const submitData = ref({
     approved: true,
@@ -86,10 +109,41 @@ const submitData = ref({
 </script>
 
 <template>
-    <TooltipProvider>
+    <Dialog v-if="props.viewRoute && hasPermission('view_' + permissionName)" class="min-w-full mx-2">
+        <DialogTrigger>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button class="bg-purple-500 mx-2" v-if="props.viewRoute" @click="fetchViewData()">
+                            <Eye class="h-4 w-4" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>View {{ props.name }}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+        </DialogTrigger>
+        <DialogContent class="min-w-full mx-2">
+            <DialogHeader>
+                <DialogTitle>
+                    View {{ props.name }}
+                </DialogTitle>
+                <DialogDescription>
+                    <component
+                        v-if="viewData"
+                        :is="viewComponent"
+                        v-bind="viewData"
+                    />
+                </DialogDescription>
+            </DialogHeader>
+        </DialogContent>
+    </Dialog>
+
+    <TooltipProvider v-if="props.editRoute && hasPermission('edit_' + permissionName)">
         <Tooltip>
             <TooltipTrigger>
-                <Button class="dark:bg-[#449e48] mx-2" v-if="props.editRoute && hasPermission('edit_' + permissionName)" @click="router.get(props.editRoute)">
+                <Button class="dark:bg-[#449e48] mx-2" @click="router.get(props.editRoute)">
                     <Pencil class="h-4 w-4" />
                 </Button>
             </TooltipTrigger>
@@ -126,7 +180,7 @@ const submitData = ref({
 
             <DialogFooter class="sm:justify-start">
                 <DialogClose as-child>
-                    <Button class="bg-destructive" v-if="props.deleteRoute" @click="router.post(props.deleteRoute)">
+                    <Button class="bg-destructive" :disabled="!props.deleteRoute" @click="router.post(props.deleteRoute)">
                         Delete {{ props.name }}
                     </Button>
                 </DialogClose>
@@ -161,8 +215,45 @@ const submitData = ref({
 
             <DialogFooter class="sm:justify-start">
                 <DialogClose as-child>
-                    <Button class="bg-blue-500" v-if="props.approvalRoute" @click="router.post(props.approvalRoute, submitData)">
+                    <Button class="bg-blue-500" :disabled="!props.approvalRoute" @click="router.post(props.approvalRoute, submitData)">
                         <CheckCheckIcon class="h-4 w-4" />Approve {{ props.name }}
+                    </Button>
+                </DialogClose>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+
+    <Dialog v-if="props.publishRoute && hasPermission('publish_' + permissionName)">
+        <DialogTrigger>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button class="bg-orange-500 mx-2">
+                            <Send class="h-4 w-4" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Publish {{ props.name }}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+        </DialogTrigger>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>
+                    Publish {{ props.name }}
+                </DialogTitle>
+                <DialogDescription>
+                    This Action Will Publish This Object And Make It Publicly Viewable. <br />
+                    <span class="text-red-500" v-if="permissionName === 'batch'">If This Is A Batch, All Children Will Also Be Published (If They Are Approved).</span>
+                    <span class="text-red-500" v-else>If this object is part of a batch, it will be taken out and published individually.</span>
+                </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter class="sm:justify-start">
+                <DialogClose as-child>
+                    <Button class="bg-orange-500" :disabled="!props.publishRoute" @click="router.post(props.publishRoute, submitData)">
+                        <Send class="h-4 w-4" />Publish {{ props.name }}
                     </Button>
                 </DialogClose>
             </DialogFooter>

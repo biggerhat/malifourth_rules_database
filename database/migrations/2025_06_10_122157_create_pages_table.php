@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('title')->nullable();
             $table->string('slug')->index();
-            $table->longText('content')->nullable();
+            $table->longText('left_column')->nullable();
+            $table->longText('right_column')->nullable();
             $table->longText('searchable_text')->nullable();
             $table->longText('internal_notes')->nullable();
+            $table->integer('page_number');
+            $table->string('book_page_numbers')->nullable();
             $table->foreignId('batch_id')->nullable()->constrained('batches', 'id');
             $table->foreignId('previous')->nullable()->constrained('pages', 'id');
             $table->foreignId('original')->nullable()->constrained('pages', 'id');

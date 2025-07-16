@@ -109,7 +109,7 @@ const submit = () => {
                         <InputError :message="form.errors.name" />
                     </div>
                     <div class="grid md:grid-cols-4 w-full">
-                        <div v-for="permission in props.permissions" class="flex items-center space-x-2 space-y-2">
+                        <div v-for="permission in props.permissions" :key="permission.value" class="flex items-center space-x-2 space-y-2">
                             <Checkbox
                                 :id="permission.value"
                                 class="inline-block"

@@ -24,13 +24,23 @@ import {
     getFilteredRowModel,
     useVueTable,
 } from '@tanstack/vue-table';
+import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
 
 const columns: ColumnDef<Approvals>[] = [
     {
         accessorKey: 'title',
         header: () => h('div', {}, 'Approval'),
         cell: ({ row }) => {
-            return h('div', {}, row.getValue('title'))
+            const approval = row.original;
+
+            if (approval.internal_notes) {
+                return h('div', {}, h(AdminInternalNotes, {
+                    title: approval.title,
+                    internal_note: approval.internal_notes,
+                }));
+            }
+
+            return h('div', {}, row.getValue('title'));
         },
     },{
         accessorKey: 'type',

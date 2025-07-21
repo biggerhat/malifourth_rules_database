@@ -24,14 +24,14 @@ const props =defineProps({
         }
     },
     left_column: {
-        type: [Object, Array],
+        type: [Object, Array, String],
         required: false,
         default() {
             return '';
         }
     },
     right_column: {
-        type: [Object, Array],
+        type: [Object, Array, String],
         required: false,
         default() {
             return '';

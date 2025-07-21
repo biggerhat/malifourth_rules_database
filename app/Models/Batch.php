@@ -25,8 +25,8 @@ class Batch extends Model implements HasPublisher
     use HasFactory;
 
     use LogsActivity;
-    use UsesApproval;
     use SoftDeletes;
+    use UsesApproval;
 
     protected $guarded = ['id'];
 

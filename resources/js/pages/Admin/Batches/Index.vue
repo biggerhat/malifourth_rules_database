@@ -25,13 +25,23 @@ import {
     useVueTable,
 } from '@tanstack/vue-table';
 import {hasPermission} from "@/composables/hasPermission";
+import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
 
 const columns: ColumnDef<Batches>[] = [
     {
         accessorKey: 'title',
         header: () => h('div', {}, 'Batch'),
         cell: ({ row }) => {
-            return h('div', {}, row.getValue('title'))
+            const batch = row.original;
+
+            if (batch.internal_notes) {
+                return h('div', {}, h(AdminInternalNotes, {
+                    title: batch.title,
+                    internal_note: batch.internal_notes,
+                }));
+            }
+
+            return h('div', {}, row.getValue('title'));
         },
     },{
         accessorKey: 'published_at',

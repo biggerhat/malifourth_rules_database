@@ -16,10 +16,7 @@ class ApprovalAdminController extends Controller
         ]);
     }
 
-    public function edit(Request $request, Approval $approval)
-    {
-
-    }
+    public function edit(Request $request, Approval $approval) {}
 
     public function update(Request $request, Approval $approval)
     {

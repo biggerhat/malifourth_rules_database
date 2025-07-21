@@ -18,7 +18,7 @@ const props =defineProps({
         }
     },
     content: {
-        type: [Object, Array],
+        type: [Object, Array, String],
         required: false,
         default() {
             return '';

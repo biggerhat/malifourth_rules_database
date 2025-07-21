@@ -6,7 +6,6 @@ use App\Actions\Approvals\CreateApprovalAction;
 use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Batch;
-use App\Models\Index;
 use Illuminate\Http\Request;
 
 class BatchAdminController extends Controller
@@ -56,7 +55,7 @@ class BatchAdminController extends Controller
     public function publish(Request $request, Batch $batch)
     {
         $batch->loadMissing(['approval', ...$batch->batchables]);
-        if (!$batch->approval?->approved_at) {
+        if (! $batch->approval?->approved_at) {
             return redirect()->back()->withMessage($batch->title.' must be approved before it can be published.', messageType: MessageTypeEnum::destructive);
         }
 
@@ -64,7 +63,7 @@ class BatchAdminController extends Controller
         foreach ($batch->batchables as $batchable) {
             $batch->$batchable->each(function ($batchable) use ($request, &$itemNeedsApproval) {
                 $batchable->loadMissing('approval');
-                if (!$batchable->approval?->approved_at) {
+                if (! $batchable->approval?->approved_at) {
                     $itemNeedsApproval = true;
                 } else {
                     $batchable->publish($request->user());
@@ -73,7 +72,7 @@ class BatchAdminController extends Controller
         }
 
         if ($itemNeedsApproval) {
-            return to_route('admin.batches.index')->withMessage("All Batch Items Must Be Approved Before Publishing", messageType: MessageTypeEnum::destructive);
+            return to_route('admin.batches.index')->withMessage('All Batch Items Must Be Approved Before Publishing', messageType: MessageTypeEnum::destructive);
         }
 
         $batch->update([
@@ -81,7 +80,7 @@ class BatchAdminController extends Controller
             'published_by' => $request->user()->id,
         ]);
 
-        return to_route('admin.batches.index')->withMessage($batch->title . ' has been published!');
+        return to_route('admin.batches.index')->withMessage($batch->title.' has been published!');
     }
 
     private function validateAndSave(Request $request, ?Batch $batch = null): Batch

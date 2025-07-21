@@ -29,7 +29,7 @@ class Section extends Model implements HasBatching, HasPublisher
     protected $guarded = ['id'];
 
     protected $casts = [
-        'published_at' => 'datetime'
+        'published_at' => 'datetime',
     ];
 
     public function getRouteKeyName(): string

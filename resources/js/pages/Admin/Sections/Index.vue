@@ -26,13 +26,23 @@ import {
     useVueTable,
 } from '@tanstack/vue-table';
 import SectionView from "@/pages/Rules/SectionView.vue";
+import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
 
 const columns: ColumnDef<Sections>[] = [
     {
         accessorKey: 'title',
         header: () => h('div', {}, 'Section'),
         cell: ({ row }) => {
-            return h('div', {}, row.getValue('title'))
+            const section = row.original;
+
+            if (section.internal_notes) {
+                return h('div', {}, h(AdminInternalNotes, {
+                    title: section.title,
+                    internal_note: section.internal_notes,
+                }));
+            }
+
+            return h('div', {}, row.getValue('title'));
         },
     },{
         accessorKey: 'batch',

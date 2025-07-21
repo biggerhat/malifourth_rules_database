@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
-import {Pencil, Trash2, CheckCheckIcon, Send, Eye, Component} from "lucide-vue-next";
+import {Pencil, Trash2, CheckCheckIcon, Send, Eye, Component, Info} from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { hasPermission } from "@/composables/hasPermission";
 import {
@@ -24,6 +24,15 @@ import {
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import axios from 'axios';
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter, DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger
+} from "@/components/ui/drawer";
 
 const props = defineProps({
     name: {
@@ -109,36 +118,31 @@ const submitData = ref({
 </script>
 
 <template>
-    <Dialog v-if="props.viewRoute && hasPermission('view_' + permissionName)" class="min-w-full mx-2">
-        <DialogTrigger>
-            <TooltipProvider>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <Button class="bg-purple-500 mx-2" v-if="props.viewRoute" @click="fetchViewData()">
-                            <Eye class="h-4 w-4" />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>View {{ props.name }}</p>
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
-        </DialogTrigger>
-        <DialogContent class="min-w-full mx-2">
-            <DialogHeader>
-                <DialogTitle>
-                    View {{ props.name }}
-                </DialogTitle>
-                <DialogDescription>
+    <Drawer v-if="props.viewRoute && hasPermission('view_' + permissionName)">
+        <DrawerTrigger as-child>
+            <Button class="bg-purple-500 mx-2" v-if="props.viewRoute" @click="fetchViewData()">
+                <Eye class="h-4 w-4" />
+            </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+            <div class="mx-auto w-full mt-2 container overflow-y-auto">
+                <DrawerDescription>
                     <component
                         v-if="viewData"
                         :is="viewComponent"
                         v-bind="viewData"
                     />
-                </DialogDescription>
-            </DialogHeader>
-        </DialogContent>
-    </Dialog>
+                </DrawerDescription>
+                <DrawerFooter>
+                    <DrawerClose as-child>
+                        <Button type="button" class="mx-auto w-25" variant="destructive">
+                            Close
+                        </Button>
+                    </DrawerClose>
+                </DrawerFooter>
+            </div>
+        </DrawerContent>
+    </Drawer>
 
     <TooltipProvider v-if="props.editRoute && hasPermission('edit_' + permissionName)">
         <Tooltip>

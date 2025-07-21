@@ -6,6 +6,7 @@ parameters:
     level: 4
     ignoreErrors:
         - '#Attribute class JetBrains\\PhpStorm\\ArrayShape does not exist.#'
+        - '#Unknown parameter \$messageType in call to method Illuminate\\Http\\RedirectResponse::withMessage\(\).#'
     scanFiles:
         - _ide_helper_models.php
     treatPhpDocTypesAsCertain: false

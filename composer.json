@@ -86,10 +86,10 @@
             "./vendor/bin/phpstan analyse --memory-limit=-1"
         ],
         "prepush": [
-            "APP_ENV=testing php artisan key:generate",
             "@composer ide-generate",
             "@composer stan",
             "@composer lint",
+            "APP_ENV=testing php artisan key:generate",
             "@php -d memory_limit=-1 -d opcache.enable_cli=1 artisan test --parallel --processes=4",
             "sed -i 's/APP_KEY=.*/APP_KEY=/g' .env.testing"
         ],

@@ -9,7 +9,9 @@ use App\Models\Section;
 class ContentBuilder
 {
     public array $parsedContent = [];
+
     public string $jsonContent;
+
     /** @var array<string, string> */
     public array $pluckedTagResults = [];
 
@@ -71,18 +73,18 @@ class ContentBuilder
         $content = $this->getParsedContent();
         $slugs = $this->getTagSlugs();
         $modelMap = [];
-        foreach($slugs as $key => $slug) {
+        foreach ($slugs as $key => $slug) {
             $modelMap[$key] = $this->slugModelMap[$key]::whereIn('slug', $slug)
                 ->with('newestVersion')
                 ->withTrashed()
                 ->get()
                 ->keyBy('slug')
-                ->map(fn($model) => [
-                    'slug' => $model->newestVersion?->slug ?? $model->slug,
-                    'type' => $model->newestVersion?->type?->value ?? $model->type?->value ?? null,
-                    'image' => $model->newestVersion?->image ?? $model->image ?? null,
-                    'title' => $model->newestVersion?->title ?? $model->newestVersion?->name ?? $model->title ?? $model->name ?? null,
-                    'content' => (new ContentBuilder($model->newestVersion?->content ?? $model->content ?? ''))->getFullyHydratedContent(),
+                ->map(fn ($model) => [
+                    'slug' => $model->newestVersion->slug ?? $model->slug,
+                    'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,
+                    'image' => $model->newestVersion->image ?? $model->image ?? null,
+                    'title' => $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null,
+                    'content' => (new ContentBuilder($model->newestVersion->content ?? $model->content ?? ''))->getFullyHydratedContent(),
                 ])
                 ->toArray();
         }
@@ -103,6 +105,7 @@ class ContentBuilder
     public function getTagSlugs(): array
     {
         $this->pluckTagSlugs($this->parsedContent);
+
         return $this->pluckedTagResults;
     }
 
@@ -113,6 +116,7 @@ class ContentBuilder
         foreach ($parsedContent as $node) {
             if (isset($node['text'])) {
                 $output[] = $node;
+
                 continue;
             }
 
@@ -137,17 +141,18 @@ class ContentBuilder
         return $output;
     }
 
-
     private function parseTaggedTextRecursive(): array
     {
         $basicHtmlTags = $this->parseBasicElements();
         $tokens = $this->tokenize($basicHtmlTags);
+
         return $this->parseTokens($tokens);
     }
 
     private function parseBasicElements(): string
     {
         $nl2br = nl2br($this->stringContent);
+
         return str_replace([
             '{{b}}',
             '{{/b}}',
@@ -186,6 +191,7 @@ class ContentBuilder
     private function tokenize($text): array|false
     {
         $pattern = '/(\{\{\/?\w+(?:=[^}\s]+)?(?:\s+[^}\/]+)?\s*\/?\}\})/';
+
         return preg_split($pattern, $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
     }
 
@@ -193,7 +199,7 @@ class ContentBuilder
     {
         $result = [];
 
-        while (!empty($tokens)) {
+        while (! empty($tokens)) {
             $token = array_shift($tokens);
 
             // Closing tag
@@ -201,27 +207,29 @@ class ContentBuilder
                 if ($expectedTag && $closeMatch[1] === $expectedTag) {
                     return $result;
                 }
+
                 continue;
             }
 
             // Self-closing tag
             if (preg_match('/^\{\{(\w+)(=([^\s\/}]+))?((?:\s+\w+=(?:"[^"]*"|\'[^\']*\'|\S+))*)\s*\/\}\}$/', $token, $match)) {
                 $tag = $match[1];
-                $slug = $match[3] ?? null;
-                $attrString = trim($match[4] ?? '');
+                $slug = $match[3];
+                $attrString = trim($match[4]);
                 $attrs = $this->parseAttributes($attrString);
                 if ($slug) {
                     $attrs['slug'] = $slug;
                 }
                 $result[] = [$tag => $attrs];
+
                 continue;
             }
 
             // Opening tag
             if (preg_match('/^\{\{(\w+)(=([^\s\/}]+))?((?:\s+\w+=(?:"[^"]*"|\'[^\']*\'|\S+))*)\}\}$/', $token, $match)) {
                 $tag = $match[1];
-                $slug = $match[3] ?? null;
-                $attrString = trim($match[4] ?? '');
+                $slug = $match[3];
+                $attrString = trim($match[4]);
                 $attrs = $this->parseAttributes($attrString);
                 if ($slug) {
                     $attrs['slug'] = $slug;
@@ -231,6 +239,7 @@ class ContentBuilder
                 $attrs['text'] = $this->flattenText($children);
 
                 $result[] = [$tag => $attrs];
+
                 continue;
             }
 
@@ -250,6 +259,7 @@ class ContentBuilder
             $value = trim($match[2], "\"'");
             $attrs[$key] = $value;
         }
+
         return $attrs;
     }
 
@@ -258,11 +268,12 @@ class ContentBuilder
         if (count($nodes) === 1 && isset($nodes[0]['text']) && is_string($nodes[0]['text'])) {
             return $nodes[0]['text'];
         }
+
         return $nodes;
     }
 
     /**
-     * @param array<string, mixed> $parsed
+     * @param  array<string, mixed>  $parsed
      */
     private function pluckTagSlugs(array $parsed): self
     {
@@ -272,12 +283,12 @@ class ContentBuilder
             }
 
             foreach ($node as $tag => $data) {
-                if (!isset($data['slug'])) {
+                if (! isset($data['slug'])) {
                     continue; // skip if no slug
                 }
 
                 // Initialize the array for the tag
-                if (!isset($this->pluckedTagResults[$tag])) {
+                if (! isset($this->pluckedTagResults[$tag])) {
                     $this->pluckedTagResults[$tag] = [];
                 }
 
@@ -296,6 +307,4 @@ class ContentBuilder
 
         return $this;
     }
-
-
 }

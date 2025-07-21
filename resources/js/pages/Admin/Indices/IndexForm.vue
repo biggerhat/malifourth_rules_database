@@ -10,33 +10,25 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from '@/components/ui/drawer';
+import { Switch } from '@/components/ui/switch';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import InputError from "@/components/InputError.vue";
 import {LoaderCircle, CircleX, CheckCheckIcon, ChevronsUpDown, Search, Check} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from "@/components/ui/checkbox";
 import RichTextEditor from "@/components/RichTextEditor.vue";
 import {hasPermission} from "@/composables/hasPermission";
-import {
-    Dialog, DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter, DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {cn} from "@/lib/utils";
-import {
-    Combobox,
-    ComboboxAnchor,
-    ComboboxEmpty,
-    ComboboxGroup, ComboboxInput,
-    ComboboxItem,
-    ComboboxList, ComboboxTrigger
-} from "@/components/ui/combobox";
 
 const props = defineProps({
     index: {
@@ -87,40 +79,6 @@ onMounted(() => {
     form.batch_id = props.index?.published_at ? null : props.index?.batch_id ?? null;
 });
 
-const addToBatch = () => {
-    if (form.batch_id) {
-        submitIndex();
-    }
-
-    return;
-};
-
-const updateUnpublished = () => {
-    form.publish_directly = false;
-    submitIndex();
-};
-
-const publishDirectly = () => {
-    form.batch_id = null;
-    form.publish_directly = true;
-    form.approve_directly = true;
-    submitIndex();
-};
-
-const approveDirectly = () => {
-    form.batch_id = null;
-    form.publish_directly = false;
-    form.approve_directly = true;
-    submitIndex();
-}
-
-const submitForApprovalDirectly = () => {
-    form.batch_id = null;
-    form.publish_directly = false;
-    form.approve_directly = false;
-    submitIndex();
-}
-
 const submitIndex = () => {
     if (props.index) {
         form.post(route('admin.indices.update', {index: props.index.slug}));
@@ -128,7 +86,6 @@ const submitIndex = () => {
         form.post(route('admin.indices.store'));
     }
 };
-
 </script>
 
 <template>
@@ -195,34 +152,16 @@ const submitIndex = () => {
         </CardContent>
         <CardFooter>
             <div class="flex ml-auto my-auto">
-                <div v-if="props.index && props.index?.batch_id && !props.index?.published_at">
-                    <Button class="bg-green-500" @click="updateUnpublished()">
-                        Update Index
-                    </Button>
-                </div>
-                <div v-else>
-                    <Dialog>
-                        <DialogTrigger>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button class="bg-green-500">
-                                            Add To Existing Batch
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Add To Existing Batch</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>
-                                    Add To Existing Batch
-                                </DialogTitle>
-                                <DialogDescription>
-                                    <div class="flex">
+                <Drawer>
+                    <DrawerTrigger>
+                        <Button class="bg-green-500">{{ props.index ? 'Update' : 'Create' }} Index</Button>
+                    </DrawerTrigger>
+                    <DrawerContent class="max-w-lg mx-auto">
+                        <DrawerHeader>
+                            <DrawerTitle>{{ props.index ? 'Update' : 'Create' }} Index</DrawerTitle>
+                            <DrawerDescription>
+                                <div class="mx-auto max-w-lg mt-2 container overflow-y-auto">
+                                    <div class="flex mb-4">
                                         <Select id="type" v-model="form.batch_id">
                                             <SelectTrigger class="w-full">
                                                 <SelectValue placeholder="Select Batch" />
@@ -235,129 +174,27 @@ const submitIndex = () => {
                                         </Select>
                                         <CircleX class="text-destructive my-auto ml-2" v-if="form.batch_id" @click="form.batch_id = null" />
                                     </div>
-                                </DialogDescription>
-                            </DialogHeader>
-
-                            <DialogFooter class="sm:justify-start">
-                                <DialogClose as-child>
-                                    <Button class="bg-green-500 ml-auto" :disabled="!form.batch_id" @click="addToBatch()">
-                                        <CheckCheckIcon class="h-4 w-4" />Add To Batch
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </div>
-                <div v-if="hasPermission('publish_index')" class="ml-2">
-                    <Dialog>
-                        <DialogTrigger>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button class="bg-blue-500 my-auto">
-                                            Approve & Publish<span v-if="props.index"> Update</span> Directly
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Approve & Publish<span v-if="props.index"> Update</span> Directly</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>
-                                    Approve & Publish<span v-if="props.index"> Update</span> Directly
-                                </DialogTitle>
-                                <DialogDescription>
-                                    This Index will go directly live. Make sure this is what you want before submitting.
-                                </DialogDescription>
-                            </DialogHeader>
-
-                            <DialogFooter class="sm:justify-start">
-                                <DialogClose as-child>
-                                    <Button class="bg-blue-500 ml-auto" @click="publishDirectly()">
-                                        <CheckCheckIcon class="h-4 w-4" />Approve & Publish<span v-if="props.index"> Update</span> Directly
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </div>
-                <div v-if="hasPermission('approve_index')" class="ml-2">
-                    <Dialog>
-                        <DialogTrigger>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button class="bg-blue-500">
-                                            Approve<span v-if="props.index"> Update</span> Directly
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Approve<span v-if="props.index"> Update</span> Directly</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>
-                                    Approve<span v-if="props.index"> Update</span> Directly
-                                </DialogTitle>
-                                <DialogDescription>
-                                    This will not be added to an existing batch and be submitted for direct publishing.
-                                </DialogDescription>
-                            </DialogHeader>
-
-                            <DialogFooter class="sm:justify-start">
-                                <DialogClose as-child>
-                                    <Button class="bg-blue-500 ml-auto" @click="approveDirectly()">
-                                        <CheckCheckIcon class="h-4 w-4" />Approve<span v-if="props.index"> Update</span> Directly
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </div>
-                <div v-else class="ml-2">
-                    <Dialog>
-                        <DialogTrigger>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Button class="bg-blue-500">
-                                            Submit<span v-if="props.index"> Update</span> For Approval Directly
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Submit<span v-if="props.index"> Update</span> For Approval Directly</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>
-                                    Submit<span v-if="props.index"> Update</span> For Approval Directly
-                                </DialogTitle>
-                                <DialogDescription>
-                                    <div class="flex">
-                                        This will not be added to a batch and be submitted for Approval to be Published directly.
+                                    <div class="flex items-center mb-4 space-x-2" v-if="hasPermission('approve_index')">
+                                        <Switch id="approve-directly" v-model="form.approve_directly" />
+                                        <Label for="approve-directly">Approve Directly</Label>
                                     </div>
-                                </DialogDescription>
-                            </DialogHeader>
-
-                            <DialogFooter class="sm:justify-start">
-                                <DialogClose as-child>
-                                    <Button class="bg-blue-500 ml-auto" @click="submitForApprovalDirectly()">
-                                        <CheckCheckIcon class="h-4 w-4" />Submit<span v-if="props.index"> Update</span> For Approval Directly
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </div>
+                                    <div class="flex items-center mb-4 space-x-2" v-if="hasPermission('publish_index')">
+                                        <Switch id="publish-directly" v-model="form.publish_directly" />
+                                        <Label for="publish-directly">Publish Directly</Label>
+                                    </div>
+                                </div>
+                            </DrawerDescription>
+                        </DrawerHeader>
+                        <DrawerFooter class="container grid grid-cols-2">
+                            <Button @click="submitIndex">Submit</Button>
+                            <DrawerClose>
+                                <Button variant="destructive" class="w-full">
+                                    Cancel
+                                </Button>
+                            </DrawerClose>
+                        </DrawerFooter>
+                    </DrawerContent>
+                </Drawer>
                 <div class="ml-2">
                     <Button @click="back()" class="bg-destructive my-auto">
                         Cancel

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Rules;
 
 use App\Http\Controllers\Controller;
-use App\Models\Index;
 use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
@@ -15,7 +14,7 @@ class SectionController extends Controller
         $section->loadMissing('newestVersion', 'publishedBy');
         $section = $section->newestVersion ?? $section;
 
-        if (!$section->published_at) {
+        if (! $section->published_at) {
             return response('', 404);
         }
 

@@ -13,12 +13,10 @@ use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Permission;
 use Str;
 
 class IndexAdminController extends Controller
 {
-
     public function list(Request $request)
     {
         return IndexListResource::collection(
@@ -100,7 +98,7 @@ class IndexAdminController extends Controller
             return redirect()->back()->withMessage($exception->getMessage(), messageType: MessageTypeEnum::destructive);
         }
 
-        return to_route('admin.indices.index')->withMessage($index->title . ' has been published!');
+        return to_route('admin.indices.index')->withMessage($index->title.' has been published!');
     }
 
     private function validateAndSave(Request $request, ?Index $index = null): Index
@@ -132,17 +130,17 @@ class IndexAdminController extends Controller
             $fileName = sprintf('%s_%s.%s', Str::slug($nameSlug), $uuid, $extension);
             $filePath = "indices/{$nameSlug}/{$fileName}";
             Storage::disk('public')->put($filePath, file_get_contents($validated['image']));
-            $validated['image'] = "/storage/" . $filePath;
+            $validated['image'] = '/storage/'.$filePath;
         } else {
             unset($validated['image']);
         }
 
-        if (!$index) {
+        if (! $index) {
             $index = Index::create($validated);
         } else {
             $index->loadMissing('approval');
 
-            if (!$index->published_at) {
+            if (! $index->published_at) {
                 $index->update($validated);
                 $index->approval?->delete();
             } else {

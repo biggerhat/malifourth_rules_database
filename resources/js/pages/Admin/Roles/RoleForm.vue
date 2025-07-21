@@ -109,16 +109,20 @@ const submit = () => {
                         <InputError :message="form.errors.name" />
                     </div>
                     <div class="grid md:grid-cols-4 w-full">
-                        <div v-for="permission in props.permissions" :key="permission.value" class="flex items-center space-x-2 space-y-2">
-                            <Checkbox
-                                :id="permission.value"
-                                class="inline-block"
-                                :default-value="props.checked_permissions.includes(permission.value)"
-                                @update:modelValue="togglePermission(permission.value)"
-                            />
-                            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 my-auto" :for="permission.value">
-                                {{ permission.name }}
-                            </label>
+                        <div v-for="(permissions, key) in props.permissions" :key="key" class="mb-4">
+                            {{ key }}
+                            <hr />
+                            <div v-for="permission in permissions" :key="key" class="flex items-center space-x-2 space-y-2 py-2">
+                                <Checkbox
+                                    :id="permission.value"
+                                    class="inline-block my-auto"
+                                    :default-value="props.checked_permissions.includes(permission.value)"
+                                    @update:modelValue="togglePermission(permission.value)"
+                                />
+                                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 my-auto" :for="permission.value">
+                                    {{ permission.name }}
+                                </label>
+                            </div>
                         </div>
                     </div>
 

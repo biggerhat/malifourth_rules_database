@@ -27,7 +27,7 @@ enum ApprovablesEnum: string
 
     public static function fromClass(string $className): ?self
     {
-        return match($className) {
+        return match ($className) {
             Batch::class => self::Batch,
             Index::class => self::Index,
             Page::class => self::Page,
@@ -41,7 +41,7 @@ enum ApprovablesEnum: string
 
     public function routePrefix(): string
     {
-        return match($this) {
+        return match ($this) {
             self::Batch => 'admin.batches',
             self::Index => 'admin.indices',
             self::Page => 'admin.pages',

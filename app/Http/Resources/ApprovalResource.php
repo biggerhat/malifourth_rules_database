@@ -5,8 +5,8 @@ namespace App\Http\Resources;
 use App\Enums\ApprovablesEnum;
 use App\Enums\PermissionEnum;
 use App\Models\Approval;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @mixin Approval */
 class ApprovalResource extends JsonResource
@@ -29,6 +29,7 @@ class ApprovalResource extends JsonResource
             'title' => $title,
             'type' => $type,
             'model' => $permissionName,
+            'internal_notes' => $this->internal_notes,
             'approved_at' => $this->approved_at,
             /** @phpstan-ignore-next-line property.notFound */
             'published_at' => $this->approvable->published_at,

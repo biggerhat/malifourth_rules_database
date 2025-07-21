@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { valueUpdater } from '@/lib/utils'
 import AdminActions from '@/components/AdminActions.vue';
-import {Ban, Check} from "lucide-vue-next";
+import {Ban, Check, Info } from "lucide-vue-next";
 import { hasPermission } from "@/composables/hasPermission";
 
 import {
@@ -26,13 +26,23 @@ import {
     useVueTable,
 } from '@tanstack/vue-table';
 import IndexView from "@/pages/Rules/IndexView.vue";
+import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
 
 const columns: ColumnDef<Indices>[] = [
     {
         accessorKey: 'title',
         header: () => h('div', {}, 'Index'),
         cell: ({ row }) => {
-            return h('div', {}, row.getValue('title'))
+            const index = row.original;
+
+            if (index.internal_notes) {
+                return h('div', {}, h(AdminInternalNotes, {
+                    title: index.title,
+                    internal_note: index.internal_notes,
+                }));
+            }
+
+            return h('div', {}, row.getValue('title'));
         },
     },{
         accessorKey: 'type',

@@ -2,12 +2,9 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\ApprovablesEnum;
-use App\Enums\PermissionEnum;
-use App\Models\Approval;
 use App\Models\Index;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @mixin Index */
 class IndexListResource extends JsonResource
@@ -23,7 +20,7 @@ class IndexListResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'title' => sprintf("%s %s", $this->title, !$this->published_at ? ' (Unpublished)' : ' (Published)'),
+            'title' => sprintf('%s %s', $this->title, ! $this->published_at ? ' (Unpublished)' : ' (Published)'),
             'slug' => $this->slug,
             'type' => $this->type,
             'approved_at' => $this->approval?->approved_at,

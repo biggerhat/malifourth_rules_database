@@ -22825,6 +22825,8 @@ namespace Illuminate\Http {
         /**
          * 
          *
+         * @phpstan-param string $message
+         * @phpstan-param MessageTypeEnum $messageType
          * @see \App\Providers\AppServiceProvider::register()
          * @param string $message
          * @param \App\Enums\MessageTypeEnum $messageType

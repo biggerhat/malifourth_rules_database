@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreignId('batch_id')->nullable()->constrained('batches', 'id');
             $table->foreignId('previous')->nullable()->constrained('pages', 'id');
             $table->foreignId('original')->nullable()->constrained('pages', 'id');
-            $table->foreignId('newest')->index()->nullable()->constrained('pages','id');
+            $table->foreignId('newest')->index()->nullable()->constrained('pages', 'id');
             $table->dateTime('published_at')->nullable();
             $table->foreignId('published_by')->nullable()->constrained('users', 'id');
             $table->timestamps();

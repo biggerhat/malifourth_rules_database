@@ -26,13 +26,23 @@ import {
     useVueTable,
 } from '@tanstack/vue-table';
 import PageContent from "@/components/PageContent.vue";
+import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
 
 const columns: ColumnDef<Pages>[] = [
     {
         accessorKey: 'title',
         header: () => h('div', {}, 'Page'),
         cell: ({ row }) => {
-            return h('div', {}, row.getValue('title'))
+            const page = row.original;
+
+            if (page.internal_notes) {
+                return h('div', {}, h(AdminInternalNotes, {
+                    title: page.title,
+                    internal_note: page.internal_notes,
+                }));
+            }
+
+            return h('div', {}, row.getValue('title'));
         },
     },{
         accessorKey: 'batch',

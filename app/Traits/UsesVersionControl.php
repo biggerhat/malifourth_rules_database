@@ -2,13 +2,9 @@
 
 namespace App\Traits;
 
-use App\Models\Index;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Http\Request;
-use phpDocumentor\Reflection\Types\Self_;
 
 trait UsesVersionControl
 {
@@ -53,7 +49,7 @@ trait UsesVersionControl
     {
         $this->loadMissing('approval', 'previousVersion');
 
-        if (!$this->approval?->approved_at) {
+        if (! $this->approval?->approved_at) {
             throw new \Exception(self::NO_APPROVAL);
         }
 

@@ -7,7 +7,6 @@ use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PageListResource;
 use App\Models\Batch;
-use App\Models\Index;
 use App\Models\Page;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
@@ -95,7 +94,7 @@ class PageAdminController extends Controller
             return redirect()->back()->withMessage($exception->getMessage(), messageType: MessageTypeEnum::destructive);
         }
 
-        return to_route('admin.pages.index')->withMessage($page->title . ' has been published!');
+        return to_route('admin.pages.index')->withMessage($page->title.' has been published!');
     }
 
     private function validateAndSave(Request $request, ?Page $page = null): Page
@@ -120,7 +119,7 @@ class PageAdminController extends Controller
         $changeNotes = $validated['change_notes'] ?? null;
         unset($validated['change_notes']);
 
-        if (!isset($validated['page_number'])) {
+        if (! isset($validated['page_number'])) {
             $highestPage = Page::orderBy('page_number', 'DESC')->first();
             if ($highestPage) {
                 $validated['page_number'] = $highestPage->page_number + 1;
@@ -129,12 +128,12 @@ class PageAdminController extends Controller
             }
         }
 
-        if (!$page) {
+        if (! $page) {
             $page = Page::create($validated);
         } else {
             $page->loadMissing('approval');
 
-            if (!$page->published_at) {
+            if (! $page->published_at) {
                 $page->update($validated);
                 $page->approval?->delete();
             } else {

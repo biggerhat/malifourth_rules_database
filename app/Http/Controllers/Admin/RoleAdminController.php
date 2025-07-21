@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\PermissionEnum;
+use App\Enums\PermissionGroupEnum;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -20,20 +21,30 @@ class RoleAdminController extends Controller
 
     public function create(Request $request): \Inertia\Response|\Inertia\ResponseFactory
     {
+        $permissions = [];
+        foreach (PermissionGroupEnum::cases() as $permissionGroup) {
+            $permissions[$permissionGroup->label()] = PermissionEnum::getPermissionsByGroup($permissionGroup);
+        }
+
         return inertia('Admin/Roles/RoleForm', [
-            'permissions' => PermissionEnum::toSelectOptions(),
+            'permissions' => $permissions,
         ]);
     }
 
     public function edit(Request $request, Role $role)
     {
+        $permissions = [];
+        foreach (PermissionGroupEnum::cases() as $permissionGroup) {
+            $permissions[$permissionGroup->label()] = PermissionEnum::getPermissionsByGroup($permissionGroup);
+        }
+
         return inertia('Admin/Roles/RoleForm', [
             'role' => $role->loadMissing('permissions'),
             'checked_permissions' => $role->permissions->map(function ($permission) {
                 /** @phpstan-ignore property.notFound */
                 return $permission->name;
             }),
-            'permissions' => PermissionEnum::toSelectOptions(),
+            'permissions' => $permissions,
         ]);
     }
 

@@ -7,7 +7,6 @@ use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SectionListResource;
 use App\Models\Batch;
-use App\Models\Index;
 use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
@@ -91,7 +90,7 @@ class SectionAdminController extends Controller
             return redirect()->back()->withMessage($exception->getMessage(), messageType: MessageTypeEnum::destructive);
         }
 
-        return to_route('admin.sections.index')->withMessage($section->title . ' has been published!');
+        return to_route('admin.sections.index')->withMessage($section->title.' has been published!');
     }
 
     private function validateAndSave(Request $request, ?Section $section = null): Section
@@ -113,12 +112,12 @@ class SectionAdminController extends Controller
         $changeNotes = $validated['change_notes'];
         unset($validated['change_notes']);
 
-        if (!$section) {
+        if (! $section) {
             $section = Section::create($validated);
         } else {
             $section->loadMissing('approval');
 
-            if (!$section->published_at) {
+            if (! $section->published_at) {
                 $section->update($validated);
                 $section->approval?->delete();
             } else {

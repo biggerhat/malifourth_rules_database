@@ -14,7 +14,7 @@ class IndexController extends Controller
         $index->loadMissing('newestVersion', 'publishedBy');
         $index = $index->newestVersion ?? $index;
 
-        if (!$index->published_at) {
+        if (! $index->published_at) {
             return response('', 404);
         }
 

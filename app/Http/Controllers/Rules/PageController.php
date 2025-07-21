@@ -4,17 +4,17 @@ namespace App\Http\Controllers\Rules;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
-use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    public function index(Request $request) {
-        $page = Page::with('newestVersion', 'publishedBy')->orderBy('page_number', 'ASC')->first();
+    public function index(Request $request)
+    {
+        $page = Page::with('newestVersion', 'publishedBy')->published()->orderBy('page_number', 'ASC')->first();
         $page = $page->newestVersion ?? $page;
 
-        if (!$page->published_at) {
+        if (! $page->published_at) {
             return response('', 404);
         }
 
@@ -22,7 +22,7 @@ class PageController extends Controller
         $rightColumn = (new ContentBuilder($page->right_column ?? ''))->getFullyHydratedContent();
 
         return inertia('Rules/PageView', [
-            'pages' => Page::orderBy('page_number', 'ASC')->get()->map(function (Page $page) {
+            'pages' => Page::orderBy('page_number', 'ASC')->published()->get()->map(function (Page $page) {
                 return [
                     'slug' => $page->slug,
                     'title' => $page->title,
@@ -45,7 +45,7 @@ class PageController extends Controller
         $page->loadMissing('newestVersion', 'publishedBy');
         $page = $page->newestVersion ?? $page;
 
-        if (!$page->published_at) {
+        if (! $page->published_at) {
             return response('', 404);
         }
 

@@ -7,7 +7,6 @@ use App\Interfaces\HasBatching;
 use App\Interfaces\HasPublisher;
 use App\Observers\IndexObserver;
 use App\Traits\UsesVersionControl;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

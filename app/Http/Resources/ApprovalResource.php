@@ -31,6 +31,8 @@ class ApprovalResource extends JsonResource
             'model' => $permissionName,
             'internal_notes' => $this->internal_notes,
             'approved_at' => $this->approved_at,
+            /** @phpstan-ignore-next-line method.notFound */
+            'is_approvable' => $this->approvable->canBeApproved(),
             /** @phpstan-ignore-next-line property.notFound */
             'published_at' => $this->approvable->published_at,
             'route_prefix' => $approvable->routePrefix(),

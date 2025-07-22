@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ApprovablesEnum;
 use App\Interfaces\HasPublisher;
 use App\Observers\BatchObserver;
 use App\Traits\UsesApproval;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -87,6 +89,39 @@ class Batch extends Model implements HasPublisher
     public function strategies(): HasMany
     {
         return $this->hasMany(Strategy::class, 'batch_id', 'id');
+    }
+
+    public function flattenBatchables(): Collection
+    {
+        $this->loadMissing($this->batchables);
+        $flatMap = collect([]);
+        foreach ($this->batchables as $relationship) {
+            $flatMap->push($this->$relationship->map(function (Model $model) {
+                $model->loadMissing('approval');
+                /** @phpstan-ignore-next-line property.notFound */
+                $model->class = ApprovablesEnum::fromClass(get_class($model));
+                /** @phpstan-ignore-next-line property.notFound */
+                $model->approved_at = $model->approval?->approved_at;
+
+                return $model;
+            }));
+        }
+
+        return $flatMap->flatten();
+    }
+
+    public function canBeApproved(): bool
+    {
+        $canBeApproved = true;
+        $batchItems = $this->flattenBatchables();
+        if (! (bool) $batchItems->count()
+            || (bool) $batchItems->whereNull('approved_at')->count()
+            || (bool) $this->approval?->approved_at
+        ) {
+            $canBeApproved = false;
+        }
+
+        return $canBeApproved;
     }
 
     public function getActivityLogOptions(): LogOptions

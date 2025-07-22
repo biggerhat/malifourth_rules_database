@@ -5,6 +5,8 @@ import AppShell from '@/components/AppShell.vue';
 import type { BreadcrumbItemType } from '@/types';
 import AlertMessage from "@/components/AlertMessage.vue";
 import { hasPermission } from "@/composables/hasPermission";
+import { Toaster } from '@/components/ui/sonner';
+import 'vue-sonner/style.css'
 
 interface Props {
     breadcrumbs?: BreadcrumbItemType[];
@@ -22,5 +24,6 @@ withDefaults(defineProps<Props>(), {
             <AlertMessage v-if="$page.props.flash?.message" :message="$page.props.flash.message" :message-title="$page.props.flash.messageTitle ?? null" :message-type="$page.props.flash.messageType ?? null" />
             <slot />
         </AppContent>
+        <Toaster />
     </AppShell>
 </template>

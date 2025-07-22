@@ -73,7 +73,7 @@ const columns: ColumnDef<Approvals>[] = [
                 name: approval.title,
                 modelName: approval.model,
                 editRoute: route(approval.route_prefix + '.edit', approval.route_binding),
-                approvalRoute: route('admin.approvals.update', approval.id),
+                approvalRoute: approval.is_approvable ? route('admin.approvals.update', approval.id) : null,
             }))
         },
     },

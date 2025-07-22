@@ -70,7 +70,7 @@ const columns: ColumnDef<Batches>[] = [
                 modelName: 'batch',
                 editRoute: batch.published_at ? null : route('admin.batches.edit', batch.slug),
                 deleteRoute: batch.published_at ? null : route('admin.batches.delete', batch.slug),
-                approvalRoute: batch.approval?.approved_at ? null : route('admin.approvals.update', batch.approval?.id),
+                approvalRoute: batch.is_approvable ? route('admin.approvals.update', batch.approval?.id) : null,
                 publishRoute: publishable ? route('admin.batches.publish', batch.slug) : null,
             }))
         },

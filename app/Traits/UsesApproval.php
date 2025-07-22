@@ -11,4 +11,9 @@ trait UsesApproval
     {
         return $this->morphOne(Approval::class, 'approvable');
     }
+
+    public function canBeApproved(): bool
+    {
+        return ! (bool) $this->loadMissing('approval')->approval?->approved_at;
+    }
 }

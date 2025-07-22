@@ -105,7 +105,6 @@ const viewData = ref(null);
 
 const fetchViewData = () => {
     axios.get(props.viewRoute).then((response) => {
-        console.log(response.data);
         viewData.value = response.data;
     });
 }

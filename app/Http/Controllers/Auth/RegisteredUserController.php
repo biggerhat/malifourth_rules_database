@@ -11,16 +11,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
     /**
      * Show the registration page.
      */
-    public function create(): Response
+    public function create()
     {
-        return Inertia::render('auth/Register');
+        if (User::count() > 1) {
+            return response('404');
+        } else {
+            return Inertia::render('auth/Register');
+        }
     }
 
     /**

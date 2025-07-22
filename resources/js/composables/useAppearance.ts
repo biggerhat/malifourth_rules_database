@@ -62,7 +62,7 @@ export function initializeTheme() {
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
-const appearance = ref<Appearance>('system');
+const appearance = ref<Appearance>('light');
 
 export function useAppearance() {
     onMounted(() => {
@@ -70,11 +70,15 @@ export function useAppearance() {
 
         if (savedAppearance) {
             appearance.value = savedAppearance;
+            //TODO: Fix this once we get better images.
+            appearance.value = 'light';
         }
     });
 
     function updateAppearance(value: Appearance) {
         appearance.value = value;
+        //TODO: Fix this once we get better images.
+        appearance.value = 'light';
 
         // Store in localStorage for client-side persistence...
         localStorage.setItem('appearance', value);

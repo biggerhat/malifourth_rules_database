@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Actions\Approvals\CreateApprovalAction;
 use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BatchableListResource;
+use App\Http\Resources\BatchListResource;
 use App\Models\Batch;
 use Illuminate\Http\Request;
 
@@ -13,7 +15,7 @@ class BatchAdminController extends Controller
     public function index(Request $request): \Inertia\Response|\Inertia\ResponseFactory
     {
         return inertia('Admin/Batches/Index', [
-            'batches' => Batch::with('approval')->orderBy('id', 'DESC')->get(),
+            'batches' => BatchListResource::collection(Batch::with('approval')->orderBy('id', 'DESC')->get())->toArray($request),
         ]);
     }
 
@@ -26,6 +28,7 @@ class BatchAdminController extends Controller
     {
         return inertia('Admin/Batches/BatchForm', [
             'batch' => $batch,
+            'batchables' => BatchableListResource::collection($batch->flattenBatchables())->toArray($request),
         ]);
     }
 

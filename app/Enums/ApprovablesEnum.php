@@ -51,4 +51,14 @@ enum ApprovablesEnum: string
             self::Strategy => 'admin.strategies',
         };
     }
+
+    public function viewComponent(): ?string
+    {
+        return match ($this) {
+            self::Index => 'indexView',
+            self::Section => 'sectionView',
+            self::Page => 'pageView',
+            default => null,
+        };
+    }
 }

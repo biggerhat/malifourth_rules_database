@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import ParsedContent from "@/components/ParsedContent.vue";
+import Button from "@/components/ui/button/Button.vue";
+import ScrollToTop from "@/components/ScrollToTop.vue";
 
 const props =defineProps({
     pages: {
@@ -91,9 +93,12 @@ const props =defineProps({
                     <ParsedContent :content="props.right_column" />
                 </div>
             </div>
-            <div class="w-full text-center text-sm mt-4">
-                {{ props.page_number }}
+            <div class="w-full text-center text-sm mt-4 p-4 flex justify-between">
+                <div><Button disabled>Previous</Button></div>
+                <div><Button>Next</Button></div>
             </div>
         </div>
+
+        <ScrollToTop />
     </div>
 </template>

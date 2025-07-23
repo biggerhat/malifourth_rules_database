@@ -40,7 +40,8 @@ const getStoredAppearance = () => {
         return null;
     }
 
-    return localStorage.getItem('appearance') as Appearance | null;
+    return 'light';
+    // return localStorage.getItem('appearance') as Appearance | null;
 };
 
 const handleSystemThemeChange = () => {

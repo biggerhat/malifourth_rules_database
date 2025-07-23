@@ -195,7 +195,7 @@ const table = useVueTable({
                     </div>
 
                     <!-- Batchables Table -->
-                    <div class="container mx-auto mt-6">
+                    <div class="container mx-auto mt-6" v-if="props.batchables">
                         <div class="flex items-center justify-between py-4">
                             <Input class="max-w-sm" placeholder="Filter Batch Entries"
                                    :model-value="table.getColumn('title')?.getFilterValue() as string"

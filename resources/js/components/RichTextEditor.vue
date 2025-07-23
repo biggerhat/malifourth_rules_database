@@ -50,6 +50,27 @@ const props = defineProps({
             return '';
         }
     },
+    indices: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    pages: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    sections: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    }
 })
 
 const model = defineModel();
@@ -587,6 +608,9 @@ const insertPageLink = () => {
     textarea.focus();
 };
 
+const currentTheme = computed(() => {
+    return localStorage.appearance;
+});
 </script>
 
 <template>
@@ -892,21 +916,21 @@ const insertPageLink = () => {
     </div>
     <div class="flex gap-1">
         <div class="my-auto">Icons: </div>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('crow')"><Crow class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('magic')"><Magic class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('magicaldefense')"><MagicalDefense class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('mask')"><Mask class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('melee')"><Melee class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('missile')"><Missile class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('negative')"><Negative class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('physicaldefense')"><PhysicalDefense class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('positive')"><Positive class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('pulse')"><Pulse class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('ram')"><Ram class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('signatureaction')"><SignatureAction class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('soulstone')"><Soulstone class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('tome')"><Tome class-name="h-6" enforce-black /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('unusualdefense')"><UnusualDefense class-name="h-6" enforce-black /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('crow')"><Crow class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('magic')"><Magic class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('magicaldefense')"><MagicalDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('mask')"><Mask class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('melee')"><Melee class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('missile')"><Missile class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('negative')"><Negative class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('physicaldefense')"><PhysicalDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('positive')"><Positive class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('pulse')"><Pulse class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('ram')"><Ram class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('signatureaction')"><SignatureAction class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('soulstone')"><Soulstone class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('tome')"><Tome class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2" @click="addIcon('unusualdefense')"><UnusualDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
     </div>
     <Textarea class="min-h-75" id="text_editor" v-model="model" :placeholder="props.placeholder" />
 </template>

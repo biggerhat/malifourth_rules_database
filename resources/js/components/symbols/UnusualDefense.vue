@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import {HTMLAttributes} from "vue";
-
-defineOptions({
-    inheritAttrs: false,
-});
-
 const props = defineProps({
-    enforceBlack: {
-        type: Boolean,
+    mode: {
+        type: String,
         required: false,
         default() {
-            return false;
+            return localStorage.appearance;
         }
     },
     className: {
@@ -22,13 +15,9 @@ const props = defineProps({
         }
     }
 });
-
-const currentTheme = computed(() => {
-    return localStorage.theme;
-});
 </script>
 
 <template>
-    <img v-if="currentTheme === 'light' || props.enforceBlack" src='/Images/Symbols/M4E-Symbol_Unusual-Def-Black.png' :class="className" class="my-auto inline-block" alt="Unusual Defense" />
+    <img v-if="props.mode === 'light'" src='/Images/Symbols/M4E-Symbol_Unusual-Def-Black.png' :class="className" class="my-auto inline-block" alt="Unusual Defense" />
     <img v-else src='/Images/Symbols/M4E-Symbol_Unusual-Def-White.png' :class="className" class="my-auto inline-block" alt="Unusual Defense" />
 </template>

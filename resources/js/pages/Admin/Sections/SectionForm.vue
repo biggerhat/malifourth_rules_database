@@ -14,7 +14,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import InputError from "@/components/InputError.vue";
-import {LoaderCircle, CircleX, CheckCheckIcon, ChevronsUpDown, Search, Check} from "lucide-vue-next";
+import {LoaderCircle, CircleX, CheckCheckIcon, ChevronsUpDown, Search, Check, Component, Eye} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from "@/components/ui/checkbox";
 import RichTextEditor from "@/components/RichTextEditor.vue";
@@ -46,6 +46,8 @@ import {
     DrawerTrigger
 } from "@/components/ui/drawer";
 import {Switch} from "@/components/ui/switch";
+import axios from "axios";
+import sectionView from "@/pages/Rules/SectionView.vue";
 
 const props = defineProps({
     section: {
@@ -56,6 +58,27 @@ const props = defineProps({
         }
     },
     batches: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    indices: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    pages: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    sections: {
         type: [Object, Array],
         required: false,
         default() {
@@ -94,6 +117,14 @@ const submitSection = () => {
     }
 };
 
+const viewData = ref(null);
+
+const fetchViewData = () => {
+    axios.post(route('admin.sections.preview'), { title: form.title, content: form.content }).then((response) => {
+        viewData.value = response.data;
+    });
+}
+
 </script>
 
 <template>
@@ -117,11 +148,25 @@ const submitSection = () => {
                         <InputError :message="form.errors.title" />
                     </div>
                     <div class="flex flex-col space-y-1.5">
-                        <RichTextEditor placeholder="Add Section Content" label="Content" v-model="form.content" />
+                        <RichTextEditor
+                            placeholder="Add Section Content"
+                            label="Content"
+                            v-model="form.content"
+                            :indices="props.indices"
+                            :sections="props.sections"
+                            :pages="props.pages"
+                        />
                         <InputError :message="form.errors.content" />
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="(props.section && props.section?.published_at) || props.section?.approval?.change_notes">
-                        <RichTextEditor placeholder="Add Change Notes" label="Change Notes" v-model="form.change_notes" />
+                        <RichTextEditor
+                            placeholder="Add Change Notes"
+                            label="Change Notes"
+                            v-model="form.change_notes"
+                            :indices="props.indices"
+                            :sections="props.sections"
+                            :pages="props.pages"
+                        />
                         <InputError :message="form.errors.change_notes" />
                     </div>
                     <div class="flex flex-col space-y-1.5">
@@ -134,6 +179,31 @@ const submitSection = () => {
         </CardContent>
         <CardFooter>
             <div class="flex ml-auto my-auto">
+                <Drawer v-if="hasPermission('view_section')">
+                    <DrawerTrigger as-child>
+                        <Button class="bg-purple-500 mx-2" @click="fetchViewData()">
+                            <Eye class="h-4 w-4" /> Preview
+                        </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                        <div class="mx-auto w-full mt-2 container overflow-y-auto">
+                            <DrawerDescription>
+                                <component
+                                    v-if="viewData"
+                                    :is="sectionView"
+                                    v-bind="viewData"
+                                />
+                            </DrawerDescription>
+                            <DrawerFooter>
+                                <DrawerClose as-child>
+                                    <Button type="button" class="mx-auto w-25" variant="destructive">
+                                        Close
+                                    </Button>
+                                </DrawerClose>
+                            </DrawerFooter>
+                        </div>
+                    </DrawerContent>
+                </Drawer>
                 <Drawer>
                     <DrawerTrigger>
                         <Button class="bg-green-500">{{ props.section ? 'Update' : 'Create' }} Section</Button>

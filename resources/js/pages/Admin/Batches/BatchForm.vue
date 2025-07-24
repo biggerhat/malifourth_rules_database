@@ -59,6 +59,27 @@ const props = defineProps({
             return null;
         }
     },
+    indices: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    pages: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    sections: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    }
 });
 
 const back = () => {
@@ -185,7 +206,14 @@ const table = useVueTable({
                         <InputError :message="form.errors.title" />
                     </div>
                     <div class="flex flex-col space-y-1.5">
-                        <RichTextEditor placeholder="Add Release Notes" label="Release Notes" v-model="form.release_notes" />
+                        <RichTextEditor
+                            placeholder="Add Release Notes"
+                            label="Release Notes"
+                            v-model="form.release_notes"
+                            :indices="props.indices"
+                            :sections="props.sections"
+                            :pages="props.pages"
+                        />
                         <InputError :message="form.errors.release_notes" />
                     </div>
                     <div class="flex flex-col space-y-1.5">

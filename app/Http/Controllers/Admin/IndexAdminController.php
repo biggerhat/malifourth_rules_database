@@ -7,8 +7,12 @@ use App\Enums\IndexTypeEnum;
 use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\IndexListResource;
+use App\Http\Resources\PageListResource;
+use App\Http\Resources\SectionListResource;
 use App\Models\Batch;
 use App\Models\Index;
+use App\Models\Page;
+use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -55,6 +59,15 @@ class IndexAdminController extends Controller
         return inertia('Admin/Indices/IndexForm', [
             'index_types' => IndexTypeEnum::toSelectOptions(),
             'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
+            'indices' => IndexListResource::collection(
+                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'sections' => SectionListResource::collection(
+                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'pages' => PageListResource::collection(
+                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
         ]);
     }
 
@@ -64,6 +77,15 @@ class IndexAdminController extends Controller
             'index' => $index->loadMissing('approval'),
             'index_types' => IndexTypeEnum::toSelectOptions(),
             'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
+            'indices' => IndexListResource::collection(
+                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'sections' => SectionListResource::collection(
+                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'pages' => PageListResource::collection(
+                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
         ]);
     }
 

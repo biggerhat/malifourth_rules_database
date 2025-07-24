@@ -1007,7 +1007,7 @@ const currentTheme = computed(() => {
                         <SheetTitle>Add Page Elements</SheetTitle>
                         <SheetDescription class="text-primary">
                             <Tabs default-value="index" class="w-full">
-                                <TabsList class="grid w-full grid-cols-3">
+                                <TabsList class="grid w-full grid-cols-2">
                                     <TabsTrigger value="index">
                                         Index
                                     </TabsTrigger>
@@ -1055,7 +1055,7 @@ const currentTheme = computed(() => {
                                         </div>
                                     </div>
                                     <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
-                                        <Button :disabled="!selectedSection" class="bg-green-500" @click="insertPageSection()">Add Link</Button>
+                                        <Button :disabled="!selectedSection" class="bg-green-500" @click="insertPageSection()">Add Page Element</Button>
                                         <Button class="bg-red-500" @click="elementSheetOpen = false;clearValues()">Cancel</Button>
                                     </div>
 

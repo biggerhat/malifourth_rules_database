@@ -74,6 +74,10 @@ class ContentBuilder
         $slugs = $this->getTagSlugs();
         $modelMap = [];
         foreach ($slugs as $key => $slug) {
+            if (! isset($this->slugModelMap[$key])) {
+                continue;
+            }
+
             $modelMap[$key] = $this->slugModelMap[$key]::whereIn('slug', $slug)
                 ->with('newestVersion')
                 ->withTrashed()
@@ -226,7 +230,8 @@ class ContentBuilder
             }
 
             // Opening tag
-            if (preg_match('/^\{\{(\w+)(=([^\s\/}]+))?((?:\s+\w+=(?:"[^"]*"|\'[^\']*\'|\S+))*)\}\}$/', $token, $match)) {
+            //            if (preg_match('/^\{\{(\w+)(=([^\s\/}]+))?((?:\s+\w+=(?:"[^"]*"|\'[^\']*\'|\S+))*)\}\}$/', $token, $match)) {
+            if (preg_match('/^\{\{(\w+)(=([^\s}]+))?((?:\s+\w+=(?:"[^"]*"|\'[^\']*\'|\S+))*)\}\}$/', $token, $match)) {
                 $tag = $match[1];
                 $slug = $match[3];
                 $attrString = trim($match[4]);

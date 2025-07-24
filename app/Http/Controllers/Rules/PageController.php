@@ -37,6 +37,8 @@ class PageController extends Controller
             'book_page_numbers' => $page->book_page_numbers,
             'published_at' => $page->published_at->format('m-d-Y'),
             'published_by' => $page->publishedBy->name,
+            'previous_page' => $page->previousPage()?->slug,
+            'next_page' => $page->nextPage()?->slug,
         ]);
     }
 
@@ -68,6 +70,8 @@ class PageController extends Controller
             'book_page_numbers' => $page->book_page_numbers,
             'published_at' => $page->published_at->format('m-d-Y'),
             'published_by' => $page->publishedBy->name,
+            'previous_page' => $page->previousPage()?->slug,
+            'next_page' => $page->nextPage()?->slug,
         ]);
     }
 }

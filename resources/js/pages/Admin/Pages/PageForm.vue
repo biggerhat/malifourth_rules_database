@@ -46,6 +46,7 @@ import {
     DrawerTrigger
 } from "@/components/ui/drawer";
 import {Switch} from "@/components/ui/switch";
+import TextEditor from "@/components/TextEditor.vue";
 
 const props = defineProps({
     page: {
@@ -61,6 +62,27 @@ const props = defineProps({
         default() {
             return {};
         }
+    },
+    indices: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    pages: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    sections: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
     }
 });
 
@@ -69,7 +91,6 @@ const form = useForm({
     left_column: '',
     right_column: '',
     internal_notes: '',
-    page_number: null,
     book_page_numbers: null,
     change_notes: '',
     batch_id: null,
@@ -85,7 +106,6 @@ onMounted(() => {
     form.title = props.page?.title ?? null;
     form.left_column = props.page?.left_column ?? '';
     form.right_column = props.page?.right_column ?? '';
-    form.page_number = props.page?.page_number ?? null;
     form.book_page_numbers = props.page?.book_page_numbers ?? null;
     form.internal_notes = props.page?.internal_notes ?? '';
     form.change_notes = props.page?.published_at ? '' : props.page?.approval?.change_notes ?? '';
@@ -99,7 +119,6 @@ const submitPage = () => {
         form.post(route('admin.pages.store'));
     }
 };
-
 </script>
 
 <template>
@@ -123,23 +142,36 @@ const submitPage = () => {
                         <InputError :message="form.errors.title" />
                     </div>
                     <div class="flex flex-col space-y-1.5">
-                        <Label for="page_number">
-                            Page Number <br />
-                            <span class="text-red-500">If No Page Number Is Given, This Page Will Be Added To The End</span>
-                            <Input id="page_number" type="number" min="1" required v-model="form.page_number" />
-                            <InputError :message="form.errors.page_number" />
-                        </Label>
-                    </div>
-                    <div class="flex flex-col space-y-1.5">
-                        <RichTextEditor placeholder="Add Left Column Content" label="Left Column Content" v-model="form.left_column" />
+                        <RichTextEditor
+                            placeholder="Add Left Column Content"
+                            label="Left Column Content"
+                            v-model="form.left_column"
+                            :indices="props.indices"
+                            :sections="props.sections"
+                            :pages="props.pages"
+                        />
                         <InputError :message="form.errors.left_column" />
                     </div>
                     <div class="flex flex-col space-y-1.5">
-                        <RichTextEditor placeholder="Add Right Column" label="Right Column Content" v-model="form.right_column" />
+                        <RichTextEditor
+                            placeholder="Add Right Column"
+                            label="Right Column Content"
+                            v-model="form.right_column"
+                            :indices="props.indices"
+                            :sections="props.sections"
+                            :pages="props.pages"
+                        />
                         <InputError :message="form.errors.right_column" />
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="(props.page && props.page?.published_at) || props.page?.approval?.change_notes">
-                        <RichTextEditor placeholder="Add Change Notes" label="Change Notes" v-model="form.change_notes" />
+                        <RichTextEditor
+                            placeholder="Add Change Notes"
+                            label="Change Notes"
+                            v-model="form.change_notes"
+                            :indices="props.indices"
+                            :sections="props.sections"
+                            :pages="props.pages"
+                        />
                         <InputError :message="form.errors.change_notes" />
                     </div>
                     <div class="flex flex-col space-y-1.5">

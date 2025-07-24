@@ -2,6 +2,7 @@
 import ParsedContent from "@/components/ParsedContent.vue";
 import Button from "@/components/ui/button/Button.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import { router } from "@inertiajs/vue3";
 
 const props =defineProps({
     pages: {
@@ -66,6 +67,20 @@ const props =defineProps({
         default() {
             return '';
         }
+    },
+    previous_page: {
+        type: String,
+        required: false,
+        default() {
+            return null;
+        }
+    },
+    next_page: {
+        type: String,
+        required: false,
+        default() {
+            return null;
+        }
     }
 });
 </script>
@@ -77,11 +92,11 @@ const props =defineProps({
         <div class="lg:col-span-2 hidden lg:block">
             <div class="lg:col-span-2">
                 <Link v-for="page in props.pages" :key="page.slug" :href="route('rules.page.view', page.slug)" class="p-2 block hover:bg-secondary" :class="page.slug === props.slug ? 'bg-secondary' : ''">
-                    {{ page.page_number }}. {{ page.title }}
+                    {{ page.title }}
                 </Link>
             </div>
         </div>
-        <div class="lg:col-span-6">
+        <div class="lg:col-span-6 min-h-screen">
             <div class="w-full text-center text-xl mb-4">
                 {{ props.title }}
             </div>
@@ -94,8 +109,8 @@ const props =defineProps({
                 </div>
             </div>
             <div class="w-full text-center text-sm mt-4 p-4 flex justify-between">
-                <div><Button disabled>Previous</Button></div>
-                <div><Button>Next</Button></div>
+                <div><Button :disabled="!props.previous_page" @click="router.get(route('rules.page.view', props.previous_page))">Previous</Button></div>
+                <div><Button :disabled="!props.next_page" @click="router.get(route('rules.page.view', props.next_page))">Next</Button></div>
             </div>
         </div>
 

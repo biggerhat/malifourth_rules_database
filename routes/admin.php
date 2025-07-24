@@ -52,6 +52,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(SectionAdminController::class)->prefix('sections')->name('sections.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_section']);
         Route::get('/view/{section}', 'view')->name('view')->middleware(['permission:view_section']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_section']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_section']);
         Route::get('/edit/{section}', 'edit')->name('edit')->middleware(['permission:edit_section']);

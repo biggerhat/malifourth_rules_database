@@ -24,10 +24,11 @@ import SectionView from "@/pages/Rules/SectionView.vue";
 import SectionContent from "@/components/SectionContent.vue";
 import SectionLink from "@/components/SectionLink.vue";
 import PageLink from "@/components/PageLink.vue";
+import ExternalLink from "@/components/ExternalLink.vue";
 
 const props = defineProps({
     content: {
-        type: [Object, Array],
+        type: [Object, Array, String],
         required: true
     }
 })
@@ -39,6 +40,7 @@ const componentMap = {
     section: SectionContent,
     sectionLink: SectionLink,
     pageLink: PageLink,
+    Link: ExternalLink,
     crow: Crow,
     magic: Magic,
     magicaldefense: MagicalDefense,

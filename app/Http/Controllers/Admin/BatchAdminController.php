@@ -7,7 +7,13 @@ use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BatchableListResource;
 use App\Http\Resources\BatchListResource;
+use App\Http\Resources\IndexListResource;
+use App\Http\Resources\PageListResource;
+use App\Http\Resources\SectionListResource;
 use App\Models\Batch;
+use App\Models\Index;
+use App\Models\Page;
+use App\Models\Section;
 use Illuminate\Http\Request;
 
 class BatchAdminController extends Controller
@@ -21,7 +27,17 @@ class BatchAdminController extends Controller
 
     public function create(Request $request): \Inertia\Response|\Inertia\ResponseFactory
     {
-        return inertia('Admin/Batches/BatchForm');
+        return inertia('Admin/Batches/BatchForm', [
+            'indices' => IndexListResource::collection(
+                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'sections' => SectionListResource::collection(
+                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'pages' => PageListResource::collection(
+                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+        ]);
     }
 
     public function edit(Request $request, Batch $batch)
@@ -29,6 +45,15 @@ class BatchAdminController extends Controller
         return inertia('Admin/Batches/BatchForm', [
             'batch' => $batch,
             'batchables' => BatchableListResource::collection($batch->flattenBatchables())->toArray($request),
+            'indices' => IndexListResource::collection(
+                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'sections' => SectionListResource::collection(
+                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'pages' => PageListResource::collection(
+                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
         ]);
     }
 

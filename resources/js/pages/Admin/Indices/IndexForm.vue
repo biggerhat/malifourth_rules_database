@@ -51,6 +51,27 @@ const props = defineProps({
         default() {
             return {};
         }
+    },
+    indices: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    pages: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    sections: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
     }
 });
 
@@ -135,11 +156,25 @@ const submitIndex = () => {
                         <Input id="image" type="file" accept=".jpeg, .jpg, .png" @input="form.image = $event.target.files[0]" />
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="form.type === 'text'">
-                        <RichTextEditor placeholder="Add Index Content" label="Content" v-model="form.content" />
+                        <RichTextEditor
+                            placeholder="Add Index Content"
+                            label="Content"
+                            v-model="form.content"
+                            :indices="props.indices"
+                            :sections="props.sections"
+                            :pages="props.pages"
+                        />
                         <InputError :message="form.errors.content" />
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="(props.index && props.index?.published_at) || props.index?.approval?.change_notes">
-                        <RichTextEditor placeholder="Add Change Notes" label="Change Notes" v-model="form.change_notes" />
+                        <RichTextEditor
+                            placeholder="Add Change Notes"
+                            label="Change Notes"
+                            v-model="form.change_notes"
+                            :indices="props.indices"
+                            :sections="props.sections"
+                            :pages="props.pages"
+                        />
                         <InputError :message="form.errors.change_notes" />
                     </div>
                     <div class="flex flex-col space-y-1.5">

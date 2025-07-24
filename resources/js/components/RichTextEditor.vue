@@ -2,11 +2,20 @@
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
-import { computed, ref } from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import axios from 'axios';
-import { Check, Search, ChevronsUpDown } from 'lucide-vue-next'
+import {Check, Search, ChevronsUpDown, SquarePlus, SquareMinus, Link2, MousePointerClick, Pencil, FileChartColumnIncreasing, SeparatorHorizontal } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
-import { Combobox, ComboboxAnchor, ComboboxTrigger, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxItemIndicator, ComboboxList } from '@/components/ui/combobox'
+import {
+    Combobox,
+    ComboboxAnchor,
+    ComboboxTrigger,
+    ComboboxEmpty,
+    ComboboxGroup,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxItemIndicator,
+    ComboboxList } from '@/components/ui/combobox'
 import MagicalDefense from "@/components/symbols/MagicalDefense.vue";
 import Crow from "@/components/symbols/Crow.vue";
 import Magic from "@/components/symbols/Magic.vue";
@@ -22,7 +31,20 @@ import SignatureAction from "@/components/symbols/SignatureAction.vue";
 import Soulstone from "@/components/symbols/Soulstone.vue";
 import Tome from "@/components/symbols/Tome.vue";
 import UnusualDefense from "@/components/symbols/UnusualDefense.vue";
-
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from '@/components/ui/tabs'
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet'
 import {
     Dialog,
     DialogContent,
@@ -34,6 +56,9 @@ import {
     DialogClose,
 } from '@/components/ui/dialog'
 import {Input} from "@/components/ui/input";
+import {hasPermission} from "@/composables/hasPermission";
+import {router} from "@inertiajs/vue3";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 
 const props = defineProps({
     label: {
@@ -73,13 +98,84 @@ const props = defineProps({
     }
 })
 
+const element_id = ref(`textarea_${Date.now()}_${Math.floor(Math.random() * 1000000)}`);
+
 const model = defineModel();
-const indices = ref(null);
-const sections = ref(null);
-const pages = ref(null);
 
 const selectedIndex = ref(null);
 const indexText = ref(null);
+const tooltipSheetOpen = ref(false);
+const linkSheetOpen = ref(false);
+const elementSheetOpen = ref(false);
+
+const indexFilterText = ref('');
+const filteredIndices = computed(() => {
+    const filter = indexFilterText.value;
+
+    if (!filter.length) {
+        return props.indices;
+    }
+
+    let filtered = props.indices;
+
+    return filtered.filter(index => {
+        return index.title.toLowerCase().includes(filter.toLowerCase());
+    });
+});
+
+const sectionFilterText = ref('');
+const filteredSections = computed(() => {
+    const filter = sectionFilterText.value;
+
+    if (!filter.length) {
+        return props.sections;
+    }
+
+    let filtered = props.sections;
+
+    return filtered.filter(section => {
+        return section.title.toLowerCase().includes(filter.toLowerCase());
+    });
+});
+
+const pageFilterText = ref('');
+const filteredPages = computed(() => {
+    const filter = pageFilterText.value;
+
+    if (!filter.length) {
+        return props.pages;
+    }
+
+    let filtered = props.pages;
+
+    return filtered.filter(page => {
+        return page.title.toLowerCase().includes(filter.toLowerCase());
+    });
+});
+
+
+const selectedElement = ref(null);
+const linkText = ref(null);
+const linkUrl = ref(null);
+const linkType = ref(null);
+
+const processLink = () => {
+    if (linkType.value === 'section') {
+        selectedSection.value = selectedElement.value;
+        sectionText.value = linkText.value;
+        insertSectionLink();
+
+        return;
+    } else if(linkType.value === 'page') {
+        selectedPage.value = selectedElement.value;
+        pageText.value = linkText.value;
+        insertPageLink();
+
+        return;
+    }
+
+
+}
 
 const selectedSection = ref(null);
 const sectionText = ref(null);
@@ -92,7 +188,7 @@ const selectionEnd = ref(null);
 
 const boldStarted = ref(false);
 const bold = () => {
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -128,7 +224,7 @@ const bold = () => {
 
 const textXlStarted = ref(false);
 const textXl = () => {
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -164,7 +260,7 @@ const textXl = () => {
 
 const textLgStarted = ref(false);
 const textLg = () => {
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -200,7 +296,7 @@ const textLg = () => {
 
 const textSmStarted = ref(false);
 const textSm = () => {
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -236,7 +332,7 @@ const textSm = () => {
 
 const textXsStarted = ref(false);
 const textXs = () => {
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -272,7 +368,7 @@ const textXs = () => {
 
 const italicStarted = ref(false);
 const italic = () => {
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -308,7 +404,7 @@ const italic = () => {
 
 const underlineStarted = ref(false);
 const underline = () => {
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -343,7 +439,8 @@ const underline = () => {
 };
 
 const horizontal = () => {
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
+
     const replacement = "{{hr /}}";
 
     const start = textarea.selectionStart;
@@ -360,7 +457,7 @@ const horizontal = () => {
 
 const loadIndices = () => {
     clearValues();
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -375,20 +472,50 @@ const loadIndices = () => {
     selectionEnd.value = end;
 
     indexText.value = selected;
+    tooltipSheetOpen.value = true;
+}
 
-    if (indices.value) {
-        return
+const loadLinks = () => {
+    clearValues();
+    const textarea = document.getElementById(element_id.value);
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected  = textarea.value.substring(start, end);
+
+    // If no text selected
+    if (start === end) {
+        sectionText.value = null;
+        pageText.value = null;
+        linkText.value = null;
     }
 
-    axios.get(route('admin.indices.list'))
-        .then(function (response) {
-            indices.value = response.data;
-        });
+    selectionStart.value = start;
+    selectionEnd.value = end;
+
+    sectionText.value = selected;
+    pageText.value = selected;
+    linkText.value = selected;
+    linkSheetOpen.value = true;
+}
+
+const loadElements = () => {
+    clearValues();
+    const textarea = document.getElementById(element_id.value);
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected  = textarea.value.substring(start, end);
+
+    selectionStart.value = start;
+    selectionEnd.value = end;
+
+    elementSheetOpen.value = true;
 }
 
 const loadSections = () => {
     clearValues();
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -403,20 +530,12 @@ const loadSections = () => {
     selectionEnd.value = end;
 
     sectionText.value = selected;
-
-    if (sections.value) {
-        return
-    }
-
-    axios.get(route('admin.sections.list'))
-        .then(function (response) {
-            sections.value = response.data;
-        });
+    linkSheetOpen.value = true;
 }
 
 const loadPages = () => {
     clearValues();
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -431,15 +550,7 @@ const loadPages = () => {
     selectionEnd.value = end;
 
     pageText.value = selected;
-
-    if (pages.value) {
-        return
-    }
-
-    axios.get(route('admin.pages.list'))
-        .then(function (response) {
-            pages.value = response.data;
-        });
+    linkSheetOpen.value = true;
 }
 
 const clearValues = () => {
@@ -451,14 +562,16 @@ const clearValues = () => {
     pageText.value = null;
     selectionStart.value = null;
     selectionEnd.value = null;
+    linkText.value = null;
+    linkUrl.value = null;
 }
 
 const insertIndexTooltip = () => {
     if (!selectedIndex.value) {
         return;
     }
-    const textarea = document.getElementById('text_editor');
-    const text = indexText.value.length > 0 ? indexText.value : selectedIndex.value.title;
+    const textarea = document.getElementById(element_id.value);
+    const text = indexText && indexText.value?.length > 0 ? indexText.value : selectedIndex.value.title;
     const replacement = "{{indexTooltip=" + selectedIndex.value.slug + "}}" + text + "{{/indexTooltip}}";
 
     const start = selectionStart.value;
@@ -467,6 +580,9 @@ const insertIndexTooltip = () => {
     // If no text selected
     if (start === end) {
         model.value += replacement;
+        tooltipSheetOpen.value = false;
+
+        clearValues();
         textarea.focus();
         return;
     }
@@ -475,6 +591,8 @@ const insertIndexTooltip = () => {
     model.value = model.value.substring(0, start)
         + replacement
         + model.value.substring(end);
+
+    tooltipSheetOpen.value = false;
 
     // Move the cursor after the replacement
     textarea.start = textarea.end = start + replacement.length;
@@ -488,7 +606,7 @@ const insertPageIndex = () => {
     if (!selectedIndex.value) {
         return;
     }
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
     const replacement = "{{index=" + selectedIndex.value.slug + " /}}";
 
     const start = selectionStart.value;
@@ -499,6 +617,8 @@ const insertPageIndex = () => {
         + replacement
         + model.value.substring(end);
 
+    elementSheetOpen.value = false;
+
     // Move the cursor after the replacement
     textarea.start = textarea.end = start + replacement.length;
 
@@ -508,7 +628,7 @@ const insertPageIndex = () => {
 };
 
 const addIcon = (icon) => {
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
     const replacement = `{{${icon} /}}`;
 
     const start = textarea.selectionStart;
@@ -527,7 +647,7 @@ const insertPageSection = () => {
     if (!selectedSection.value) {
         return;
     }
-    const textarea = document.getElementById('text_editor');
+    const textarea = document.getElementById(element_id.value);
     const replacement = "{{section=" + selectedSection.value.slug + " /}}";
 
     const start = selectionStart.value;
@@ -537,6 +657,8 @@ const insertPageSection = () => {
     model.value = model.value.substring(0, start)
         + replacement
         + model.value.substring(end);
+
+    elementSheetOpen.value = false;
 
     // Move the cursor after the replacement
     textarea.start = textarea.end = start + replacement.length;
@@ -550,8 +672,8 @@ const insertSectionLink = () => {
     if (!selectedSection.value) {
         return;
     }
-    const textarea = document.getElementById('text_editor');
-    const text = sectionText.value.length > 0 ? sectionText.value : selectedSection.value.title;
+    const textarea = document.getElementById(element_id.value);
+    const text = sectionText && sectionText.value?.length > 0 ? sectionText.value : selectedSection.value.title;
     const replacement = "{{sectionLink=" + selectedSection.value.slug + "}}" + text + "{{/sectionLink}}";
 
     const start = selectionStart.value;
@@ -560,6 +682,10 @@ const insertSectionLink = () => {
     // If no text selected
     if (start === end) {
         model.value += replacement;
+
+        linkSheetOpen.value = false;
+        clearValues();
+
         textarea.focus();
         return;
     }
@@ -568,6 +694,8 @@ const insertSectionLink = () => {
     model.value = model.value.substring(0, start)
         + replacement
         + model.value.substring(end);
+
+    linkSheetOpen.value = false;
 
     // Move the cursor after the replacement
     textarea.start = textarea.end = start + replacement.length;
@@ -581,8 +709,8 @@ const insertPageLink = () => {
     if (!selectedPage.value) {
         return;
     }
-    const textarea = document.getElementById('text_editor');
-    const text = pageText.value.length > 0 ? pageText.value : selectedPage.value.title;
+    const textarea = document.getElementById(element_id.value);
+    const text = pageText && pageText.value?.length > 0 ? pageText.value : selectedPage.value.title;
     const replacement = "{{pageLink=" + selectedPage.value.slug + "}}" + text + "{{/pageLink}}";
 
     const start = selectionStart.value;
@@ -591,6 +719,9 @@ const insertPageLink = () => {
     // If no text selected
     if (start === end) {
         model.value += replacement;
+        linkSheetOpen.value = false;
+
+        clearValues();
         textarea.focus();
         return;
     }
@@ -600,6 +731,8 @@ const insertPageLink = () => {
         + replacement
         + model.value.substring(end);
 
+    linkSheetOpen.value = false;
+
     // Move the cursor after the replacement
     textarea.start = textarea.end = start + replacement.length;
 
@@ -608,329 +741,369 @@ const insertPageLink = () => {
     textarea.focus();
 };
 
+const insertExternalLink = () => {
+    if (!linkUrl.value) {
+        return;
+    }
+    const textarea = document.getElementById(element_id.value);
+    const text = linkText && linkText.value?.length > 0 ? linkText.value : linkUrl.value;
+    const replacement = "{{Link=" + linkUrl.value + "}}" + text + "{{/Link}}";
+
+    const start = selectionStart.value;
+    const end = selectionEnd.value;
+
+    // If no text selected
+    if (start === end) {
+        model.value += replacement;
+        linkSheetOpen.value = false;
+
+        clearValues();
+        textarea.focus();
+        return;
+    }
+
+    // Replace selected text
+    model.value = model.value.substring(0, start)
+        + replacement
+        + model.value.substring(end);
+
+    linkSheetOpen.value = false;
+
+    // Move the cursor after the replacement
+    textarea.start = textarea.end = start + replacement.length;
+
+    clearValues();
+    // Optionally focus the textarea again
+    textarea.focus();
+}
+
 const currentTheme = computed(() => {
     return localStorage.appearance;
 });
 </script>
 
 <template>
-    <Label for="text_editor">{{ props.label }}</Label>
+    <Label :for="element_id">{{ props.label }}</Label>
     <div class="flex gap-1">
-        <div class="my-auto">Text Changes: </div>
         <Button type="button" :variant="textXlStarted ? 'outline' : 'default'" @click="textXl" class="text-xl p-2">XL</Button>
         <Button type="button" :variant="textLgStarted ? 'outline' : 'default'" @click="textLg" class="text-lg p-2">LG</Button>
         <Button type="button" :variant="textSmStarted ? 'outline' : 'default'" @click="textSm" class="text-sm p-2">SM</Button>
         <Button type="button" :variant="textXsStarted ? 'outline' : 'default'" @click="textXs" class="text-xs p-2">XS</Button>
-        <Button type="button" :variant="boldStarted ? 'outline' : 'default'" @click="bold" class="font-bold p-2">Bold</Button>
-        <Button type="button" :variant="italicStarted ? 'outline' : 'default'" @click="italic" class="italic p-2">Italic</Button>
-        <Button type="button" :variant="underlineStarted ? 'outline' : 'default'" @click="underline" class="underline p-2">Underline</Button>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger>
+                    <Button type="button" :variant="boldStarted ? 'outline' : 'default'" @click="bold" class="font-bold min-w-10 p-2">
+                        B
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    Bold
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger>
+                    <Button type="button" :variant="italicStarted ? 'outline' : 'default'" @click="italic" class="italic p-2 min-w-10">I</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    Italic
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger>
+                    <Button type="button" :variant="underlineStarted ? 'outline' : 'default'" @click="underline" class="underline min-w-10 p-2">U</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    Italic
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
         <div>
-            <Dialog>
-                <DialogTrigger>
-                    <Button type="button" @click="loadIndices" class="p-2">Add Index Tooltip</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Add Index Tooltip</DialogTitle>
-                    </DialogHeader>
-                        <DialogDescription>
-                            <Combobox v-model="selectedIndex" by="label">
-                                <ComboboxAnchor as-child>
-                                    <ComboboxTrigger as-child>
-                                        <Button variant="outline" class="justify-between w-full">
-                                            {{ selectedIndex?.title ?? 'Select Index' }}
-                                            <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </ComboboxTrigger>
-                                </ComboboxAnchor>
+            <Sheet :open="tooltipSheetOpen">
+                <SheetTrigger>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button type="button" class="p-1 mx-1 min-w-10" @click="loadIndices()"><MousePointerClick /></Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                Add Index Tooltip
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </SheetTrigger>
+                <SheetContent>
+                    <SheetHeader>
+                        <SheetTitle>Add Index Tooltip</SheetTitle>
+                        <SheetDescription class="text-primary">
+                            <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                <Label for="label">Tooltip Label</Label>
+                                <Input id="label" type="text" autofocus v-model="indexText" placeholder="Tooltip Label" />
+                            </div>
+                            <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                <Label>Selected Index</Label>
+                                <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedIndex">
+                                    <div @click="indexText = selectedIndex.title" class="my-auto">{{ selectedIndex.title }}</div>
+                                    <SquareMinus class="my-auto" @click="selectedIndex = null" />
+                                </div>
+                                <div v-else class="w-full p-2 my-1 text-red-500">
+                                    None
+                                </div>
+                            </div>
+                            <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
+                                <Button :disabled="!selectedIndex" class="bg-green-500" @click="insertIndexTooltip">Add Tooltip</Button>
+                                <Button class="bg-red-500" @click="tooltipSheetOpen = false;clearValues()">Cancel</Button>
+                            </div>
 
-                                <ComboboxList class="max-h-80 w-full overflow-y-auto">
-                                    <div class="relative w-full items-center">
-                                        <ComboboxInput class="pl-9 focus-visible:ring-0 border-0 border-b rounded-none h-10" placeholder="Select Index..." />
-                                        <span class="absolute start-0 inset-y-0 flex items-center justify-center px-3">
-                                    <Search class="size-4 text-muted-foreground" />
-                                  </span>
+                            <div class="flex flex-col w-full mt-12 space-y-1.5">
+                                <hr class="border-primary" />
+                                <Label for="indexFilter">Select An Index</Label>
+                                <Input id="indexFilter" type="text" v-model="indexFilterText" placeholder="Search..." />
+                            </div>
+                            <div class="max-h-100 overflow-y-auto">
+                                <div v-for="index in filteredIndices" :key="index.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
+                                    <div @click="indexText = index.title" class="my-auto">{{ index.title }}</div>
+                                    <SquarePlus class="my-auto" @click="selectedIndex = index" />
+                                </div>
+                            </div>
+                        </SheetDescription>
+                    </SheetHeader>
+                </SheetContent>
+            </Sheet>
+        </div>
+        <div>
+            <Sheet :open="linkSheetOpen">
+                <SheetTrigger>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button type="button" class="p-1 mx-1 min-w-10" @click="loadLinks()"><Link2 /></Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                Add Link
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </SheetTrigger>
+                <SheetContent>
+                    <SheetHeader>
+                        <SheetTitle>Add Link</SheetTitle>
+                        <SheetDescription class="text-primary">
+                            <Tabs default-value="account" class="w-full">
+                                <TabsList class="grid w-full grid-cols-3">
+                                    <TabsTrigger value="section">
+                                        Section
+                                    </TabsTrigger>
+                                    <TabsTrigger value="page">
+                                        Page
+                                    </TabsTrigger>
+                                    <TabsTrigger value="external">
+                                        External
+                                    </TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="section">
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label for="label">Label</Label>
+                                        <Input id="label" type="text" autofocus v-model="sectionText" placeholder="Add Label" />
+                                    </div>
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label>Selected Section</Label>
+                                        <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedSection">
+                                            <div @click="sectionText = selectedSection.title" class="my-auto">{{ selectedSection.title }}</div>
+                                            <SquareMinus class="my-auto" @click="selectedSection = null" />
+                                        </div>
+                                        <div v-else class="w-full p-2 my-1 text-red-500">
+                                            None
+                                        </div>
+                                    </div>
+                                    <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
+                                        <Button :disabled="!selectedSection" class="bg-green-500" @click="insertSectionLink">Add Link</Button>
+                                        <Button class="bg-red-500" @click="linkSheetOpen = false;clearValues()">Cancel</Button>
                                     </div>
 
-                                    <ComboboxEmpty>
-                                        No Indexes Found.
-                                    </ComboboxEmpty>
+                                    <div class="flex flex-col w-full mt-12 space-y-1.5">
+                                        <hr class="border-primary" />
+                                        <Label for="sectionFilter">Select A Section</Label>
+                                        <Input id="sectionFilter" type="text" v-model="sectionFilterText" placeholder="Search..." />
+                                    </div>
+                                    <div class="max-h-100 overflow-y-auto">
+                                        <div v-for="section in filteredSections" :key="section.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
+                                            <div @click="sectionText = section.title" class="my-auto">{{ section.title }}</div>
+                                            <SquarePlus class="my-auto" @click="selectedSection = section" />
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                                <TabsContent value="page">
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label for="label">Label</Label>
+                                        <Input id="label" type="text" autofocus v-model="pageText" placeholder="Add Label" />
+                                    </div>
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label>Selected Page</Label>
+                                        <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedPage">
+                                            <div @click="pageText = selectedPage.title" class="my-auto">{{ selectedPage.title }}</div>
+                                            <SquareMinus class="my-auto" @click="selectedPage = null" />
+                                        </div>
+                                        <div v-else class="w-full p-2 my-1 text-red-500">
+                                            None
+                                        </div>
+                                    </div>
+                                    <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
+                                        <Button :disabled="!selectedPage" class="bg-green-500" @click="insertPageLink">Add Link</Button>
+                                        <Button class="bg-red-500" @click="linkSheetOpen = false;clearValues()">Cancel</Button>
+                                    </div>
 
-                                    <ComboboxGroup>
-                                        <ComboboxItem
-                                            v-for="index in indices"
-                                            :key="index.id"
-                                            :value="index"
-                                        >
-                                            {{ index.title }}
-
-                                            <Check v-if="index.slug === selectedIndex?.slug" :class="cn('ml-auto h-4 w-4')" />
-                                        </ComboboxItem>
-                                    </ComboboxGroup>
-                                </ComboboxList>
-                            </Combobox>
-                            <div class="flex flex-col w-full mt-6 space-y-1.5">
-                                <Label for="label">Index Label</Label>
-                                <Input id="label" type="text" autofocus :tabindex="1" autocomplete="" v-model="indexText" placeholder="Index Label" />
-                            </div>
-                        </DialogDescription>
-
-                    <DialogFooter>
-                        <DialogClose as-child>
-                            <Button @click="insertIndexTooltip">Add Tooltip</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                                    <div class="flex flex-col w-full mt-12 space-y-1.5">
+                                        <hr class="border-primary" />
+                                        <Label for="pageFilter">Select A Page</Label>
+                                        <Input id="pageFilter" type="text" v-model="pageFilterText" placeholder="Search..." />
+                                    </div>
+                                    <div class="max-h-100 overflow-y-auto">
+                                        <div v-for="page in filteredPages" :key="page.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
+                                            <div @click="pageText = page.title" class="my-auto">{{ page.title }}</div>
+                                            <SquarePlus class="my-auto" @click="selectedPage = page" />
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                                <TabsContent value="external">
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label for="label">Label</Label>
+                                        <Input id="label" type="text" autofocus v-model="linkText" placeholder="Add Label" />
+                                    </div>
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label for="url">URL</Label>
+                                        <Input id="url" type="text" v-model="linkUrl" placeholder="Add URL" />
+                                    </div>
+                                    <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
+                                        <Button :disabled="!linkUrl || !linkText" class="bg-green-500" @click="insertExternalLink">Add Link</Button>
+                                        <Button class="bg-red-500" @click="linkSheetOpen = false;clearValues()">Cancel</Button>
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
+                        </SheetDescription>
+                    </SheetHeader>
+                </SheetContent>
+            </Sheet>
         </div>
         <div>
-            <Dialog>
-                <DialogTrigger>
-                    <Button type="button" @click="loadSections" class="p-2">Add Section Link</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Add Section Link</DialogTitle>
-                    </DialogHeader>
-                    <DialogDescription>
-                        <Combobox v-model="selectedSection" by="label">
-                            <ComboboxAnchor as-child>
-                                <ComboboxTrigger as-child>
-                                    <Button variant="outline" class="justify-between w-full">
-                                        {{ selectedSection?.title ?? 'Select Section' }}
-                                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                    </Button>
-                                </ComboboxTrigger>
-                            </ComboboxAnchor>
+            <Sheet :open="elementSheetOpen">
+                <SheetTrigger>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button type="button" class="p-1 mx-1 min-w-10" @click="loadElements()"><FileChartColumnIncreasing /></Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                Add Page Elements
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </SheetTrigger>
+                <SheetContent>
+                    <SheetHeader>
+                        <SheetTitle>Add Page Elements</SheetTitle>
+                        <SheetDescription class="text-primary">
+                            <Tabs default-value="index" class="w-full">
+                                <TabsList class="grid w-full grid-cols-2">
+                                    <TabsTrigger value="index">
+                                        Index
+                                    </TabsTrigger>
+                                    <TabsTrigger value="section">
+                                        Section
+                                    </TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="index">
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label>Selected Index</Label>
+                                        <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedIndex">
+                                            <div class="my-auto">{{ selectedIndex.title }}</div>
+                                            <SquareMinus class="my-auto" @click="selectedIndex = null" />
+                                        </div>
+                                        <div v-else class="w-full p-2 my-1 text-red-500">
+                                            None
+                                        </div>
+                                    </div>
+                                    <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
+                                        <Button :disabled="!selectedIndex" class="bg-green-500" @click="insertPageIndex">Add Page Element</Button>
+                                        <Button class="bg-red-500" @click="elementSheetOpen = false;clearValues()">Cancel</Button>
+                                    </div>
 
-                            <ComboboxList class="max-h-80 w-full overflow-y-auto">
-                                <div class="relative w-full items-center">
-                                    <ComboboxInput class="pl-9 focus-visible:ring-0 border-0 border-b rounded-none h-10" placeholder="Select Section..." />
-                                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-3">
-                                    <Search class="size-4 text-muted-foreground" />
-                                  </span>
-                                </div>
+                                    <div class="flex flex-col w-full mt-12 space-y-1.5">
+                                        <hr class="border-primary" />
+                                        <Label for="indexFilter">Select An Index</Label>
+                                        <Input id="indexFilter" type="text" v-model="indexFilterText" placeholder="Search..." />
+                                    </div>
+                                    <div class="max-h-100 overflow-y-auto">
+                                        <div v-for="index in filteredIndices" :key="index.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
+                                            <div class="my-auto">{{ index.title }}</div>
+                                            <SquarePlus class="my-auto" @click="selectedIndex = index" />
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                                <TabsContent value="section">
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label>Selected Section</Label>
+                                        <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedSection">
+                                            <div class="my-auto">{{ selectedSection.title }}</div>
+                                            <SquareMinus class="my-auto" @click="selectedSection = null" />
+                                        </div>
+                                        <div v-else class="w-full p-2 my-1 text-red-500">
+                                            None
+                                        </div>
+                                    </div>
+                                    <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
+                                        <Button :disabled="!selectedSection" class="bg-green-500" @click="insertPageSection()">Add Page Element</Button>
+                                        <Button class="bg-red-500" @click="elementSheetOpen = false;clearValues()">Cancel</Button>
+                                    </div>
 
-                                <ComboboxEmpty>
-                                    No Sections Found.
-                                </ComboboxEmpty>
-
-                                <ComboboxGroup>
-                                    <ComboboxItem
-                                        v-for="section in sections"
-                                        :key="section.slug"
-                                        :value="section"
-                                    >
-                                        {{ section.title }}
-                                        <Check v-if="section.slug === selectedSection?.slug" :class="cn('ml-auto h-4 w-4')" />
-                                    </ComboboxItem>
-                                </ComboboxGroup>
-                            </ComboboxList>
-                        </Combobox>
-                        <div class="flex flex-col w-full mt-6 space-y-1.5">
-                            <Label for="label">Section Label</Label>
-                            <Input id="label" type="text" autofocus :tabindex="1" autocomplete="" v-model="sectionText" placeholder="Section Label" />
-                        </div>
-                    </DialogDescription>
-
-                    <DialogFooter>
-                        <DialogClose as-child>
-                            <Button @click="insertSectionLink">Add Section Link</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                                    <div class="flex flex-col w-full mt-12 space-y-1.5">
+                                        <hr class="border-primary" />
+                                        <Label for="sectionFilter">Select A Section</Label>
+                                        <Input id="sectionFilter" type="text" v-model="sectionFilterText" placeholder="Search..." />
+                                    </div>
+                                    <div class="max-h-100 overflow-y-auto">
+                                        <div v-for="section in filteredSections" :key="section.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
+                                            <div class="my-auto">{{ section.title }}</div>
+                                            <SquarePlus class="my-auto" @click="selectedSection = section" />
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
+                        </SheetDescription>
+                    </SheetHeader>
+                </SheetContent>
+            </Sheet>
         </div>
-        <div>
-            <Dialog>
-                <DialogTrigger>
-                    <Button type="button" @click="loadPages" class="p-2">Add Page Link</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Add Page Link</DialogTitle>
-                    </DialogHeader>
-                    <DialogDescription>
-                        <Combobox v-model="selectedPage" by="label">
-                            <ComboboxAnchor as-child>
-                                <ComboboxTrigger as-child>
-                                    <Button variant="outline" class="justify-between w-full">
-                                        {{ selectedPage?.title ?? 'Select Page' }}
-                                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                    </Button>
-                                </ComboboxTrigger>
-                            </ComboboxAnchor>
-
-                            <ComboboxList class="max-h-80 w-full overflow-y-auto">
-                                <div class="relative w-full items-center">
-                                    <ComboboxInput class="pl-9 focus-visible:ring-0 border-0 border-b rounded-none h-10" placeholder="Select Page..." />
-                                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-3">
-                                    <Search class="size-4 text-muted-foreground" />
-                                  </span>
-                                </div>
-
-                                <ComboboxEmpty>
-                                    No Pages Found.
-                                </ComboboxEmpty>
-
-                                <ComboboxGroup>
-                                    <ComboboxItem
-                                        v-for="page in pages"
-                                        :key="page.slug"
-                                        :value="page"
-                                    >
-                                        {{ page.title }}
-                                        <Check v-if="page.slug === selectedPage?.slug" :class="cn('ml-auto h-4 w-4')" />
-                                    </ComboboxItem>
-                                </ComboboxGroup>
-                            </ComboboxList>
-                        </Combobox>
-                        <div class="flex flex-col w-full mt-6 space-y-1.5">
-                            <Label for="label">Page Link Label</Label>
-                            <Input id="label" type="text" autofocus :tabindex="1" autocomplete="" v-model="pageText" placeholder="Page Link Label" />
-                        </div>
-                    </DialogDescription>
-
-                    <DialogFooter>
-                        <DialogClose as-child>
-                            <Button @click="insertPageLink">Add Page Link</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </div>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger>
+                    <Button type="button" variant="default" @click="horizontal" class="p-2 min-w-10"><SeparatorHorizontal /></Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    Add Horizontal Line
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     </div>
     <div class="flex gap-1">
-        <div class="my-auto">Page Elements: </div>
-        <div>
-            <Dialog>
-                <DialogTrigger>
-                    <Button type="button" @click="loadIndices" class="p-2">Add Index</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Add Index</DialogTitle>
-                    </DialogHeader>
-                    <DialogDescription>
-                        <Combobox v-model="selectedIndex" by="label">
-                            <ComboboxAnchor as-child>
-                                <ComboboxTrigger as-child>
-                                    <Button variant="outline" class="justify-between w-full">
-                                        {{ selectedIndex?.title ?? 'Select Index' }}
-                                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                    </Button>
-                                </ComboboxTrigger>
-                            </ComboboxAnchor>
-
-                            <ComboboxList class="max-h-80 w-full overflow-y-auto">
-                                <div class="relative w-full items-center">
-                                    <ComboboxInput class="pl-9 focus-visible:ring-0 border-0 border-b rounded-none h-10" placeholder="Select Index..." />
-                                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-3">
-                                    <Search class="size-4 text-muted-foreground" />
-                                  </span>
-                                </div>
-
-                                <ComboboxEmpty>
-                                    No Indexes Found.
-                                </ComboboxEmpty>
-
-                                <ComboboxGroup>
-                                    <ComboboxItem
-                                        v-for="index in indices"
-                                        :key="index.slug"
-                                        :value="index"
-                                    >
-                                        {{ index.title }}
-
-                                        <Check v-if="index.slug === selectedIndex?.slug" :class="cn('ml-auto h-4 w-4')" />
-                                    </ComboboxItem>
-                                </ComboboxGroup>
-                            </ComboboxList>
-                        </Combobox>
-                    </DialogDescription>
-
-                    <DialogFooter>
-                        <DialogClose as-child>
-                            <Button @click="insertPageIndex">Add Index</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </div>
-        <div>
-            <Dialog>
-                <DialogTrigger>
-                    <Button type="button" @click="loadSections" class="p-2">Add Section</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Add Section</DialogTitle>
-                    </DialogHeader>
-                    <DialogDescription>
-                        <Combobox v-model="selectedSection" by="label">
-                            <ComboboxAnchor as-child>
-                                <ComboboxTrigger as-child>
-                                    <Button variant="outline" class="justify-between w-full">
-                                        {{ selectedSection?.title ?? 'Select Section' }}
-                                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                    </Button>
-                                </ComboboxTrigger>
-                            </ComboboxAnchor>
-
-                            <ComboboxList class="max-h-80 w-full overflow-y-auto">
-                                <div class="relative w-full items-center">
-                                    <ComboboxInput class="pl-9 focus-visible:ring-0 border-0 border-b rounded-none h-10" placeholder="Select Section..." />
-                                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-3">
-                                    <Search class="size-4 text-muted-foreground" />
-                                  </span>
-                                </div>
-
-                                <ComboboxEmpty>
-                                    No Sections Found.
-                                </ComboboxEmpty>
-
-                                <ComboboxGroup>
-                                    <ComboboxItem
-                                        v-for="section in sections"
-                                        :key="section.slug"
-                                        :value="section"
-                                    >
-                                        {{ section.title }}
-
-                                        <Check v-if="section.slug === selectedSection?.slug" :class="cn('ml-auto h-4 w-4')" />
-                                    </ComboboxItem>
-                                </ComboboxGroup>
-                            </ComboboxList>
-                        </Combobox>
-                    </DialogDescription>
-
-                    <DialogFooter>
-                        <DialogClose as-child>
-                            <Button @click="insertPageSection">Add Section</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </div>
-        <Button type="button" variant="default" @click="horizontal" class="p-2">Horizontal Split</Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('crow')"><Crow class-name="h-5 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('magic')"><Magic class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('magicaldefense')"><MagicalDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('mask')"><Mask class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('melee')"><Melee class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('missile')"><Missile class-name="h-4" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('negative')"><Negative class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('physicaldefense')"><PhysicalDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('positive')"><Positive class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('pulse')"><Pulse class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('ram')"><Ram class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('signatureaction')"><SignatureAction class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('soulstone')"><Soulstone class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('tome')"><Tome class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('unusualdefense')"><UnusualDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
     </div>
-    <div class="flex gap-1">
-        <div class="my-auto">Icons: </div>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('crow')"><Crow class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('magic')"><Magic class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('magicaldefense')"><MagicalDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('mask')"><Mask class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('melee')"><Melee class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('missile')"><Missile class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('negative')"><Negative class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('physicaldefense')"><PhysicalDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('positive')"><Positive class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('pulse')"><Pulse class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('ram')"><Ram class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('signatureaction')"><SignatureAction class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('soulstone')"><Soulstone class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('tome')"><Tome class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2" @click="addIcon('unusualdefense')"><UnusualDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-    </div>
-    <Textarea class="min-h-75" id="text_editor" v-model="model" :placeholder="props.placeholder" />
+    <Textarea class="min-h-75" :id="element_id" v-model="model" :placeholder="props.placeholder" />
 </template>

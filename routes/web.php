@@ -1,21 +1,15 @@
 <?php
 
 use App\Http\Controllers\CommandController;
+use App\Http\Controllers\IndexController as IndexPageController;
 use App\Http\Controllers\Rules\IndexController;
 use App\Http\Controllers\Rules\PageController;
 use App\Http\Controllers\Rules\SectionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/command', CommandController::class)->name('command');
 
-Route::get('/', function () {
-    return Inertia::render('Index');
-})->name('index');
-
-Route::get('dashboard', function () {
-    return Inertia::render('Index');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', IndexPageController::class)->name('index');
 
 Route::prefix('rules')->name('rules.')->group(function () {
     Route::get('/', [PageController::class, 'index'])->name('index');

@@ -26,6 +26,7 @@ import {
     CommandSeparator,
 } from '@/components/ui/command'
 import axios from 'axios';
+import {ZiggyVue} from "ziggy-js";
 
 interface Props {
     breadcrumbs?: BreadcrumbItem[];
@@ -56,28 +57,36 @@ function toggleDialog() {
 const page = usePage();
 const auth = computed(() => page.props.auth);
 
-const isCurrentRoute = computed(() => (url: string) => window.location.href === url);
+const isCurrentRoute = computed(() => (url: string) => route().current(url));
 
 const activeItemStyles = computed(
     () => (url: string) => (isCurrentRoute.value(url) ? 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100' : ''),
 );
 
+onMounted(() => {
+    console.log(window.location.pathname);
+})
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Rules',
         href: route('rules.index'),
+        route: 'rules.index',
         icon: LayoutGrid,
     },{
         title: 'Gaining Grounds',
-        href: '/dashboard',
+        href: route('rules.index'),
+        route: 'dashboard',
         icon: LayoutGrid,
     },{
         title: 'FAQ',
-        href: '/dashboard',
+        href: route('rules.index'),
+        route: 'dashboard',
         icon: LayoutGrid,
     },{
         title: 'Errata',
-        href: '/dashboard',
+        href: route('rules.index'),
+        route: 'dashboard',
         icon: LayoutGrid,
     },
 ];
@@ -133,7 +142,7 @@ const rightNavItems: NavItem[] = [];
                     </Sheet>
                 </div>
 
-                <Link :href="route('index')" class="flex items-center gap-x-2">
+                <Link :href="route('index')" class="flex items-center gap-x-2" v-if="!route().current('index')">
                     <AppLogo />
                 </Link>
 
@@ -150,7 +159,7 @@ const rightNavItems: NavItem[] = [];
                                     {{ item.title }}
                                 </Link>
                                 <div
-                                    v-if="isCurrentRoute(item.href)"
+                                    v-if="route().current(item.route)"
                                     class="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"
                                 ></div>
                             </NavigationMenuItem>

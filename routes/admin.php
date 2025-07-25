@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ApprovalAdminController;
 use App\Http\Controllers\Admin\BatchAdminController;
 use App\Http\Controllers\Admin\IndexAdminController;
 use App\Http\Controllers\Admin\PageAdminController;
+use App\Http\Controllers\Admin\PageOrderController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\SectionAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
@@ -72,6 +73,10 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/update/{page}', 'update')->name('update')->middleware(['permission:edit_page']);
         Route::post('/delete/{page}', 'delete')->name('delete')->middleware(['permission:delete_page']);
         Route::post('/publish/{page}', 'publish')->name('publish')->middleware(['permission:publish_page']);
+        Route::prefix('order')->name('order.')->group(function () {
+            Route::get('/', [PageOrderController::class, 'index'])->name('index');
+            Route::post('/update', [PageOrderController::class, 'update'])->name('update');
+        });
     });
 
     Route::controller(ApprovalAdminController::class)->prefix('approvals')->name('approvals.')->group(function () {

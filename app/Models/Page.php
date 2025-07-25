@@ -44,11 +44,11 @@ class Page extends Model implements HasBatching, HasPublisher
 
     public function nextPage(): ?Page
     {
-        return Page::where('page_number', '>', $this->page_number)->orderBy('page_number', 'ASC')->first();
+        return Page::where('page_number', '>', $this->page_number)->published()->orderBy('page_number', 'ASC')->first();
     }
 
     public function previousPage(): ?Page
     {
-        return Page::where('page_number', '<', $this->page_number)->orderBy('page_number', 'DESC')->first();
+        return Page::where('page_number', '<', $this->page_number)->published()->orderBy('page_number', 'DESC')->first();
     }
 }

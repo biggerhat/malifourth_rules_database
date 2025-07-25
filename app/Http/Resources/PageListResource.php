@@ -22,6 +22,7 @@ class PageListResource extends JsonResource
             'id' => $this->id,
             'title' => sprintf('%s %s', $this->title, ! $this->published_at ? ' (Unpublished)' : ' (Published)'),
             'slug' => $this->slug,
+            'page_number' => $this->page_number,
             'approved_at' => $this->approval?->approved_at,
             'published_at' => $this->published_at,
         ];

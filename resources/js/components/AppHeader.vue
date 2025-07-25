@@ -63,10 +63,6 @@ const activeItemStyles = computed(
     () => (url: string) => (isCurrentRoute.value(url) ? 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100' : ''),
 );
 
-onMounted(() => {
-    console.log(window.location.pathname);
-})
-
 const mainNavItems: NavItem[] = [
     {
         title: 'Rules',

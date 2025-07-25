@@ -116,7 +116,7 @@ const filteredIndices = computed(() => {
         return props.indices;
     }
 
-    let filtered = props.indices;
+    const filtered = props.indices;
 
     return filtered.filter(index => {
         return index.title.toLowerCase().includes(filter.toLowerCase());
@@ -131,7 +131,7 @@ const filteredSections = computed(() => {
         return props.sections;
     }
 
-    let filtered = props.sections;
+    const filtered = props.sections;
 
     return filtered.filter(section => {
         return section.title.toLowerCase().includes(filter.toLowerCase());
@@ -146,7 +146,7 @@ const filteredPages = computed(() => {
         return props.pages;
     }
 
-    let filtered = props.pages;
+    const filtered = props.pages;
 
     return filtered.filter(page => {
         return page.title.toLowerCase().includes(filter.toLowerCase());
@@ -571,7 +571,7 @@ const insertIndexTooltip = () => {
         return;
     }
     const textarea = document.getElementById(element_id.value);
-    const text = indexText && indexText.value?.length > 0 ? indexText.value : selectedIndex.value.title;
+    const text = indexText.value && indexText.value?.length > 0 ? indexText.value : selectedIndex.value.title;
     const replacement = "{{indexTooltip=" + selectedIndex.value.slug + "}}" + text + "{{/indexTooltip}}";
 
     const start = selectionStart.value;
@@ -673,7 +673,7 @@ const insertSectionLink = () => {
         return;
     }
     const textarea = document.getElementById(element_id.value);
-    const text = sectionText && sectionText.value?.length > 0 ? sectionText.value : selectedSection.value.title;
+    const text = sectionText.value && sectionText.value?.length > 0 ? sectionText.value : selectedSection.value.title;
     const replacement = "{{sectionLink=" + selectedSection.value.slug + "}}" + text + "{{/sectionLink}}";
 
     const start = selectionStart.value;
@@ -710,7 +710,7 @@ const insertPageLink = () => {
         return;
     }
     const textarea = document.getElementById(element_id.value);
-    const text = pageText && pageText.value?.length > 0 ? pageText.value : selectedPage.value.title;
+    const text = pageText.value && pageText.value?.length > 0 ? pageText.value : selectedPage.value.title;
     const replacement = "{{pageLink=" + selectedPage.value.slug + "}}" + text + "{{/pageLink}}";
 
     const start = selectionStart.value;
@@ -746,7 +746,7 @@ const insertExternalLink = () => {
         return;
     }
     const textarea = document.getElementById(element_id.value);
-    const text = linkText && linkText.value?.length > 0 ? linkText.value : linkUrl.value;
+    const text = linkText.value && linkText.value?.length > 0 ? linkText.value : linkUrl.value;
     const replacement = "{{Link=" + linkUrl.value + "}}" + text + "{{/Link}}";
 
     const start = selectionStart.value;

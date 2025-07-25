@@ -114,9 +114,14 @@ const table = useVueTable({
             <Input class="max-w-sm" placeholder="Filter Pages"
                    :model-value="table.getColumn('title')?.getFilterValue() as string"
                    @update:model-value=" table.getColumn('title')?.setFilterValue($event)" />
-            <Button @click="router.get(route('admin.pages.create'))" v-if="hasPermission('add_page')">
-                Create New Page
-            </Button>
+            <div class="flex gap-1">
+                <Button @click="router.get(route('admin.pages.order.index'))" v-if="hasPermission('edit_page')" class="bg-blue-500">
+                    Set Page Order
+                </Button>
+                <Button @click="router.get(route('admin.pages.create'))" v-if="hasPermission('add_page')">
+                    Create New Page
+                </Button>
+            </div>
         </div>
         <div class="border rounded-md">
             <Table>

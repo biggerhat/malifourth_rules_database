@@ -8,6 +8,10 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
+import DraggableContent from "@/components/DraggableContent.vue";
+import {router} from "@inertiajs/vue3";
+import ScrollToTop from "@/components/ScrollToTop.vue";
+import Button from "@/components/ui/button/Button.vue";
 
 const props =defineProps({
     title: {
@@ -17,7 +21,14 @@ const props =defineProps({
             return '';
         }
     },
-    content: {
+    left_column: {
+        type: [Object, Array, String],
+        required: false,
+        default() {
+            return '';
+        }
+    },
+    right_column: {
         type: [Object, Array, String],
         required: false,
         default() {
@@ -44,24 +55,25 @@ const props =defineProps({
 
 <template>
     <Head :title="props.title" />
-    <div class="container grid lg:grid-cols-3 mx-auto">
-        <div>
-        </div>
-        <div class="min-h-full mx-2 lg:mx-0">
-            <Card>
-                <CardHeader>
-                    <CardTitle>{{ props.title }}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <ParsedContent :content="props.content" />
-                </CardContent>
-                <CardFooter class="mt-20 text-sm italic text-end">
-                    <div class="w-full text-end">Last Updated: {{ props.published_at }}<br />by {{ props.published_by}}</div>
-                </CardFooter>
-            </Card>
-        </div>
-        <div>
 
-        </div>
+    <div class="min-h-full mx-2 lg:mx-0">
+        <Card>
+            <CardHeader>
+                <CardTitle>{{ props.title }}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div class="grid w-full mx-auto" :class="props.right_column && props.right_column.length > 0 ? 'grid-cols-2' : 'grid-cols-1'">
+                    <div>
+                        <ParsedContent :content="props.left_column ?? []" />
+                    </div>
+                    <div v-if="props.right_column && props.right_column.length > 0">
+                        <ParsedContent :content="props.right_column ?? []" />
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter class="mt-20 text-sm italic text-end">
+                <div class="w-full text-end">Last Updated: {{ props.published_at }}<br />by {{ props.published_by}}</div>
+            </CardFooter>
+        </Card>
     </div>
 </template>

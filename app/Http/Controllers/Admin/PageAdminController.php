@@ -28,13 +28,11 @@ class PageAdminController extends Controller
     {
         $page->loadMissing('newestVersion', 'publishedBy');
 
-        $leftContent = (new ContentBuilder($page->left_column ?? ''))->getFullyHydratedContent();
-        $rightContent = (new ContentBuilder($page->right_column ?? ''))->getFullyHydratedContent();
+        $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
 
         return [
             'title' => $page->title,
-            'left_column' => $leftContent,
-            'right_column' => $rightContent,
+            'content' => $content,
             'page_number' => $page->page_number,
             'book_page_numbers' => $page->book_page_numbers,
             'published_at' => $page->published_at?->format('m-d-Y'),
@@ -123,8 +121,7 @@ class PageAdminController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'left_column' => ['nullable', 'string'],
-            'right_column' => ['nullable', 'string'],
+            'content' => ['nullable', 'string'],
             'book_page_numbers' => ['nullable', 'string'],
             'internal_notes' => ['nullable', 'string'],
             'change_notes' => ['nullable', 'string'],

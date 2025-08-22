@@ -57,8 +57,10 @@ const props =defineProps({
 </script>
 
 <template>
-    <div>
+    <div v-if="props.type === 'image'">
         <img :src="props.image" :alt="props.title" class="mx-auto" v-if="props.type === 'image'" />
-        <ParsedContent :content="props.content" v-if="props.type === 'text'" />
+    </div>
+    <div v-if="props.type === 'text'">
+        <strong>{{ props.title }}:</strong> <ParsedContent :content="props.content" v-if="props.type === 'text'" />
     </div>
 </template>

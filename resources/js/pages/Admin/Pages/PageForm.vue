@@ -88,8 +88,7 @@ const props = defineProps({
 
 const form = useForm({
     title: '',
-    left_column: '',
-    right_column: '',
+    content: '',
     internal_notes: '',
     book_page_numbers: null,
     change_notes: '',
@@ -104,8 +103,7 @@ const back = () => {
 
 onMounted(() => {
     form.title = props.page?.title ?? null;
-    form.left_column = props.page?.left_column ?? '';
-    form.right_column = props.page?.right_column ?? '';
+    form.content = props.page?.content ?? '';
     form.book_page_numbers = props.page?.book_page_numbers ?? null;
     form.internal_notes = props.page?.internal_notes ?? '';
     form.change_notes = props.page?.published_at ? '' : props.page?.approval?.change_notes ?? '';
@@ -143,25 +141,14 @@ const submitPage = () => {
                     </div>
                     <div class="flex flex-col space-y-1.5">
                         <RichTextEditor
-                            placeholder="Add Left Column Content"
-                            label="Left Column Content"
-                            v-model="form.left_column"
+                            placeholder="Add Content"
+                            label="Page Content"
+                            v-model="form.content"
                             :indices="props.indices"
                             :sections="props.sections"
                             :pages="props.pages"
                         />
-                        <InputError :message="form.errors.left_column" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5">
-                        <RichTextEditor
-                            placeholder="Add Right Column"
-                            label="Right Column Content"
-                            v-model="form.right_column"
-                            :indices="props.indices"
-                            :sections="props.sections"
-                            :pages="props.pages"
-                        />
-                        <InputError :message="form.errors.right_column" />
+                        <InputError :message="form.errors.content" />
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="(props.page && props.page?.published_at) || props.page?.approval?.change_notes">
                         <RichTextEditor

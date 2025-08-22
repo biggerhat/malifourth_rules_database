@@ -26,11 +26,19 @@ class SectionAdminController extends Controller
 
     public function preview(Request $request)
     {
+        $leftColumn = $request->get('left_column') ?? '';
+        $rightColumn = $request->get('right_column') ?? null;
+        //        if ($request->get('left_column')) {
+        //            $leftColumn = ContentBuilder::removeInlineTags($request->get('left_column'));
+        //        }
+        //        if ($request->get('right_column')) {
+        //            $rightColumn = ContentBuilder::removeInlineTags($request->get('right_column'));
+        //        }
+
         return [
             'title' => $request->get('title') ?? '',
-            'content' => (new ContentBuilder($request->get('content') ?? ''))->getFullyHydratedContent(),
-            'published_at' => null,
-            'published_by' => null,
+            'left_column' => (new ContentBuilder($leftColumn))->getFullyHydratedContent(),
+            'right_column' => $rightColumn ? (new ContentBuilder($rightColumn))->getFullyHydratedContent() : null,
         ];
     }
 
@@ -38,11 +46,13 @@ class SectionAdminController extends Controller
     {
         $section->loadMissing('newestVersion', 'publishedBy');
 
-        $content = (new ContentBuilder($section->content ?? ''))->getFullyHydratedContent();
+        $leftColumn = (new ContentBuilder($section->left_column ?? ''))->getFullyHydratedContent();
+        $rightColumn = (new ContentBuilder($section->right_column ?? ''))->getFullyHydratedContent();
 
         return [
             'title' => $section->title,
-            'content' => $content,
+            'left_column' => $leftColumn,
+            'right_column' => $rightColumn,
             'published_at' => $section->published_at?->format('m-d-Y'),
             'published_by' => $section->publishedBy?->name,
         ];
@@ -129,7 +139,8 @@ class SectionAdminController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'content' => ['nullable', 'string'],
+            'left_column' => ['nullable', 'string'],
+            'right_column' => ['nullable', 'string'],
             'internal_notes' => ['nullable', 'string'],
             'change_notes' => ['nullable', 'string'],
             'batch_id' => ['nullable', 'int', 'exists:batches,id'],
@@ -143,6 +154,13 @@ class SectionAdminController extends Controller
         unset($validated['approve_directly']);
         $changeNotes = $validated['change_notes'];
         unset($validated['change_notes']);
+
+        if ($validated['left_column']) {
+            $validated['left_column'] = preg_replace("/(\r|\n)/", '', nl2br($validated['left_column']));
+        }
+        if ($validated['right_column']) {
+            $validated['right_column'] = preg_replace("/(\r|\n)/", '', nl2br($validated['right_column']));
+        }
 
         if (! $section) {
             $section = Section::create($validated);

@@ -198,8 +198,6 @@ namespace App\Models{
  * @property int $id
  * @property string|null $title
  * @property string $slug
- * @property string|null $left_column
- * @property string|null $right_column
  * @property string|null $searchable_text
  * @property string|null $internal_notes
  * @property int $page_number
@@ -213,6 +211,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $content
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Approval|null $approval
@@ -230,18 +229,17 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereBatchId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereBookPageNumbers($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereInternalNotes($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereLeftColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereNewest($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereOriginal($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePageNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePrevious($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page wherePublishedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereRightColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereSearchableText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page whereTitle($value)
@@ -391,7 +389,6 @@ namespace App\Models{
  * @property int $id
  * @property string|null $title
  * @property string $slug
- * @property string|null $content
  * @property string|null $searchable_text
  * @property string|null $internal_notes
  * @property int|null $batch_id
@@ -403,6 +400,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $left_column
+ * @property string|null $right_column
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Activitylog\Models\Activity> $activities
  * @property-read int|null $activities_count
  * @property-read \App\Models\Approval|null $approval
@@ -419,16 +418,17 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section unpublished()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereBatchId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereInternalNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereLeftColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereNewest($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereOriginal($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section wherePrevious($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section wherePublishedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section wherePublishedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereRightColumn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereSearchableText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereTitle($value)

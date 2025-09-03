@@ -187,7 +187,7 @@ const columns: ColumnDef<Batches>[] = [
                 viewComponent: viewComponent,
                 editRoute: batchable.published_at ? null : route(batchable.route_prefix + '.edit', batchable.slug),
                 deleteRoute: batchable.published_at ? null : route(batchable.route_prefix + '.delete', batchable.slug),
-                approvalRoute: batchable.is_approvable ? route(batchable.route_prefix + '.update', batchable.approval_id) : null,
+                approvalRoute: batchable.is_approvable ? route('admin.approvals.update', batchable.approval_id) : null,
                 publishRoute: null,
             }))
         },

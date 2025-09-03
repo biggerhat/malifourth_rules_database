@@ -43,6 +43,8 @@ import {
 } from '@tanstack/vue-table';
 import {hasPermission} from "@/composables/hasPermission";
 import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
+import DraggableContent from "@/components/DraggableContent.vue";
+import axios from "axios";
 
 const props = defineProps({
     batch: {
@@ -96,7 +98,26 @@ onMounted(() => {
     form.title = props.batch?.title ?? null;
     form.release_notes = props.batch?.release_notes ?? '';
     form.internal_notes = props.batch?.internal_notes ?? '';
+    fetchViewData();
 });
+
+const viewData = ref(null);
+
+const fetchViewData = () => {
+    axios.post(route('admin.batches.preview'), { title: form.title, release_notes: form.release_notes }).then((response) => {
+        viewData.value = response.data;
+        viewData.value = JSON.parse(JSON.stringify(response.data));
+    });
+};
+
+const releaseNotesUpdate = (newOrder) => {
+    form.release_notes = newOrder;
+};
+
+const releaseNotesNewContent = (content) => {
+    form.release_notes = content;
+    fetchViewData();
+}
 
 const submit = () => {
     if (props.batch) {
@@ -206,13 +227,16 @@ const table = useVueTable({
                         <InputError :message="form.errors.title" />
                     </div>
                     <div class="flex flex-col space-y-1.5">
-                        <RichTextEditor
-                            placeholder="Add Release Notes"
+                        <DraggableContent
+                            v-if="viewData"
+                            @update:content-order="releaseNotesUpdate"
+                            @update:new-content="releaseNotesNewContent"
+                            :content="viewData.release_notes ?? []"
                             label="Release Notes"
-                            v-model="form.release_notes"
                             :indices="props.indices"
                             :sections="props.sections"
                             :pages="props.pages"
+                            :key="viewData.release_notes"
                         />
                         <InputError :message="form.errors.release_notes" />
                     </div>

@@ -18,8 +18,7 @@ class PageController extends Controller
             return response('', 404);
         }
 
-        $leftColumn = (new ContentBuilder($page->left_column ?? ''))->getFullyHydratedContent();
-        $rightColumn = (new ContentBuilder($page->right_column ?? ''))->getFullyHydratedContent();
+        $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
 
         return inertia('Rules/PageView', [
             'pages' => Page::orderBy('page_number', 'ASC')->published()->get()->map(function (Page $page) {
@@ -31,8 +30,7 @@ class PageController extends Controller
             }),
             'title' => $page->title,
             'slug' => $page->slug,
-            'left_column' => $leftColumn,
-            'right_column' => $rightColumn,
+            'content' => $content,
             'page_number' => $page->page_number,
             'book_page_numbers' => $page->book_page_numbers,
             'published_at' => $page->published_at->format('m-d-Y'),
@@ -51,8 +49,7 @@ class PageController extends Controller
             return response('', 404);
         }
 
-        $leftColumn = (new ContentBuilder($page->left_column ?? ''))->getFullyHydratedContent();
-        $rightColumn = (new ContentBuilder($page->right_column ?? ''))->getFullyHydratedContent();
+        $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
 
         return inertia('Rules/PageView', [
             'pages' => Page::orderBy('page_number', 'ASC')->get()->map(function (Page $page) {
@@ -64,8 +61,7 @@ class PageController extends Controller
             }),
             'title' => $page->title,
             'slug' => $page->slug,
-            'left_column' => $leftColumn,
-            'right_column' => $rightColumn,
+            'content' => $content,
             'page_number' => $page->page_number,
             'book_page_numbers' => $page->book_page_numbers,
             'published_at' => $page->published_at->format('m-d-Y'),

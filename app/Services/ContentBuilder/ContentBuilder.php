@@ -23,6 +23,11 @@ class ContentBuilder
         'pageLink' => Page::class,
     ];
 
+    public array $blockTags = [
+        'index',
+        'section',
+    ];
+
     public function __construct(public string $stringContent)
     {
         $this->parsedContent = $this->parseTaggedTextRecursive();
@@ -31,15 +36,20 @@ class ContentBuilder
 
     public static function toSearchable(string $content): string
     {
-        $content = str_replace([
+        return preg_replace('/{{.*?}}/', '', self::removeInlineTags($content));
+    }
+
+    public static function removeInlineTags(string $content): string
+    {
+        return str_replace([
             '{{crow /}}',
             '{{magic /}}',
-            '{{magicaldefense /}}',
+            '{{warding /}}',
             '{{mask /}}',
             '{{melee /}}',
             '{{missile /}}',
             '{{negative /}}',
-            '{{physicaldefense /}}',
+            '{{fortitude /}}',
             '{{positive /}}',
             '{{pulse /}}',
             '{{ram /}}',
@@ -47,15 +57,16 @@ class ContentBuilder
             '{{soulstone /}}',
             '{{tome /}}',
             '{{unusualdefense /}}',
+            '<br />',
         ], [
             '[crow]',
             '[magic]',
-            '[magical defense]',
+            '[warding]',
             '[mask]',
             '[melee]',
             '[missile]',
             '[negative]',
-            '[physical defense]',
+            '[fortitude]',
             '[positive]',
             '[pulse]',
             '[ram]',
@@ -63,9 +74,8 @@ class ContentBuilder
             '[soulstone]',
             '[tome]',
             '[unusual defense]',
+            '',
         ], $content);
-
-        return preg_replace('/{{.*?}}/', '', $content);
     }
 
     public function getFullyHydratedContent(): array
@@ -86,9 +96,12 @@ class ContentBuilder
                 ->map(fn ($model) => [
                     'slug' => $model->newestVersion->slug ?? $model->slug,
                     'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,
+                    'inline' => ! in_array($key, $this->blockTags),
                     'image' => $model->newestVersion->image ?? $model->image ?? null,
                     'title' => $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null,
                     'content' => (new ContentBuilder($model->newestVersion->content ?? $model->content ?? ''))->getFullyHydratedContent(),
+                    'left_column' => (new ContentBuilder($model->newestVersion->left_column ?? $model->left_column ?? ''))->getFullyHydratedContent(),
+                    'right_column' => (new ContentBuilder($model->newestVersion->right_column ?? $model->right_column ?? ''))->getFullyHydratedContent(),
                 ])
                 ->toArray();
         }
@@ -221,6 +234,7 @@ class ContentBuilder
                 $slug = $match[3];
                 $attrString = trim($match[4]);
                 $attrs = $this->parseAttributes($attrString);
+                $attrs['inline'] = ! in_array($tag, $this->blockTags);
                 if ($slug) {
                     $attrs['slug'] = $slug;
                 }
@@ -249,7 +263,7 @@ class ContentBuilder
             }
 
             // Plain text
-            $result[] = ['text' => $token];
+            $result[] = ['text' => preg_replace('~[\r\n]+~', '', $token)];
         }
 
         return $result;

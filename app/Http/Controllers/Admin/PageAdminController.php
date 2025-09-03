@@ -24,17 +24,27 @@ class PageAdminController extends Controller
         )->toArray($request);
     }
 
+    public function preview(Request $request)
+    {
+        $content = $request->get('content') ?? '';
+        $changeNotes = $request->get('change_notes') ?? null;
+
+        return [
+            'title' => $request->get('title') ?? '',
+            'content' => (new ContentBuilder($content))->getFullyHydratedContent(),
+            'change_notes' => $changeNotes ? (new ContentBuilder($changeNotes))->getFullyHydratedContent() : null,
+        ];
+    }
+
     public function view(Request $request, Page $page)
     {
         $page->loadMissing('newestVersion', 'publishedBy');
 
-        $leftContent = (new ContentBuilder($page->left_column ?? ''))->getFullyHydratedContent();
-        $rightContent = (new ContentBuilder($page->right_column ?? ''))->getFullyHydratedContent();
+        $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
 
         return [
             'title' => $page->title,
-            'left_column' => $leftContent,
-            'right_column' => $rightContent,
+            'content' => $content,
             'page_number' => $page->page_number,
             'book_page_numbers' => $page->book_page_numbers,
             'published_at' => $page->published_at?->format('m-d-Y'),
@@ -123,8 +133,7 @@ class PageAdminController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'left_column' => ['nullable', 'string'],
-            'right_column' => ['nullable', 'string'],
+            'content' => ['nullable', 'string'],
             'book_page_numbers' => ['nullable', 'string'],
             'internal_notes' => ['nullable', 'string'],
             'change_notes' => ['nullable', 'string'],
@@ -137,8 +146,12 @@ class PageAdminController extends Controller
         unset($validated['publish_directly']);
         $approveDirectly = $validated['approve_directly'];
         unset($validated['approve_directly']);
-        $changeNotes = $validated['change_notes'] ?? null;
+        $changeNotes = preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
         unset($validated['change_notes']);
+
+        if ($validated['content']) {
+            $validated['content'] = preg_replace("/(\r|\n)/", '', nl2br($validated['content']));
+        }
 
         $highestPage = Page::orderBy('page_number', 'DESC')->first();
         if ($highestPage) {

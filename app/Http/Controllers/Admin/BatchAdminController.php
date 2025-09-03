@@ -14,6 +14,7 @@ use App\Models\Batch;
 use App\Models\Index;
 use App\Models\Page;
 use App\Models\Section;
+use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
 
 class BatchAdminController extends Controller
@@ -23,6 +24,16 @@ class BatchAdminController extends Controller
         return inertia('Admin/Batches/Index', [
             'batches' => BatchListResource::collection(Batch::with('approval')->orderBy('id', 'DESC')->get())->toArray($request),
         ]);
+    }
+
+    public function preview(Request $request)
+    {
+        $releaseNotes = $request->get('release_notes') ?? null;
+
+        return [
+            'title' => $request->get('title') ?? '',
+            'release_notes' => $releaseNotes ? (new ContentBuilder($releaseNotes))->getFullyHydratedContent() : null,
+        ];
     }
 
     public function create(Request $request): \Inertia\Response|\Inertia\ResponseFactory
@@ -120,6 +131,10 @@ class BatchAdminController extends Controller
         ]);
 
         $validated['created_by'] = $request->user()->id;
+
+        if ($validated['release_notes']) {
+            $validated['release_notes'] = preg_replace("/(\r|\n)/", '', nl2br($validated['release_notes']));
+        }
 
         if (! $batch) {
             $batch = Batch::create($validated);

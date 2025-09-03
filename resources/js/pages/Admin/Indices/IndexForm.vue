@@ -29,6 +29,8 @@ import {LoaderCircle, CircleX, CheckCheckIcon, ChevronsUpDown, Search, Check} fr
 import { Textarea } from '@/components/ui/textarea'
 import RichTextEditor from "@/components/RichTextEditor.vue";
 import {hasPermission} from "@/composables/hasPermission";
+import axios from "axios";
+import DraggableContent from "@/components/DraggableContent.vue";
 
 const props = defineProps({
     index: {
@@ -98,6 +100,7 @@ onMounted(() => {
     form.internal_notes = props.index?.internal_notes ?? '';
     form.change_notes = props.index?.published_at ? '' : props.index?.approval?.change_notes ?? '';
     form.batch_id = props.index?.published_at ? null : props.index?.batch_id ?? null;
+    fetchViewData();
 });
 
 const submitIndex = () => {
@@ -107,6 +110,34 @@ const submitIndex = () => {
         form.post(route('admin.indices.store'));
     }
 };
+
+const viewData = ref(null);
+
+const fetchViewData = () => {
+    axios.post(route('admin.indices.preview'), { title: form.title, content: form.content, change_notes: form.change_notes }).then((response) => {
+        viewData.value = response.data;
+        viewData.value = JSON.parse(JSON.stringify(response.data));
+    });
+};
+
+const contentUpdate = (newOrder) => {
+    form.content = newOrder;
+    console.log(form.content);
+};
+
+const contentNewContent = (content) => {
+    form.content = content;
+    fetchViewData();
+}
+
+const changeNotesUpdate = (newOrder) => {
+    form.change_notes = newOrder;
+};
+
+const changeNotesNewContent = (content) => {
+    form.change_notes = content;
+    fetchViewData();
+}
 </script>
 
 <template>
@@ -156,24 +187,30 @@ const submitIndex = () => {
                         <Input id="image" type="file" accept=".jpeg, .jpg, .png" @input="form.image = $event.target.files[0]" />
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="form.type === 'text'">
-                        <RichTextEditor
-                            placeholder="Add Index Content"
-                            label="Content"
-                            v-model="form.content"
+                        <DraggableContent
+                            v-if="viewData"
+                            @update:content-order="contentUpdate"
+                            @update:new-content="contentNewContent"
+                            :content="viewData.content ?? []"
+                            label="Index Content"
                             :indices="props.indices"
                             :sections="props.sections"
                             :pages="props.pages"
+                            :key="viewData.content"
                         />
                         <InputError :message="form.errors.content" />
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="(props.index && props.index?.published_at) || props.index?.approval?.change_notes">
-                        <RichTextEditor
-                            placeholder="Add Change Notes"
+                        <DraggableContent
+                            v-if="viewData"
+                            @update:content-order="changeNotesUpdate"
+                            @update:new-content="changeNotesNewContent"
+                            :content="viewData.change_notes ?? []"
                             label="Change Notes"
-                            v-model="form.change_notes"
                             :indices="props.indices"
                             :sections="props.sections"
                             :pages="props.pages"
+                            :key="viewData.change_notes"
                         />
                         <InputError :message="form.errors.change_notes" />
                     </div>

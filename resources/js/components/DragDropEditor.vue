@@ -2,7 +2,7 @@
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 import {Textarea} from "@/components/ui/textarea";
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import axios from 'axios';
 import {Check, Search, ChevronsUpDown, SquarePlus, SquareMinus, Link2, MousePointerClick, Pencil, FileChartColumnIncreasing, SeparatorHorizontal } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
@@ -59,6 +59,7 @@ import {Input} from "@/components/ui/input";
 import {hasPermission} from "@/composables/hasPermission";
 import {router} from "@inertiajs/vue3";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import SectionView from "@/pages/Rules/SectionView.vue";
 
 const props = defineProps({
     label: {
@@ -780,6 +781,82 @@ const insertExternalLink = () => {
 const currentTheme = computed(() => {
     return localStorage.appearance;
 });
+
+const parsedViewData = ref(null);
+const updateParsedViewData = () => {
+    if (model.value.length > 0) {
+        axios.post(route('admin.sections.preview'), { title: '', content: model.value }).then((response) => {
+            parsedViewData.value = mergeTextAndInline(JSON.parse(JSON.stringify(response.data.content)));
+        });
+    }
+};
+
+const mergeTextAndInline = (input) => {
+    const output = [];
+    let currentTextParts = [];
+
+    const flushText = () => {
+        if (currentTextParts.length) {
+            output.push({ text: currentTextParts });
+            currentTextParts = [];
+        }
+    };
+
+    for (const item of input) {
+        const key = Object.keys(item)[0];
+        const value = item[key];
+
+        // Treat 'text' keys as raw HTML to parse,
+        // and inline elements (inline: true) as part of the text group
+        if (key === 'text') {
+            currentTextParts.push(...parseHtmlToTypedParts(value));
+        } else if (value && value.inline === true) {
+            currentTextParts.push({ type: key, content: value });
+        } else {
+            flushText();
+            output.push({ [key]: value });
+        }
+    }
+
+    flushText();
+    return output;
+};
+
+const parseHtmlToTypedParts = (html) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<div>${html}</div>`, 'text/html');
+    const container = doc.body.firstChild;
+    const parts = [];
+
+    function walk(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            if (node.textContent.trim() !== '') {
+                parts.push({ type: 'text', content: node.textContent });
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            const tagName = node.tagName.toLowerCase();
+
+            // Self-closing tags or empty elements
+            if (!node.hasChildNodes()) {
+                parts.push({ type: tagName, content: '' });
+            } else {
+                // For tags with children, gather inner text content as 'content'
+                // If you want nested tags split, modify this to walk children recursively
+                parts.push({ type: tagName, content: node.textContent });
+            }
+        }
+    }
+
+    for (const child of container.childNodes) {
+        walk(child);
+    }
+
+    return parts;
+};
+
+watch(() => model.value, (newVal) => {
+    updateParsedViewData();
+})
 </script>
 
 <template>
@@ -1105,5 +1182,15 @@ const currentTheme = computed(() => {
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('tome')"><Tome class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('unusualdefense')"><UnusualDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
     </div>
-    <Textarea class="min-h-75" :id="element_id" v-model="model" :placeholder="props.placeholder" />
+    <hr />
+    <SectionView
+        v-if="parsedViewData"
+        :content="parsedViewData"
+    />
+
+<!--    <component-->
+<!--        v-if="parsedViewData"-->
+<!--        :is="sectionView"-->
+<!--        v-bind="parsedViewData"-->
+<!--    />-->
 </template>

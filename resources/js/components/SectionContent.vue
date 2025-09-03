@@ -22,7 +22,14 @@ const props =defineProps({
             return '';
         }
     },
-    content: {
+    left_column: {
+        type: [Object, Array, String],
+        required: false,
+        default() {
+            return '';
+        }
+    },
+    right_column: {
         type: [Object, Array, String],
         required: false,
         default() {
@@ -80,7 +87,13 @@ const shareOpen = ref(false);
 <!--                </DropdownMenu>-->
             </div>
         </div>
-
-        <ParsedContent :content="props.content" />
+        <div class="grid" :class="props.right_column && props.right_column.length > 0 ? 'lg:grid-cols-2' : 'grid-cols-1'">
+            <div>
+                <ParsedContent :content="props.left_column" />
+            </div>
+            <div v-if="props.right_column && props.right_column.length > 0" class="border-l border-secondary pl-2">
+                <ParsedContent :content="props.right_column" />
+            </div>
+        </div>
     </div>
 </template>

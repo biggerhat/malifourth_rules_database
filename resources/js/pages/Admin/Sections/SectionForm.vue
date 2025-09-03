@@ -48,6 +48,8 @@ import {
 import {Switch} from "@/components/ui/switch";
 import axios from "axios";
 import sectionView from "@/pages/Rules/SectionView.vue";
+import DragDropEditor from "@/components/DragDropEditor.vue";
+import DraggableContent from "@/components/DraggableContent.vue";
 
 const props = defineProps({
     section: {
@@ -89,7 +91,8 @@ const props = defineProps({
 
 const form = useForm({
     title: '',
-    content: '',
+    left_column: '',
+    right_column: '',
     internal_notes: '',
     change_notes: '',
     batch_id: null,
@@ -103,7 +106,8 @@ const back = () => {
 
 onMounted(() => {
     form.title = props.section?.title ?? null;
-    form.content = props.section?.content ?? '';
+    form.left_column = replaceBrWithNewline(props.section?.left_column ?? '');
+    form.right_column = replaceBrWithNewline(props.section?.right_column ?? '');
     form.internal_notes = props.section?.internal_notes ?? '';
     form.change_notes = props.section?.published_at ? '' : props.section?.approval?.change_notes ?? '';
     form.batch_id = props.section?.published_at ? null : props.section?.batch_id ?? null;
@@ -120,10 +124,47 @@ const submitSection = () => {
 const viewData = ref(null);
 
 const fetchViewData = () => {
-    axios.post(route('admin.sections.preview'), { title: form.title, content: form.content }).then((response) => {
+    axios.post(route('admin.sections.preview'), { title: form.title, left_column: form.left_column, right_column: form.right_column, change_notes: form.change_notes }).then((response) => {
         viewData.value = response.data;
+        viewData.value = JSON.parse(JSON.stringify(response.data));
     });
+};
+
+onMounted(() => {
+    fetchViewData();
+});
+
+const leftColumnUpdate = (newOrder) => {
+    form.left_column = newOrder;
+};
+
+const leftColumnNewContent = (content) => {
+    form.left_column = content;
+    fetchViewData();
 }
+
+const rightColumnUpdate = (newOrder) => {
+    form.right_column = newOrder;
+};
+
+const rightColumnNewContent = (content) => {
+    form.right_column = content;
+    fetchViewData();
+}
+
+const changeNotesUpdate = (newOrder) => {
+    form.change_notes = newOrder;
+};
+
+const changeNotesNewContent = (content) => {
+    form.change_notes = content;
+    fetchViewData();
+}
+
+const replaceBrWithNewline = (text) => {
+    return text.replace(/<br\s*\/?>/gi, '\n');
+};
+
 
 </script>
 
@@ -148,24 +189,52 @@ const fetchViewData = () => {
                         <InputError :message="form.errors.title" />
                     </div>
                     <div class="flex flex-col space-y-1.5">
-                        <RichTextEditor
-                            placeholder="Add Section Content"
-                            label="Content"
-                            v-model="form.content"
-                            :indices="props.indices"
-                            :sections="props.sections"
-                            :pages="props.pages"
-                        />
-                        <InputError :message="form.errors.content" />
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
+                            <div>
+                                <div class="flex flex-col space-y-1.5">
+                                    <DraggableContent
+                                        v-if="viewData"
+                                        @update:content-order="leftColumnUpdate"
+                                        @update:new-content="leftColumnNewContent"
+                                        :content="viewData.left_column ?? []"
+                                        label="Left Column"
+                                        :indices="props.indices"
+                                        :sections="props.sections"
+                                        :pages="props.pages"
+                                        :key="viewData.left_column"
+                                    />
+                                    <InputError :message="form.errors.left_column" />
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex flex-col space-y-1.5">
+                                    <DraggableContent
+                                        v-if="viewData"
+                                        @update:content-order="rightColumnUpdate"
+                                        @update:new-content="rightColumnNewContent"
+                                        :content="viewData.right_column ?? []"
+                                        label="Right Column"
+                                        :indices="props.indices"
+                                        :sections="props.sections"
+                                        :pages="props.pages"
+                                        :key="viewData.right_column"
+                                    />
+                                    <InputError :message="form.errors.right_column" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="(props.section && props.section?.published_at) || props.section?.approval?.change_notes">
-                        <RichTextEditor
-                            placeholder="Add Change Notes"
+                        <DraggableContent
+                            v-if="viewData"
+                            @update:content-order="changeNotesUpdate"
+                            @update:new-content="changeNotesNewContent"
+                            :content="viewData.change_notes ?? []"
                             label="Change Notes"
-                            v-model="form.change_notes"
                             :indices="props.indices"
                             :sections="props.sections"
                             :pages="props.pages"
+                            :key="viewData.change_notes"
                         />
                         <InputError :message="form.errors.change_notes" />
                     </div>

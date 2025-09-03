@@ -14,7 +14,7 @@ class PageController extends Controller
         $page = Page::with('newestVersion', 'publishedBy')->published()->orderBy('page_number', 'ASC')->first();
         $page = $page->newestVersion ?? $page;
 
-        if (! $page->published_at) {
+        if (!$page || !$page?->published_at) {
             return response('', 404);
         }
 

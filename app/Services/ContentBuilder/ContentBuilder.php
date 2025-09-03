@@ -44,12 +44,12 @@ class ContentBuilder
         return str_replace([
             '{{crow /}}',
             '{{magic /}}',
-            '{{magicaldefense /}}',
+            '{{warding /}}',
             '{{mask /}}',
             '{{melee /}}',
             '{{missile /}}',
             '{{negative /}}',
-            '{{physicaldefense /}}',
+            '{{fortitude /}}',
             '{{positive /}}',
             '{{pulse /}}',
             '{{ram /}}',
@@ -57,15 +57,16 @@ class ContentBuilder
             '{{soulstone /}}',
             '{{tome /}}',
             '{{unusualdefense /}}',
+            '<br />',
         ], [
             '[crow]',
             '[magic]',
-            '[magical defense]',
+            '[warding]',
             '[mask]',
             '[melee]',
             '[missile]',
             '[negative]',
-            '[physical defense]',
+            '[fortitude]',
             '[positive]',
             '[pulse]',
             '[ram]',
@@ -73,6 +74,7 @@ class ContentBuilder
             '[soulstone]',
             '[tome]',
             '[unusual defense]',
+            '',
         ], $content);
     }
 
@@ -261,7 +263,7 @@ class ContentBuilder
             }
 
             // Plain text
-            $result[] = ['text' => $token];
+            $result[] = ['text' => preg_replace('~[\r\n]+~', '', $token)];
         }
 
         return $result;

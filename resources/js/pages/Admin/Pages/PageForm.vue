@@ -47,6 +47,8 @@ import {
 } from "@/components/ui/drawer";
 import {Switch} from "@/components/ui/switch";
 import TextEditor from "@/components/TextEditor.vue";
+import DraggableContent from "@/components/DraggableContent.vue";
+import axios from "axios";
 
 const props = defineProps({
     page: {
@@ -117,6 +119,37 @@ const submitPage = () => {
         form.post(route('admin.pages.store'));
     }
 };
+
+const viewData = ref(null);
+
+const fetchViewData = () => {
+    axios.post(route('admin.pages.preview'), { title: form.title, content: form.content, change_notes: form.change_notes }).then((response) => {
+        viewData.value = response.data;
+        viewData.value = JSON.parse(JSON.stringify(response.data));
+    });
+};
+
+onMounted(() => {
+    fetchViewData();
+});
+
+const contentUpdate = (newOrder) => {
+    form.content = newOrder;
+};
+
+const contentNewContent = (content) => {
+    form.content = content;
+    fetchViewData();
+}
+
+const changeNotesUpdate = (newOrder) => {
+    form.change_notes = newOrder;
+};
+
+const changeNotesNewContent = (content) => {
+    form.change_notes = content;
+    fetchViewData();
+}
 </script>
 
 <template>
@@ -140,24 +173,30 @@ const submitPage = () => {
                         <InputError :message="form.errors.title" />
                     </div>
                     <div class="flex flex-col space-y-1.5">
-                        <RichTextEditor
-                            placeholder="Add Content"
+                        <DraggableContent
+                            v-if="viewData"
+                            @update:content-order="contentUpdate"
+                            @update:new-content="contentNewContent"
+                            :content="viewData.content ?? []"
                             label="Page Content"
-                            v-model="form.content"
                             :indices="props.indices"
                             :sections="props.sections"
                             :pages="props.pages"
+                            :key="viewData.content"
                         />
                         <InputError :message="form.errors.content" />
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="(props.page && props.page?.published_at) || props.page?.approval?.change_notes">
-                        <RichTextEditor
-                            placeholder="Add Change Notes"
+                        <DraggableContent
+                            v-if="viewData"
+                            @update:content-order="changeNotesUpdate"
+                            @update:new-content="changeNotesNewContent"
+                            :content="viewData.change_notes ?? []"
                             label="Change Notes"
-                            v-model="form.change_notes"
                             :indices="props.indices"
                             :sections="props.sections"
                             :pages="props.pages"
+                            :key="viewData.change_notes"
                         />
                         <InputError :message="form.errors.change_notes" />
                     </div>

@@ -28,6 +28,18 @@ class IndexAdminController extends Controller
         )->toArray($request);
     }
 
+    public function preview(Request $request)
+    {
+        $content = $request->get('content') ?? '';
+        $changeNotes = $request->get('change_notes') ?? null;
+
+        return [
+            'title' => $request->get('title') ?? '',
+            'content' => (new ContentBuilder($content))->getFullyHydratedContent(),
+            'change_notes' => $changeNotes ? (new ContentBuilder($changeNotes))->getFullyHydratedContent() : null,
+        ];
+    }
+
     public function view(Request $request, Index $index)
     {
         $index->loadMissing('newestVersion', 'publishedBy');
@@ -142,8 +154,12 @@ class IndexAdminController extends Controller
         unset($validated['publish_directly']);
         $approveDirectly = $validated['approve_directly'];
         unset($validated['approve_directly']);
-        $changeNotes = $validated['change_notes'];
+        $changeNotes = preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
         unset($validated['change_notes']);
+
+        if ($validated['content']) {
+            $validated['content'] = preg_replace("/(\r|\n)/", '', nl2br($validated['content']));
+        }
 
         if ($validated['image']) {
             $nameSlug = Str::slug($validated['title']);

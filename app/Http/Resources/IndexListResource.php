@@ -20,7 +20,8 @@ class IndexListResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'title' => sprintf('%s %s', $this->title, ! $this->published_at ? ' (Unpublished)' : ' (Published)'),
+            'display_name' => sprintf('%s %s', $this->title, ! $this->published_at ? ' (Unpublished)' : ' (Published)'),
+            'title' => $this->title,
             'slug' => $this->slug,
             'type' => $this->type->value,
             'approved_at' => $this->approval?->approved_at,

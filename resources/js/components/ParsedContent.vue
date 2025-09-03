@@ -3,14 +3,14 @@ import {h, defineProps, onMounted} from 'vue'
 
 
 import IndexTooltip from "@/components/IndexTooltip.vue";
-import MagicalDefense from "@/components/symbols/MagicalDefense.vue";
+import Warding from "@/components/symbols/Warding.vue";
 import Crow from "@/components/symbols/Crow.vue";
 import Magic from "@/components/symbols/Magic.vue";
 import Mask from "@/components/symbols/Mask.vue";
 import Melee from "@/components/symbols/Melee.vue";
 import Missile from "@/components/symbols/Missile.vue";
 import Negative from "@/components/symbols/Negative.vue";
-import PhysicalDefense from "@/components/symbols/PhysicalDefense.vue";
+import Fortitude from "@/components/symbols/Fortitude.vue";
 import Positive from "@/components/symbols/Positive.vue";
 import Pulse from "@/components/symbols/Pulse.vue";
 import Ram from "@/components/symbols/Ram.vue";
@@ -43,12 +43,12 @@ const componentMap = {
     Link: ExternalLink,
     crow: Crow,
     magic: Magic,
-    magicaldefense: MagicalDefense,
+    warding: Warding,
     mask: Mask,
     melee: Melee,
     missile: Missile,
     negative: Negative,
-    physicaldefense: PhysicalDefense,
+    fortitude: Fortitude,
     positive: Positive,
     pulse: Pulse,
     ram: Ram,

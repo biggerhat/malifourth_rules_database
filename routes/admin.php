@@ -31,6 +31,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(BatchAdminController::class)->prefix('batches')->name('batches.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_batch']);
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_batch']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_batch']);
         Route::get('/edit/{batch}', 'edit')->name('edit')->middleware(['permission:edit_batch']);
         Route::post('/store', 'store')->name('store')->middleware(['permission:add_batch']);
         Route::post('/update/{batch}', 'update')->name('update')->middleware(['permission:edit_batch']);
@@ -41,6 +42,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(IndexAdminController::class)->prefix('indices')->name('indices.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_index']);
         Route::get('/view/{index}', 'view')->name('view')->middleware(['permission:view_index']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_index']);
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_index']);
         Route::get('/list', 'list')->name('list');
         Route::get('/edit/{index}', 'edit')->name('edit')->middleware(['permission:edit_index']);
@@ -66,6 +68,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(PageAdminController::class)->prefix('pages')->name('pages.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_page']);
         Route::get('/view/{page}', 'view')->name('view')->middleware(['permission:view_page']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_page']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_page']);
         Route::get('/edit/{page}', 'edit')->name('edit')->middleware(['permission:edit_page']);

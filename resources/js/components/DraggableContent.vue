@@ -1,42 +1,47 @@
 <script setup lang="ts">
-import {h, defineProps, onMounted, ref} from 'vue'
+import {h, defineProps, onMounted, ref, computed} from 'vue'
 import draggable from "vuedraggable";
-import IndexTooltip from "@/components/IndexTooltip.vue";
-import MagicalDefense from "@/components/symbols/MagicalDefense.vue";
-import Crow from "@/components/symbols/Crow.vue";
-import Magic from "@/components/symbols/Magic.vue";
-import Mask from "@/components/symbols/Mask.vue";
-import Melee from "@/components/symbols/Melee.vue";
-import Missile from "@/components/symbols/Missile.vue";
-import Negative from "@/components/symbols/Negative.vue";
-import PhysicalDefense from "@/components/symbols/PhysicalDefense.vue";
-import Positive from "@/components/symbols/Positive.vue";
-import Pulse from "@/components/symbols/Pulse.vue";
-import Ram from "@/components/symbols/Ram.vue";
-import SignatureAction from "@/components/symbols/SignatureAction.vue";
-import Soulstone from "@/components/symbols/Soulstone.vue";
-import Tome from "@/components/symbols/Tome.vue";
-import UnusualDefense from "@/components/symbols/UnusualDefense.vue";
-import ParsedContent from "@/components/ParsedContent.vue";
-import IndexContent from "@/components/IndexContent.vue";
-import SectionView from "@/pages/Rules/SectionView.vue";
-import SectionContent from "@/components/SectionContent.vue";
-import SectionLink from "@/components/SectionLink.vue";
-import PageLink from "@/components/PageLink.vue";
-import ExternalLink from "@/components/ExternalLink.vue";
-import { CircleXIcon, CircleMinusIcon } from "lucide-vue-next";
 import DragDropEditorContent from "@/components/DragDropEditorContent.vue";
+import {Label} from "@/components/ui/label";
+import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {FileChartColumnIncreasing, SquareMinus, SquarePlus, LetterTextIcon, Check, X} from "lucide-vue-next";
+import {Button} from "@/components/ui/button";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Input} from "@/components/ui/input";
+import DragDropTextEditor from "@/components/DragDropTextEditor.vue";
 
 const props = defineProps({
     content: {
         type: [Object, Array, String],
         required: true
     },
-    title: {
-        type: [Object, Array, String],
+    label: {
+        type: String,
         required: false,
         default () {
             return '';
+        }
+    },
+    indices: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    pages: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    sections: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
         }
     }
 });
@@ -49,7 +54,8 @@ onMounted(() => {
 });
 
 const emit = defineEmits([
-    'update:contentOrder'
+    'update:contentOrder',
+    'update:newContent'
 ]);
 
 const contentChange = (event) => {
@@ -66,6 +72,15 @@ const updateElementContent = (newContent) => {
     contentChange();
 }
 
+const removeElement = (uniqueIndex) => {
+    const index = parsedContent.value.findIndex(item => item.uniqueIndex === uniqueIndex);
+    if (index !== -1) {
+        parsedContent.value.splice(index, 1);
+        let currentContent = serializeContent(parsedContent.value);
+        emit('update:newContent', currentContent);
+    }
+};
+
 function serializeContent(blocks) {
     let result = ""
 
@@ -74,97 +89,114 @@ function serializeContent(blocks) {
             for (const item of block.text) {
                 switch (item.type) {
                     case "text":
-                        result += htmlToMarkdown(item.content)
-                        break
+                        result += htmlToMarkdown(item.content);
+                        break;
                     case "b":
                     case "strong":
-                        result += `{{b}}${htmlToMarkdown(item.content)}{{/b}}`
-                        break
+                        result += `{{b}}${htmlToMarkdown(item.content)}{{/b}} `
+                        break;
                     case "i":
                     case "em":
-                        result += `{{i}}${htmlToMarkdown(item.content)}{{/i}}`
+                        result += `{{i}}${htmlToMarkdown(item.content)}{{/i}} `
                         break;
                     case "u":
-                        result += `{{u}}${htmlToMarkdown(item.content)}{{/u}}`
+                        result += `{{u}}${htmlToMarkdown(item.content)}{{/u}} `
                         break;
                     case "xl":
-                        result += `{{xl}}${htmlToMarkdown(item.content)}{{/xl}}`;
+                        result += `{{xl}}${htmlToMarkdown(item.content)}{{/xl}} `;
                         break;
                     case "lg":
-                        result += `{{lg}}${htmlToMarkdown(item.content)}{{/lg}}`;
+                        result += `{{lg}}${htmlToMarkdown(item.content)}{{/lg}} `;
                         break;
                     case "sm":
-                        result += `{{sm}}${htmlToMarkdown(item.content)}{{/sm}}`;
+                        result += `{{sm}}${htmlToMarkdown(item.content)}{{/sm}} `;
                         break;
                     case "xs":
-                        result += `{{xs}}${htmlToMarkdown(item.content)}{{/xs}}`;
+                        result += `{{xs}}${htmlToMarkdown(item.content)}{{/xs}} `;
                         break;
                     case "mask":
-                        result += `{{mask /}}`;
+                        result += `{{mask /}} `;
                         break;
                     case "crow":
-                        result += `{{crow /}}`;
+                        result += `{{crow /}} `;
                         break;
                     case "magic":
-                        result += `{{magic /}}`;
+                        result += `{{magic /}} `;
                         break;
-                    case "magicaldefense":
-                        result += `{{magicaldefense /}}`;
+                    case "warding":
+                        result += `{{warding /}} `;
                         break;
                     case "melee":
-                        result += `{{melee /}}`;
+                        result += `{{melee /}} `;
                         break;
                     case "missile":
-                        result += `{{missile /}}`;
+                        result += `{{missile /}} `;
                         break;
                     case "negative":
-                        result += `{{negative /}}`;
+                        result += `{{negative /}} `;
                         break;
-                    case "physicaldefense":
-                        result += `{{physicaldefense /}}`;
+                    case "fortitude":
+                        result += `{{fortitude /}} `;
                         break;
                     case "positive":
-                        result += `{{positive /}}`;
+                        result += `{{positive /}} `;
                         break;
                     case "pulse":
-                        result += `{{pulse /}}`;
+                        result += `{{pulse /}} `;
                         break;
                     case "ram":
-                        result += `{{ram /}}`;
+                        result += `{{ram /}} `;
                         break;
                     case "signatureaction":
-                        result += `{{signatureaction /}}`;
+                        result += `{{signatureaction /}} `;
                         break;
                     case "soulstone":
-                        result += `{{soulstone /}}`;
+                        result += `{{soulstone /}} `;
                         break;
                     case "tome":
-                        result += `{{tome /}}`;
+                        result += `{{tome /}} `;
                         break;
                     case "unusualdefense":
-                        result += `{{unusualdefense /}}`;
+                        result += `{{unusualdefense /}} `;
                         break;
                     case "br":
                         result += "\n"
-                        break
+                        break;
                     case "indexTooltip":
                         if (item.content && typeof item.content === "object") {
-                            result += `{{indexTooltip=${item.content.slug}}}${htmlToMarkdown(item.content.text)}{{/indexTooltip}}`
+                            result += `{{indexTooltip=${item.content.slug}}}${htmlToMarkdown(item.content.text)}{{/indexTooltip}} `;
                         }
-                        break
+                        break;
+                    case "sectionLink":
+                        if (item.content && typeof item.content === "object") {
+                            result += `{{sectionLink=${item.content.slug}}}${htmlToMarkdown(item.content.text)}{{/sectionLink}} `;
+                        }
+                        break;
+                    case "pageLink":
+                        if (item.content && typeof item.content === "object") {
+                            result += `{{pageLink=${item.content.slug}}}${htmlToMarkdown(item.content.text)}{{/pageLink}} `;
+                        }
+                        break;
+                    case "Link":
+                        if (item.content && typeof item.content === "object") {
+                            result += `{{Link=${item.content.slug}}}${htmlToMarkdown(item.content.text)}{{/Link}} `;
+                        }
+                        break;
                     default:
-                        result += htmlToMarkdown(item.content) || ""
+                        result += htmlToMarkdown(item.content) + ' ' || ""
                 }
             }
         } else if (block.index) {
             // Normalize an index as a self-closing tag
-            result += `{{index=${block.index.slug} /}}`
+            result += `{{index=${block.index.slug} /}} `;
+        } else if (block.section) {
+            // Normalize a section as a self-closing tag
+            result += `{{section=${block.section.slug} /}} `;
         }
     }
 
     return result
 }
-
 
 const mergeTextAndInline = (input) => {
     const output = [];
@@ -173,7 +205,7 @@ const mergeTextAndInline = (input) => {
 
     const flushText = () => {
         if (currentTextParts.length) {
-            output.push({ text: currentTextParts, 'uniqueIndex': currentIndex });
+            output.push({ text: currentTextParts, uniqueIndex: currentIndex });
             currentTextParts = [];
             currentIndex++;
         }
@@ -183,15 +215,26 @@ const mergeTextAndInline = (input) => {
         const key = Object.keys(item)[0];
         const value = item[key];
 
-        // Treat 'text' keys as raw HTML to parse,
-        // and inline elements (inline: true) as part of the text group
-        if (key === 'text') {
-            currentTextParts.push(...parseHtmlToTypedParts(value));
+        if (key === "text") {
+            const parsedParts = parseHtmlToTypedParts(value);
+
+            for (const part of parsedParts) {
+                if (part.type === "text") {
+                    // split into words, ignore empty/space-only
+                    const words = part.content.split(/\s+/).filter(Boolean);
+                    for (const word of words) {
+                        currentTextParts.push({ type: "text", content: word + ' ' });
+                    }
+                } else {
+                    // inline elements remain intact
+                    currentTextParts.push(part);
+                }
+            }
         } else if (value && value.inline === true) {
             currentTextParts.push({ type: key, content: value });
         } else {
             flushText();
-            output.push({ [key]: value, 'uniqueIndex': currentIndex });
+            output.push({ [key]: value, uniqueIndex: currentIndex });
             currentIndex++;
         }
     }
@@ -268,28 +311,207 @@ const htmlToMarkdown = (html) => {
 
         // Bold <b> → {{b}}
         .replace(/<b>/gi, '{{b}}')
-        .replace(/<\/b>/gi, '{{/b}}')
-        .replace(/\[mask]/gi, '{{mask /}}')
+        .replace(/<\/b>/gi, '{{/b}} ')
+        .replace(/\[mask]/gi, '{{mask /}} ')
 
         // Italic <i> → {{i}}
         .replace(/<i>/gi, '{{i}}')
-        .replace(/<\/i>/gi, '{{/i}}')
+        .replace(/<\/i>/gi, '{{/i}} ')
 
         // Underline <u> → {{u}}
         .replace(/<u>/gi, '{{u}}')
-        .replace(/<\/u>/gi, '{{/u}}')
+        .replace(/<\/u>/gi, '{{/u}} ')
 
         // Strong → {{b}}
         .replace(/<strong>/gi, '{{b}}')
-        .replace(/<\/strong>/gi, '{{/b}}')
+        .replace(/<\/strong>/gi, '{{/b}} ')
 
         // Emphasis → {{i}}
         .replace(/<em>/gi, '{{i}}')
-        .replace(/<\/em>/gi, '{{/i}}')
+        .replace(/<\/em>/gi, '{{/i}} ')
 }
+
+const selectedIndex = ref(null);
+const indexText = ref(null);
+const selectedSection = ref(null);
+const sectionText = ref(null);
+const elementSheetOpen = ref(false);
+
+const loadElements = () => {
+    clearValues();
+    elementSheetOpen.value = true;
+}
+
+const clearValues = () => {
+    selectedIndex.value = null;
+    indexText.value = null;
+    selectedSection.value = null;
+    sectionText.value = null;
+    selectedPage.value = null;
+    pageText.value = null;
+    selectionStart.value = null;
+    selectionEnd.value = null;
+    linkText.value = null;
+    linkUrl.value = null;
+}
+
+const indexFilterText = ref('');
+const filteredIndices = computed(() => {
+    const filter = indexFilterText.value;
+
+    if (!filter.length) {
+        return props.indices;
+    }
+
+    const filtered = props.indices;
+
+    return filtered.filter(index => {
+        return index.title.toLowerCase().includes(filter.toLowerCase());
+    });
+});
+
+const sectionFilterText = ref('');
+const filteredSections = computed(() => {
+    const filter = sectionFilterText.value;
+
+    if (!filter.length) {
+        return props.sections;
+    }
+
+    const filtered = props.sections;
+
+    return filtered.filter(section => {
+        return section.title.toLowerCase().includes(filter.toLowerCase());
+    });
+});
+
+const insertPageSection = () => {
+    let currentContent = serializeContent(parsedContent.value);
+    currentContent += `{{section=${selectedSection.value.slug} /}}`;
+    elementSheetOpen.value = false;
+    emit('update:newContent', currentContent);
+}
+
+const insertPageIndex = () => {
+    let currentContent = serializeContent(parsedContent.value);
+    currentContent += `{{index=${selectedIndex.value.slug} /}}`;
+    elementSheetOpen.value = false;
+    emit('update:newContent', currentContent);
+}
+
+const addNewTextContent = (newContent) => {
+    let currentContent = serializeContent(parsedContent.value);
+    currentContent += newContent;
+    emit('update:newContent', currentContent);
+};
+
+//Start Text Editor Related Functions
+const editorOpen = ref(false);
 </script>
 
 <template>
+    <Label>{{ props.label }}</Label>
+    <div class="flex gap-1">
+        <div>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <div class="bg-primary rounded !p-1 mx-1 border border-primary" :class="editorOpen ? 'bg-secondary border-secondary text-primary' : 'text-secondary'" @click="editorOpen = true"><LetterTextIcon class="mx-auto w-4 h-4" /></div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        Add Text
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+            <Sheet :open="elementSheetOpen">
+                <SheetTrigger>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <div class="bg-primary rounded !p-1 border border-primary text-secondary" @click="elementSheetOpen = true"><FileChartColumnIncreasing class="mx-auto w-4 h-4" /></div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                Add Page Elements
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </SheetTrigger>
+                <SheetContent>
+                    <SheetHeader>
+                        <SheetTitle>Add Page Elements</SheetTitle>
+                        <SheetDescription class="text-primary">
+                            <Tabs default-value="index" class="w-full">
+                                <TabsList class="grid w-full grid-cols-2">
+                                    <TabsTrigger value="index">
+                                        Index
+                                    </TabsTrigger>
+                                    <TabsTrigger value="section">
+                                        Section
+                                    </TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="index">
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label>Selected Index</Label>
+                                        <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedIndex">
+                                            <div class="my-auto">{{ selectedIndex.title }}</div>
+                                            <SquareMinus class="my-auto" @click="selectedIndex = null" />
+                                        </div>
+                                        <div v-else class="w-full p-2 my-1 text-red-500">
+                                            None
+                                        </div>
+                                    </div>
+                                    <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
+                                        <Button :disabled="!selectedIndex" class="bg-green-500" @click="insertPageIndex">Add Page Element</Button>
+                                        <Button class="bg-red-500" @click="elementSheetOpen = false;clearValues()">Cancel</Button>
+                                    </div>
+
+                                    <div class="flex flex-col w-full mt-12 space-y-1.5">
+                                        <hr class="border-primary" />
+                                        <Label for="indexFilter">Select An Index</Label>
+                                        <Input id="indexFilter" type="text" v-model="indexFilterText" placeholder="Search..." />
+                                    </div>
+                                    <div class="max-h-100 overflow-y-auto">
+                                        <div v-for="index in filteredIndices" :key="index.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
+                                            <div class="my-auto">{{ index.title }}</div>
+                                            <SquarePlus class="my-auto" @click="selectedIndex = index" />
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                                <TabsContent value="section">
+                                    <div class="flex flex-col w-full mt-4 space-y-1.5">
+                                        <Label>Selected Section</Label>
+                                        <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedSection">
+                                            <div class="my-auto">{{ selectedSection.title }}</div>
+                                            <SquareMinus class="my-auto" @click="selectedSection = null" />
+                                        </div>
+                                        <div v-else class="w-full p-2 my-1 text-red-500">
+                                            None
+                                        </div>
+                                    </div>
+                                    <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
+                                        <Button :disabled="!selectedSection" class="bg-green-500" @click="insertPageSection()">Add Page Element</Button>
+                                        <Button class="bg-red-500" @click="elementSheetOpen = false;clearValues()">Cancel</Button>
+                                    </div>
+
+                                    <div class="flex flex-col w-full mt-12 space-y-1.5">
+                                        <hr class="border-primary" />
+                                        <Label for="sectionFilter">Select A Section</Label>
+                                        <Input id="sectionFilter" type="text" v-model="sectionFilterText" placeholder="Search..." />
+                                    </div>
+                                    <div class="max-h-100 overflow-y-auto">
+                                        <div v-for="section in filteredSections" :key="section.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
+                                            <div class="my-auto">{{ section.title }}</div>
+                                            <SquarePlus class="my-auto" @click="selectedSection = section" />
+                                        </div>
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
+                        </SheetDescription>
+                    </SheetHeader>
+                </SheetContent>
+            </Sheet>
+        </div>
+    </div>
     <div>
         <draggable
             @change="contentChange"
@@ -299,10 +521,22 @@ const htmlToMarkdown = (html) => {
             <template #item="{element}">
                 <DragDropEditorContent
                     @update:element-content="updateElementContent"
+                    @delete:element="removeElement"
                     :element="element"
                     :unique-index="element.uniqueIndex"
+                    :indices="props.indices"
+                    :sections="props.sections"
+                    :pages="props.pages"
                 />
             </template>
         </draggable>
     </div>
+    <DragDropTextEditor
+        @close-editor="editorOpen = false"
+        @save-content="addNewTextContent"
+        v-if="editorOpen"
+        :indices="props.indices"
+        :sections="props.sections"
+        :pages="props.pages"
+    />
 </template>

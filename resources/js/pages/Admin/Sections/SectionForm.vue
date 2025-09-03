@@ -124,7 +124,7 @@ const submitSection = () => {
 const viewData = ref(null);
 
 const fetchViewData = () => {
-    axios.post(route('admin.sections.preview'), { title: form.title, left_column: form.left_column, right_column: form.right_column }).then((response) => {
+    axios.post(route('admin.sections.preview'), { title: form.title, left_column: form.left_column, right_column: form.right_column, change_notes: form.change_notes }).then((response) => {
         viewData.value = response.data;
         viewData.value = JSON.parse(JSON.stringify(response.data));
     });
@@ -138,9 +138,28 @@ const leftColumnUpdate = (newOrder) => {
     form.left_column = newOrder;
 };
 
+const leftColumnNewContent = (content) => {
+    form.left_column = content;
+    fetchViewData();
+}
+
 const rightColumnUpdate = (newOrder) => {
     form.right_column = newOrder;
 };
+
+const rightColumnNewContent = (content) => {
+    form.right_column = content;
+    fetchViewData();
+}
+
+const changeNotesUpdate = (newOrder) => {
+    form.change_notes = newOrder;
+};
+
+const changeNotesNewContent = (content) => {
+    form.change_notes = content;
+    fetchViewData();
+}
 
 const replaceBrWithNewline = (text) => {
     return text.replace(/<br\s*\/?>/gi, '\n');
@@ -176,7 +195,14 @@ const replaceBrWithNewline = (text) => {
                                     <DraggableContent
                                         v-if="viewData"
                                         @update:content-order="leftColumnUpdate"
-                                        :content="viewData.left_column ?? []" />
+                                        @update:new-content="leftColumnNewContent"
+                                        :content="viewData.left_column ?? []"
+                                        label="Left Column"
+                                        :indices="props.indices"
+                                        :sections="props.sections"
+                                        :pages="props.pages"
+                                        :key="viewData.left_column"
+                                    />
                                     <InputError :message="form.errors.left_column" />
                                 </div>
                             </div>
@@ -185,20 +211,30 @@ const replaceBrWithNewline = (text) => {
                                     <DraggableContent
                                         v-if="viewData"
                                         @update:content-order="rightColumnUpdate"
-                                        :content="viewData.right_column ?? []" />
+                                        @update:new-content="rightColumnNewContent"
+                                        :content="viewData.right_column ?? []"
+                                        label="Right Column"
+                                        :indices="props.indices"
+                                        :sections="props.sections"
+                                        :pages="props.pages"
+                                        :key="viewData.right_column"
+                                    />
                                     <InputError :message="form.errors.right_column" />
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="flex flex-col space-y-1.5" v-if="(props.section && props.section?.published_at) || props.section?.approval?.change_notes">
-                        <RichTextEditor
-                            placeholder="Add Change Notes"
+                        <DraggableContent
+                            v-if="viewData"
+                            @update:content-order="changeNotesUpdate"
+                            @update:new-content="changeNotesNewContent"
+                            :content="viewData.change_notes ?? []"
                             label="Change Notes"
-                            v-model="form.change_notes"
                             :indices="props.indices"
                             :sections="props.sections"
                             :pages="props.pages"
+                            :key="viewData.change_notes"
                         />
                         <InputError :message="form.errors.change_notes" />
                     </div>

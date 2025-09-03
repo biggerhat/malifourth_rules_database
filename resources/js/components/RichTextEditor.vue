@@ -16,14 +16,14 @@ import {
     ComboboxItem,
     ComboboxItemIndicator,
     ComboboxList } from '@/components/ui/combobox'
-import MagicalDefense from "@/components/symbols/MagicalDefense.vue";
+import Warding from "@/components/symbols/Warding.vue";
 import Crow from "@/components/symbols/Crow.vue";
 import Magic from "@/components/symbols/Magic.vue";
 import Mask from "@/components/symbols/Mask.vue";
 import Melee from "@/components/symbols/Melee.vue";
 import Missile from "@/components/symbols/Missile.vue";
 import Negative from "@/components/symbols/Negative.vue";
-import PhysicalDefense from "@/components/symbols/PhysicalDefense.vue";
+import Fortitude from "@/components/symbols/Fortitude.vue";
 import Positive from "@/components/symbols/Positive.vue";
 import Pulse from "@/components/symbols/Pulse.vue";
 import Ram from "@/components/symbols/Ram.vue";
@@ -1091,12 +1091,12 @@ const currentTheme = computed(() => {
     <div class="flex gap-1">
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('crow')"><Crow class-name="h-5 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('magic')"><Magic class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('magicaldefense')"><MagicalDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('warding')"><Warding class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('mask')"><Mask class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('melee')"><Melee class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('missile')"><Missile class-name="h-4" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('negative')"><Negative class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
-        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('physicaldefense')"><PhysicalDefense class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
+        <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('fortitude')"><Fortitude class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('positive')"><Positive class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('pulse')"><Pulse class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>
         <Button type="button" variant="default" class="p-2 min-w-10" @click="addIcon('ram')"><Ram class-name="h-6" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></Button>

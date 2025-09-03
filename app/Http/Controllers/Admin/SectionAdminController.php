@@ -28,17 +28,13 @@ class SectionAdminController extends Controller
     {
         $leftColumn = $request->get('left_column') ?? '';
         $rightColumn = $request->get('right_column') ?? null;
-        //        if ($request->get('left_column')) {
-        //            $leftColumn = ContentBuilder::removeInlineTags($request->get('left_column'));
-        //        }
-        //        if ($request->get('right_column')) {
-        //            $rightColumn = ContentBuilder::removeInlineTags($request->get('right_column'));
-        //        }
+        $changeNotes = $request->get('change_notes') ?? null;
 
         return [
             'title' => $request->get('title') ?? '',
             'left_column' => (new ContentBuilder($leftColumn))->getFullyHydratedContent(),
             'right_column' => $rightColumn ? (new ContentBuilder($rightColumn))->getFullyHydratedContent() : null,
+            'change_notes' => $changeNotes ? (new ContentBuilder($changeNotes))->getFullyHydratedContent() : null,
         ];
     }
 
@@ -152,7 +148,7 @@ class SectionAdminController extends Controller
         unset($validated['publish_directly']);
         $approveDirectly = $validated['approve_directly'];
         unset($validated['approve_directly']);
-        $changeNotes = $validated['change_notes'];
+        $changeNotes = preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
         unset($validated['change_notes']);
 
         if ($validated['left_column']) {

@@ -52,7 +52,7 @@ class PageController extends Controller
         $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
 
         return inertia('Rules/PageView', [
-            'pages' => Page::orderBy('page_number', 'ASC')->get()->map(function (Page $page) {
+            'pages' => Page::orderBy('page_number', 'ASC')->published()->get()->map(function (Page $page) {
                 return [
                     'slug' => $page->slug,
                     'title' => $page->title,

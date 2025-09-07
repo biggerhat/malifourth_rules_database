@@ -3,6 +3,16 @@ import ParsedContent from "@/components/ParsedContent.vue";
 import Button from "@/components/ui/button/Button.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
 import { router } from "@inertiajs/vue3";
+import {onMounted, ref, watch} from "vue";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 
 const props =defineProps({
     pages: {
@@ -76,12 +86,23 @@ const props =defineProps({
         }
     }
 });
+
+const pageParam = ref(props.slug);
+
+const navigateToPage = () => {
+
+
+};
+
+watch(pageParam, (newValue) => {
+    window.location.href = route('rules.page.view', pageParam.value);
+});
 </script>
 
 <template>
     <Head :title="props.title" />
 
-    <div class="grid grid-cols-1 lg:grid-cols-8 lg:gap-2 text-primary leading-6 text-md">
+    <div class="grid grid-cols-1 lg:grid-cols-8 lg:gap-2 mx-1 text-primary leading-6 text-md">
         <div class="lg:col-span-2 hidden lg:block">
             <div class="lg:col-span-2">
                 <Link v-for="page in props.pages" :key="page.slug" :href="route('rules.page.view', page.slug)" class="p-2 block hover:bg-secondary" :class="page.slug === props.slug ? 'bg-secondary' : ''">
@@ -90,8 +111,25 @@ const props =defineProps({
             </div>
         </div>
         <div class="lg:col-span-6 min-h-screen">
+            <div class="lg:hidden block mb-4 mx-2">
+                <Select v-model="pageParam">
+                    <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select a Section" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Sections</SelectLabel>
+                            <SelectItem v-for="page in props.pages" :key="page.slug" :value="page.slug">
+                                {{ page.title }}
+                            </SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
             <div class="w-full text-center text-xl mb-4">
+                <img src='/Images/page_banner_top.png' alt="Banner Top" class="w-3/4 lg:w-1/2 mx-auto" />
                 {{ props.title }}
+                <img src='/Images/page_banner_bottom.png' alt="Banner Bottom" class="w-3/4 lg:w-1/2 mx-auto" />
             </div>
             <div class="min-h-full">
                 <ParsedContent :content="props.content" />

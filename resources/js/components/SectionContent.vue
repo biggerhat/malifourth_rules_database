@@ -65,7 +65,7 @@ const shareOpen = ref(false);
 </script>
 
 <template>
-    <div>
+    <div class="mt-4">
         <div class="flex justify-between">
             <div class="border-b text-xl mb-2">{{ props.title }}</div>
             <div @click="copyLink">
@@ -88,10 +88,10 @@ const shareOpen = ref(false);
             </div>
         </div>
         <div class="grid" :class="props.right_column && props.right_column.length > 0 ? 'lg:grid-cols-2' : 'grid-cols-1'">
-            <div>
+            <div class="px-2">
                 <ParsedContent :content="props.left_column" />
             </div>
-            <div v-if="props.right_column && props.right_column.length > 0" class="border-l border-secondary pl-2">
+            <div v-if="props.right_column && props.right_column.length > 0" class="lg:border-l lg:border-secondary px-2">
                 <ParsedContent :content="props.right_column" />
             </div>
         </div>

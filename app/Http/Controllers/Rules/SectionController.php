@@ -18,11 +18,13 @@ class SectionController extends Controller
             return response('', 404);
         }
 
-        $content = (new ContentBuilder($section->content ?? ''))->getFullyHydratedContent();
+        $leftColumn = (new ContentBuilder($section->left_column ?? ''))->getFullyHydratedContent();
+        $rightColumn = (new ContentBuilder($section->right_column ?? ''))->getFullyHydratedContent();
 
         return inertia('Rules/SectionView', [
             'title' => $section->title,
-            'content' => $content,
+            'left_column' => $leftColumn,
+            'right_column' => $rightColumn,
             'published_at' => $section->published_at->format('m-d-Y'),
             'published_by' => $section->publishedBy->name,
         ]);

@@ -63,11 +63,11 @@ const props =defineProps({
             </CardHeader>
             <CardContent>
                 <div class="grid w-full mx-auto" :class="props.right_column && props.right_column.length > 0 ? 'grid-cols-2' : 'grid-cols-1'">
-                    <div>
-                        <ParsedContent :content="props.left_column ?? []" />
+                    <div class="px-2">
+                        <ParsedContent :content="props.left_column" />
                     </div>
-                    <div v-if="props.right_column && props.right_column.length > 0">
-                        <ParsedContent :content="props.right_column ?? []" />
+                    <div v-if="props.right_column && props.right_column.length > 0" class="lg:border-l lg:border-secondary px-2">
+                        <ParsedContent :content="props.right_column" />
                     </div>
                 </div>
             </CardContent>

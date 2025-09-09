@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\IndexAdminController;
 use App\Http\Controllers\Admin\PageAdminController;
 use App\Http\Controllers\Admin\PageOrderController;
 use App\Http\Controllers\Admin\RoleAdminController;
+use App\Http\Controllers\Admin\SeasonAdminController;
 use App\Http\Controllers\Admin\SectionAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 
@@ -80,6 +81,19 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
             Route::get('/', [PageOrderController::class, 'index'])->name('index');
             Route::post('/update', [PageOrderController::class, 'update'])->name('update');
         });
+    });
+
+    Route::controller(SeasonAdminController::class)->prefix('seasons')->name('seasons.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware(['permission:view_season']);
+        Route::get('/view/{season}', 'view')->name('view')->middleware(['permission:view_season']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_season']);
+        Route::get('/list', 'list')->name('list');
+        Route::get('/create', 'create')->name('create')->middleware(['permission:add_season']);
+        Route::get('/edit/{season}', 'edit')->name('edit')->middleware(['permission:edit_season']);
+        Route::post('/store', 'store')->name('store')->middleware(['permission:add_season']);
+        Route::post('/update/{season}', 'update')->name('update')->middleware(['permission:edit_season']);
+        Route::post('/delete/{season}', 'delete')->name('delete')->middleware(['permission:delete_season']);
+        Route::post('/publish/{season}', 'publish')->name('publish')->middleware(['permission:publish_season']);
     });
 
     Route::controller(ApprovalAdminController::class)->prefix('approvals')->name('approvals.')->group(function () {

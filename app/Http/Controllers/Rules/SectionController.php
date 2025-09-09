@@ -22,7 +22,7 @@ class SectionController extends Controller
         $rightColumn = (new ContentBuilder($section->right_column ?? ''))->getFullyHydratedContent();
 
         return inertia('Rules/SectionView', [
-            'title' => $section->title,
+            'title' => ContentBuilder::parseTitleTags($section->title),
             'left_column' => $leftColumn,
             'right_column' => $rightColumn,
             'published_at' => $section->published_at->format('m-d-Y'),

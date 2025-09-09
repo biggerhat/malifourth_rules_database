@@ -47,10 +47,12 @@ const props = defineProps({
 });
 
 const parsedContent = ref([]);
+const inlinedContent = ref([]);
 
 onMounted(() => {
     const contentCopy = JSON.parse(JSON.stringify(props.content));
     parsedContent.value = mergeTextAndInline(contentCopy);
+    inlinedContent.value = createDragDropObject(contentCopy);
 });
 
 const emit = defineEmits([
@@ -196,6 +198,38 @@ function serializeContent(blocks) {
     }
 
     return result
+}
+
+const createDragDropObject = (input) => {
+    const output = [];
+    let currentIndex = 0;
+    let currentInlineParts = [];
+
+    const flushInline = () => {
+        if (currentInlineParts.length) {
+            output.push({text: currentInlineParts, uniqueIndex: currentIndex});
+            currentInlineParts = [];
+            currentIndex++;
+        }
+    }
+
+    for (const item of input) {
+        const key = Object.keys(item)[0];
+        const value = item[key];
+
+        if (key === "text") {
+            currentInlineParts.push({text: value});
+        } else if (value && value.inline === true) {
+            currentInlineParts.push({[key]: value});
+        } else {
+            flushInline();
+            output.push({ [key]: value, uniqueIndex: currentIndex });
+            currentIndex++;
+        }
+    }
+
+    flushInline();
+    return output;
 }
 
 const mergeTextAndInline = (input) => {
@@ -513,9 +547,26 @@ const editorOpen = ref(false);
         </div>
     </div>
     <div>
+        <!--        <draggable-->
+        <!--            @change="contentChange"-->
+        <!--            v-model="parsedContent"-->
+        <!--            item-key="slug"-->
+        <!--        >-->
+        <!--            <template #item="{element}">-->
+        <!--                <DragDropEditorContent-->
+        <!--                    @update:element-content="updateElementContent"-->
+        <!--                    @delete:element="removeElement"-->
+        <!--                    :element="element"-->
+        <!--                    :unique-index="element.uniqueIndex"-->
+        <!--                    :indices="props.indices"-->
+        <!--                    :sections="props.sections"-->
+        <!--                    :pages="props.pages"-->
+        <!--                />-->
+        <!--            </template>-->
+        <!--        </draggable>-->
         <draggable
             @change="contentChange"
-            v-model="parsedContent"
+            v-model="inlinedContent"
             item-key="slug"
         >
             <template #item="{element}">

@@ -30,7 +30,7 @@ class PageAdminController extends Controller
         $changeNotes = $request->get('change_notes') ?? null;
 
         return [
-            'title' => $request->get('title') ?? '',
+            'title' => ContentBuilder::parseTitleTags($request->get('title') ?? ''),
             'content' => (new ContentBuilder($content))->getFullyHydratedContent(),
             'change_notes' => $changeNotes ? (new ContentBuilder($changeNotes))->getFullyHydratedContent() : null,
         ];
@@ -43,7 +43,7 @@ class PageAdminController extends Controller
         $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
 
         return [
-            'title' => $page->title,
+            'title' => ContentBuilder::parseTitleTags($page->title),
             'content' => $content,
             'page_number' => $page->page_number,
             'book_page_numbers' => $page->book_page_numbers,

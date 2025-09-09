@@ -96,19 +96,19 @@ const mainNavItems: NavItem[] = [
         external: true,
     },{
         title: 'Timing',
-        href: 'https://malifauxrules.com/rules/sections/188-detailed-timing',
+        href: 'https://malifauxrules.com/rules/sections/378-quick-reference-timing',
         route: 'dashboard',
         icon: LayoutGrid,
         external: true,
     },{
         title: 'Tokens',
-        href: 'https://malifauxrules.com/rules/45-tokens',
+        href: 'https://malifauxrules.com/rules/sections/273-tokens-of-malifaux',
         route: 'dashboard',
         icon: LayoutGrid,
         external: true,
     },{
         title: 'Markers',
-        href: 'https://malifauxrules.com/rules/44-markers',
+        href: 'https://malifauxrules.com/rules/sections/274-markers-of-malifaux',
         route: 'dashboard',
         icon: LayoutGrid,
         external: true,

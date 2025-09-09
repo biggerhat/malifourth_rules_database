@@ -18,6 +18,5 @@ const props = defineProps({
 </script>
 
 <template>
-    <img v-if="props.mode === 'light'" src='/Images/Symbols/M4E-Symbol_Crow-Black.png' :class="className" class="my-auto inline-block" alt="Crow" />
-    <img v-else src='/Images/Symbols/M4E-Symbol_Crow-White.png' :class="className" alt="Crow" class="my-auto inline-block" />
+    <span class="font-[symbolFont] text-2xl">c</span>
 </template>

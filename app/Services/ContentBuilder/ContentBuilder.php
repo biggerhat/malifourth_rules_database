@@ -39,6 +39,43 @@ class ContentBuilder
         return preg_replace('/{{.*?}}/', '', self::removeInlineTags($content));
     }
 
+    public static function parseTitleTags(string $title): string
+    {
+        return str_replace([
+            '{{crow /}}',
+            '{{magic /}}',
+            '{{warding /}}',
+            '{{mask /}}',
+            '{{melee /}}',
+            '{{missile /}}',
+            '{{negative /}}',
+            '{{fortitude /}}',
+            '{{positive /}}',
+            '{{pulse /}}',
+            '{{ram /}}',
+            '{{signatureaction /}}',
+            '{{soulstone /}}',
+            '{{tome /}}',
+            '{{unusualdefense /}}',
+        ], [
+            '<span class="font-[symbolFont] text-2xl">c</span>',
+            '<span class="font-[symbolFont] text-2xl">q</span>',
+            '<span class="font-[symbolFont] text-2xl">x</span>',
+            '<span class="font-[symbolFont] text-2xl">m</span>',
+            '<span class="font-[symbolFont] text-2xl">y</span>',
+            '<span class="font-[symbolFont] text-2xl">z</span>',
+            '<span class="font-[symbolFont] text-2xl">-</span>',
+            '<span class="font-[symbolFont] text-2xl">u</span>',
+            '<span class="font-[symbolFont] text-2xl">+</span>',
+            '<span class="font-[symbolFont] text-2xl">p</span>',
+            '<span class="font-[symbolFont] text-2xl">r</span>',
+            '<span class="font-[symbolFont] text-2xl">f</span>',
+            '<span class="font-[symbolFont] text-2xl">s</span>',
+            '<span class="font-[symbolFont] text-2xl">t</span>',
+            '<span class="font-[symbolFont] text-2xl">v</span>',
+        ], $title);
+    }
+
     public static function removeInlineTags(string $content): string
     {
         return str_replace([

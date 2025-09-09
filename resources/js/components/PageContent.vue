@@ -50,7 +50,9 @@ const props =defineProps({
 
 <template>
             <div class="w-full text-center text-xl mb-4">
-                {{ props.title }}
+                <img src='/Images/page_banner_top.png' alt="Banner Top" class="w-3/4 lg:w-1/2 mx-auto" />
+                <span v-html="props.title"></span>
+                <img src='/Images/page_banner_bottom.png' alt="Banner Bottom" class="w-3/4 lg:w-1/2 mx-auto" />
             </div>
             <div class="min-h-full overflow-y-auto">
                 <ParsedContent :content="props.content" />

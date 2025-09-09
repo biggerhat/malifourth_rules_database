@@ -18,6 +18,5 @@ const props = defineProps({
 </script>
 
 <template>
-    <img v-if="props.mode === 'light'" src='/Images/Symbols/M4E-Symbol_Missile-Black.png' :class="className" class="my-auto inline-block" alt="Missile" />
-    <img v-else src='/Images/Symbols/M4E-Symbol_Missile-White.png' :class="className" class="my-auto inline-block" alt="Missile" />
+    <span class="font-[symbolFont] text-2xl">z</span>
 </template>

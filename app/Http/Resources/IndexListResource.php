@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Index;
+use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

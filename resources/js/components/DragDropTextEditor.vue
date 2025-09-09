@@ -514,21 +514,21 @@ const filteredPages = computed(() => {
             </div>
         </div>
         <div class="flex gap-1 mb-2">
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('crow')"><Crow class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('magic')"><Magic class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('warding')"><Warding class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('mask')"><Mask class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('melee')"><Melee class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('missile')"><Missile class-name="h-4" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('negative')"><Negative class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('fortitude')"><Fortitude class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('positive')"><Positive class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('pulse')"><Pulse class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('ram')"><Ram class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('signatureaction')"><SignatureAction class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('soulstone')"><Soulstone class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('tome')"><Tome class-name="w-4 h-4 my-auto" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
-            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('unusualdefense')"><UnusualDefense class-name="w-4 h-4" :mode="currentTheme === 'light' ? 'dark' : 'light'" /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('crow')"><Crow /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('magic')"><Magic /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('warding')"><Warding /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('mask')"><Mask /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('melee')"><Melee /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('missile')"><Missile /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('negative')"><Negative /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('fortitude')"><Fortitude /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('positive')"><Positive /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('pulse')"><Pulse /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('ram')"><Ram /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('signatureaction')"><SignatureAction /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('soulstone')"><Soulstone /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('tome')"><Tome /></div>
+            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('unusualdefense')"><UnusualDefense /></div>
         </div>
         <textarea
             class="rounded border border-secondary w-full min-h-60 p-1"

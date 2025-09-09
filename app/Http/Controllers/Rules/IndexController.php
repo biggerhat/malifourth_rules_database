@@ -21,7 +21,7 @@ class IndexController extends Controller
         $content = (new ContentBuilder($index->content ?? ''))->getFullyHydratedContent();
 
         return inertia('Rules/IndexView', [
-            'title' => $index->title,
+            'title' => ContentBuilder::parseTitleTags($index->title),
             'type' => $index->type->value,
             'content' => $content,
             'image' => $index->image,

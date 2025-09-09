@@ -64,7 +64,7 @@ const props =defineProps({
         <div class="min-h-full mx-2 lg:mx-0">
             <Card>
                 <CardHeader>
-                    <CardTitle>{{ props.title }}</CardTitle>
+                    <CardTitle><span v-html="props.title"></span></CardTitle>
                 </CardHeader>
                 <CardContent>
                     <img :src="props.image" :alt="props.title" class="mx-auto" v-if="props.type === 'image'" />

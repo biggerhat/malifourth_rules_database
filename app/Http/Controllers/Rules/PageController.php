@@ -25,11 +25,11 @@ class PageController extends Controller
             'pages' => Page::orderBy('page_number', 'ASC')->published()->get()->map(function (Page $page) {
                 return [
                     'slug' => $page->slug,
-                    'title' => $page->title,
+                    'title' => ContentBuilder::parseTitleTags($page->title),
                     'page_number' => $page->page_number,
                 ];
             }),
-            'title' => $page->title,
+            'title' => ContentBuilder::parseTitleTags($page->title),
             'slug' => $page->slug,
             'content' => $content,
             'page_number' => $page->page_number,
@@ -56,11 +56,11 @@ class PageController extends Controller
             'pages' => Page::orderBy('page_number', 'ASC')->published()->get()->map(function (Page $page) {
                 return [
                     'slug' => $page->slug,
-                    'title' => $page->title,
+                    'title' => ContentBuilder::parseTitleTags($page->title),
                     'page_number' => $page->page_number,
                 ];
             }),
-            'title' => $page->title,
+            'title' => ContentBuilder::parseTitleTags($page->title),
             'slug' => $page->slug,
             'content' => $content,
             'page_number' => $page->page_number,

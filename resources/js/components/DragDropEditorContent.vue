@@ -145,22 +145,69 @@ const emit = defineEmits(['update:elementContent', 'delete:element']);
 
 const normalizedContent = ref(null);
 const openEditor = () => {
-    normalizedContent.value = jsonToCustomTags(props.element.text);
+    normalizedContent.value = normalizeElement(props.element.text);
     editorOpen.value = true;
 };
+
+const normalizeElement = (segments) => {
+    let normalized = "";
+    segments.forEach((segment) => {
+        const key = Object.keys(segment)[0];
+        const value = segment[key];
+
+        if (key === 'text') {
+            normalized += htmlToTags(segment[key]);
+        } else if (value.content)  {
+            normalized += `{{${key}=${segment[key]['slug']}}}`;
+            let content = normalizeElement(segment[key]['content']);
+            normalized += `${content}{{/${key}}}`;
+        } else {
+            normalized += `{{${key} /}}`;
+        }
+    })
+
+    return normalized;
+}
+
+const htmlToTags = (text) => {
+    const replacements = {
+        '<strong>': '{{b}}',
+        '</strong>': '{{/b}}',
+        '<b>': '{{b}}',
+        '</b>': '{{/b}}',
+        '<em>': '{{i}}',
+        '</em>': '{{/i}}',
+        '<i>': '{{i}}',
+        '</i>': '{{/i}}',
+        '<br>': '\n',
+        '<br/>': '\n',
+        '<br />': '\n',
+        '<u>': '{{u}}',
+        '</u>': '{{/u}}',
+    };
+
+    let output = text;
+
+    for (const [htmlTag, customTag] of Object.entries(replacements)) {
+        const regex = new RegExp(htmlTag, 'gi');
+        output = output.replace(regex, customTag);
+    }
+
+    return output;
+}
 
 const jsonToCustomTags = (segments) => {
     let content = '';
     segments.forEach((seg) => {
         switch (seg.type) {
             case 'strong':
-                content += `{{b}}${seg.content}{{/b}}`;
+                content += `{{b}}${jsonToCustomTags(seg.content)}{{/b}}`;
                 break;
             case 'i':
-                content += `{{i}}${seg.content}{{/i}}`;
+                content += `{{i}}${jsonToCustomTags(seg.content)}{{/i}}`;
                 break;
             case 'u':
-                content += `{{u}}${seg.content}{{/i}}`;
+                content += `{{u}}${jsonToCustomTags(seg.content)}{{/i}}`;
                 break;
             case 'hr':
                 content += `{{hr /}}`;
@@ -168,19 +215,19 @@ const jsonToCustomTags = (segments) => {
                 content += '\n';
                 break;
             case 'text':
-                content += seg.content;
+                content += jsonToCustomTags(seg.content);
                 break;
             case 'indexTooltip':
-                content += `{{indexTooltip=${seg.content.slug}}}${seg.content.text}{{/indexTooltip}}`;
+                content += `{{indexTooltip=${seg.content.slug}}}${jsonToCustomTags(seg.content)}{{/indexTooltip}}`;
                 break;
             case 'sectionLink':
-                content += `{{sectionLink=${seg.content.slug}}}${seg.content.text}{{/sectionLink}}`;
+                content += `{{sectionLink=${seg.content.slug}}}${jsonToCustomTags(seg.content)}{{/sectionLink}}`;
                 break;
             case 'pageLink':
-                content += `{{pageLink=${seg.content.slug}}}${seg.content.text}{{/pageLink}}`;
+                content += `{{pageLink=${seg.content.slug}}}${jsonToCustomTags(seg.content)}{{/pageLink}}`;
                 break;
             case 'Link':
-                content += `{{Link=${seg.content.slug}}}${seg.content.text}{{/Link}}`;
+                content += `{{Link=${seg.content.slug}}}${jsonToCustomTags(seg.content)}{{/Link}}`;
                 break;
             case 'crow':
                 content += '{{crow /}}';
@@ -362,7 +409,7 @@ const changeTextContent = (content) => {
         </div>
         <transition name="fade">
             <div class="px-1" v-show="!collapsed">
-                <DragDropTextContent @update:text-order="updateTextOrder" v-if="element.text !== undefined" :content="element.text" />
+                <ParsedContent v-if="element.text !== undefined" :content="element.text" />
                 <component v-else :is="resolveComponent(element)" v-bind="getProps(element)" />
             </div>
         </transition>

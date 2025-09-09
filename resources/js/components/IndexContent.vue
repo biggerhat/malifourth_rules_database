@@ -79,7 +79,7 @@ const props =defineProps({
             </DrawerTrigger>
             <DrawerContent class="max-w-lg mx-auto">
                 <DrawerHeader>
-                    <DrawerTitle>{{ props.title }}</DrawerTitle>
+                    <DrawerTitle v-html="props.title"></DrawerTitle>
                     <DrawerDescription>
                         <img :src="props.image" :alt="props.title" class="mx-auto" v-if="props.type === 'image'" />
                     </DrawerDescription>
@@ -95,7 +95,7 @@ const props =defineProps({
         </Drawer>
     </div>
     <div v-if="props.type === 'text'">
-        <strong>{{ props.title }}:</strong>
+        <strong><span v-html="props.title"></span>:</strong>
         <div class="px-2">
             <ParsedContent :content="props.content" v-if="props.type === 'text'" />
         </div>

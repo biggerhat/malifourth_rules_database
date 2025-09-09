@@ -69,22 +69,50 @@ const mainNavItems: NavItem[] = [
         href: route('rules.index'),
         route: 'rules.index',
         icon: LayoutGrid,
+        external: false,
     },{
         title: 'Gaining Grounds',
         href: route('rules.index'),
         route: 'dashboard',
         icon: LayoutGrid,
+        external: false,
     },{
         title: 'FAQ',
         href: route('rules.index'),
         route: 'dashboard',
         icon: LayoutGrid,
+        external: false,
     },{
         title: 'Errata',
         href: route('rules.index'),
         route: 'dashboard',
         icon: LayoutGrid,
-    },
+        external: false,
+    },{
+        title: 'Glossary',
+        href: 'https://malifauxrules.com/rules/sections/2-glossary',
+        route: 'dashboard',
+        icon: LayoutGrid,
+        external: true,
+    },{
+        title: 'Timing',
+        href: 'https://malifauxrules.com/rules/sections/188-detailed-timing',
+        route: 'dashboard',
+        icon: LayoutGrid,
+        external: true,
+    },{
+        title: 'Tokens',
+        href: 'https://malifauxrules.com/rules/45-tokens',
+        route: 'dashboard',
+        icon: LayoutGrid,
+        external: true,
+    },{
+        title: 'Markers',
+        href: 'https://malifauxrules.com/rules/44-markers',
+        route: 'dashboard',
+        icon: LayoutGrid,
+        external: true,
+    }
 ];
 
 const rightNavItems: NavItem[] = [];
@@ -105,20 +133,29 @@ const rightNavItems: NavItem[] = [];
                         <SheetContent side="left" class="w-[300px] p-6">
                             <SheetTitle class="sr-only">Navigation Menu</SheetTitle>
                             <SheetHeader class="flex justify-start text-left">
-                                <AppLogoIcon class="size-6 fill-current text-black dark:text-white" />
+                                <AppLogo />
                             </SheetHeader>
                             <div class="flex h-full flex-1 flex-col justify-between space-y-4 py-6">
                                 <nav class="-mx-3 space-y-1">
-                                    <Link
-                                        v-for="item in mainNavItems"
-                                        :key="item.title"
-                                        :href="item.href"
-                                        class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
-                                        :class="activeItemStyles(item.href)"
-                                    >
-                                        <component v-if="item.icon" :is="item.icon" class="h-5 w-5" />
-                                        {{ item.title }}
-                                    </Link>
+                                    <div v-for="item in mainNavItems" :key="item.title">
+                                        <Link
+                                            :href="item.href"
+                                            v-if="!item.external"
+                                            class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
+                                            :class="activeItemStyles(item.href)"
+                                        >
+                                            <component v-if="item.icon" :is="item.icon" class="h-5 w-5" />
+                                            {{ item.title }}
+                                        </Link>
+                                        <a
+                                            v-else
+                                            :href="item.href"
+                                            :class="[navigationMenuTriggerStyle(), activeItemStyles(item.href), 'h-9 cursor-pointer px-3']"
+                                        >
+                                            <component v-if="item.icon" :is="item.icon" class="mr-2 h-4 w-4" />
+                                            {{ item.title }}
+                                        </a>
+                                    </div>
                                 </nav>
                                 <div class="flex flex-col space-y-4">
                                     <a
@@ -145,15 +182,24 @@ const rightNavItems: NavItem[] = [];
                 <!-- Desktop Menu -->
                 <div class="hidden h-full lg:flex lg:flex-1">
                     <NavigationMenu class="ml-10 flex h-full items-stretch">
-                        <NavigationMenuList class="flex h-full items-stretch space-x-2">
+                        <NavigationMenuList class="flex h-full items-stretch">
                             <NavigationMenuItem v-for="(item, index) in mainNavItems" :key="index" class="relative flex h-full items-center">
                                 <Link
+                                    v-if="!item.external"
                                     :class="[navigationMenuTriggerStyle(), activeItemStyles(item.href), 'h-9 cursor-pointer px-3']"
                                     :href="item.href"
                                 >
                                     <component v-if="item.icon" :is="item.icon" class="mr-2 h-4 w-4" />
                                     {{ item.title }}
                                 </Link>
+                                <a
+                                    v-else
+                                    :href="item.href"
+                                    :class="[navigationMenuTriggerStyle(), activeItemStyles(item.href), 'h-9 cursor-pointer px-3']"
+                                >
+                                    <component v-if="item.icon" :is="item.icon" class="mr-2 h-4 w-4" />
+                                    {{ item.title }}
+                                </a>
                                 <div
                                     v-if="route().current(item.route)"
                                     class="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"

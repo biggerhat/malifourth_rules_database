@@ -81,6 +81,15 @@ defineProps<Props>();
         </DropdownMenuItem>
     </DropdownMenuGroup>
     <DropdownMenuSeparator />
+    <DropdownMenuGroup>
+        <DropdownMenuItem :as-child="true" v-if="hasPermission('view_season')">
+            <Link class="block w-full" :href="route('admin.seasons.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                Seasons
+            </Link>
+        </DropdownMenuItem>
+    </DropdownMenuGroup>
+    <DropdownMenuSeparator />
     <DropdownMenuItem :as-child="true">
         <Link class="block w-full" method="post" :href="route('logout')" @click="handleLogout" as="button">
             <LogOut class="mr-2 h-4 w-4" />

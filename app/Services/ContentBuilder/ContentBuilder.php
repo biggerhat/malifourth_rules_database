@@ -130,16 +130,19 @@ class ContentBuilder
                 ->withTrashed()
                 ->get()
                 ->keyBy('slug')
-                ->map(fn ($model) => [
-                    'slug' => $model->newestVersion->slug ?? $model->slug,
-                    'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,
-                    'inline' => ! in_array($key, $this->blockTags),
-                    'image' => $model->newestVersion->image ?? $model->image ?? null,
-                    'title' => $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null,
-                    'content' => (new ContentBuilder($model->newestVersion->content ?? $model->content ?? ''))->getFullyHydratedContent(),
-                    'left_column' => (new ContentBuilder($model->newestVersion->left_column ?? $model->left_column ?? ''))->getFullyHydratedContent(),
-                    'right_column' => (new ContentBuilder($model->newestVersion->right_column ?? $model->right_column ?? ''))->getFullyHydratedContent(),
-                ])
+                ->map(function ($model) use ($key) {
+                    $title = $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null;
+                    return [
+                        'slug' => $model->newestVersion->slug ?? $model->slug,
+                        'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,
+                        'inline' => ! in_array($key, $this->blockTags),
+                        'image' => $model->newestVersion->image ?? $model->image ?? null,
+                        'title' => $title ? ContentBuilder::parseTitleTags($title) : $title,
+                        'content' => (new ContentBuilder($model->newestVersion->content ?? $model->content ?? ''))->getFullyHydratedContent(),
+                        'left_column' => (new ContentBuilder($model->newestVersion->left_column ?? $model->left_column ?? ''))->getFullyHydratedContent(),
+                        'right_column' => (new ContentBuilder($model->newestVersion->right_column ?? $model->right_column ?? ''))->getFullyHydratedContent(),
+                    ];
+                })
                 ->toArray();
         }
 

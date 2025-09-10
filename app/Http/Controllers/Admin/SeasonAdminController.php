@@ -45,7 +45,7 @@ class SeasonAdminController extends Controller
         $content = (new ContentBuilder($season->content ?? ''))->getFullyHydratedContent();
 
         return [
-            'title' => $season->title,
+            'title' => ContentBuilder::parseTitleTags($season->title),
             'content' => $content,
             'published_at' => $season->published_at?->format('m-d-Y'),
             'published_by' => $season->publishedBy?->name,

@@ -10,6 +10,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
     wyrd_news: {
@@ -21,6 +22,18 @@ const props = defineProps({
     }
 });
 
+const queryString = ref('');
+const generalSearch = () => {
+    if (queryString.value.length === 0) {
+        return;
+    }
+
+    router.get(route('search'), {q: queryString.value}, {
+        preserveState: true,
+        replace: true,
+    });
+}
+
 </script>
 
 <template>
@@ -31,7 +44,7 @@ const props = defineProps({
         </div>
         <div class="size-full mt-6">
             <div class="relative w-full max-w-xl mt-12 items-center mx-auto my-auto">
-                <Input id="search" type="text" autofocus placeholder="Search..." class="pl-10" />
+                <Input id="search" type="text" autofocus placeholder="Search..." class="pl-10" @keydown.enter="generalSearch" v-model="queryString" />
                 <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
                     <Search class="size-6 text-muted-foreground" />
                 </span>

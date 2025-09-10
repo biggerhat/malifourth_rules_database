@@ -15,6 +15,7 @@ use App\Models\Page;
 use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Str;
@@ -47,7 +48,7 @@ class IndexAdminController extends Controller
         $content = (new ContentBuilder($index->content ?? ''))->getFullyHydratedContent();
 
         return [
-            'title' => $index->title,
+            'title' => ContentBuilder::parseTitleTags($index->title),
             'type' => $index->type->value,
             'content' => $content,
             'image' => $index->image,

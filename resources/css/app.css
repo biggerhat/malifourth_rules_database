@@ -76,6 +76,11 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
+
+    @font-face {
+        font-family: symbolFont;
+        src: url("../../public/font/M4E-Symbols.otf");
+    }
 }
 
 @layer utilities {

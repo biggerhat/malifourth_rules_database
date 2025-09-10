@@ -25,6 +25,17 @@ import {
     CommandList,
     CommandSeparator,
 } from '@/components/ui/command'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import axios from 'axios';
 import {ZiggyVue} from "ziggy-js";
 
@@ -63,6 +74,20 @@ const activeItemStyles = computed(
     () => (url: string) => (isCurrentRoute.value(url) ? 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100' : ''),
 );
 
+const queryString = ref('');
+const searchOpen = ref(false);
+const generalSearch = () => {
+    if (queryString.value.length === 0) {
+        return;
+    }
+
+    router.get(route('search'), {q: queryString.value}, {
+        preserveState: true,
+        replace: true,
+    });
+    searchOpen.value = false;
+}
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Rules',
@@ -72,20 +97,20 @@ const mainNavItems: NavItem[] = [
         external: false,
     },{
         title: 'Gaining Grounds',
-        href: route('rules.index'),
-        route: 'dashboard',
+        href: route('gaining-grounds.index'),
+        route: 'gaining-grounds.index',
         icon: LayoutGrid,
         external: false,
     },{
         title: 'FAQ',
-        href: route('rules.index'),
-        route: 'dashboard',
+        href: route('faq.index'),
+        route: 'faq.index',
         icon: LayoutGrid,
         external: false,
     },{
         title: 'Errata',
-        href: route('rules.index'),
-        route: 'dashboard',
+        href: route('errata.index'),
+        route: 'errata.index',
         icon: LayoutGrid,
         external: false,
     },{
@@ -96,19 +121,19 @@ const mainNavItems: NavItem[] = [
         external: true,
     },{
         title: 'Timing',
-        href: 'https://malifauxrules.com/rules/sections/188-detailed-timing',
+        href: 'https://malifauxrules.com/rules/sections/378-quick-reference-timing',
         route: 'dashboard',
         icon: LayoutGrid,
         external: true,
     },{
         title: 'Tokens',
-        href: 'https://malifauxrules.com/rules/45-tokens',
+        href: 'https://malifauxrules.com/rules/sections/273-tokens-of-malifaux',
         route: 'dashboard',
         icon: LayoutGrid,
         external: true,
     },{
         title: 'Markers',
-        href: 'https://malifauxrules.com/rules/44-markers',
+        href: 'https://malifauxrules.com/rules/sections/274-markers-of-malifaux',
         route: 'dashboard',
         icon: LayoutGrid,
         external: true,
@@ -211,9 +236,27 @@ const rightNavItems: NavItem[] = [];
 
                 <div class="ml-auto flex items-center space-x-2">
                     <div class="relative flex items-center space-x-1">
-                        <Button variant="ghost" size="icon" class="group h-9 w-9 cursor-pointer">
-                            <Search class="size-5 opacity-80 group-hover:opacity-100" />
-                        </Button>
+                        <Dialog v-model:open="searchOpen">
+                            <DialogTrigger as-child>
+                                <Button variant="ghost" size="icon" class="group h-9 w-9 cursor-pointer">
+                                    <Search class="size-5 opacity-80 group-hover:opacity-100" />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent class="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Search</DialogTitle>
+<!--                                    <DialogDescription>-->
+<!--                                        Make changes to your profile here. Click save when you're done.-->
+<!--                                    </DialogDescription>-->
+                                </DialogHeader>
+                                <div class="relative w-full max-w-sm items-center">
+                                    <Input id="search" type="text" placeholder="Search..." class="pl-10" @keydown.enter="generalSearch" v-model="queryString" />
+                                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+                                        <Search class="size-6 text-muted-foreground" />
+                                    </span>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                         <BookOpen @click="toggleDialog" class="inline-block cursor-pointer" />
 
                         <div class="hidden space-x-1 lg:flex">
@@ -275,19 +318,19 @@ const rightNavItems: NavItem[] = [];
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup heading="Pages">
                     <CommandItem v-for="page in commandSearch.pages" v-bind:key="page.slug" @select="commandRoute(page.route)" value="page.slug">
-                        {{ page.title }}
+                        <span v-html="page.title"></span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Sections">
                     <CommandItem v-for="section in commandSearch.sections" v-bind:key="section.slug" @select="commandRoute(section.route)" value="section.slug">
-                        {{ section.title }}
+                        <span v-html="section.title"></span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Indices">
                     <CommandItem v-for="index in commandSearch.indices" v-bind:key="index.slug" @select="commandRoute(index.route)" value="index.slug">
-                        {{ index.title }}
+                        <span v-html="index.title"></span>
                     </CommandItem>
                 </CommandGroup>
             </CommandList>

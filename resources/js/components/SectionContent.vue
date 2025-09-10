@@ -67,7 +67,7 @@ const shareOpen = ref(false);
 <template>
     <div class="mt-4">
         <div class="flex justify-between">
-            <div class="border-b text-xl mb-2">{{ props.title }}</div>
+            <div class="border-b text-xl mb-2"><span v-if="props.title" v-html="props.title"></span></div>
             <div @click="copyLink">
                 <Clipboard class="w-4" />
 <!--                <DropdownMenu v-model:open="shareOpen">-->

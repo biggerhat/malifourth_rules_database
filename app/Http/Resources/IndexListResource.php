@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Index;
+use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,7 +21,7 @@ class IndexListResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'display_name' => sprintf('%s %s', $this->title, ! $this->published_at ? ' (Unpublished)' : ' (Published)'),
+            'display_name' => sprintf('%s %s', ContentBuilder::parseTitleTags($this->title), ! $this->published_at ? ' (Unpublished)' : ' (Published)'),
             'title' => $this->title,
             'slug' => $this->slug,
             'type' => $this->type->value,

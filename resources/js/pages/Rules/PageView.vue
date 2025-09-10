@@ -105,8 +105,7 @@ watch(pageParam, (newValue) => {
     <div class="grid grid-cols-1 lg:grid-cols-8 lg:gap-2 mx-1 text-primary leading-6 text-md">
         <div class="lg:col-span-2 hidden lg:block">
             <div class="lg:col-span-2">
-                <Link v-for="page in props.pages" :key="page.slug" :href="route('rules.page.view', page.slug)" class="p-2 block hover:bg-secondary" :class="page.slug === props.slug ? 'bg-secondary' : ''">
-                    {{ page.title }}
+                <Link v-for="page in props.pages" :key="page.slug" v-html="page.title" :href="route('rules.page.view', page.slug)" class="p-2 block hover:bg-secondary" :class="page.slug === props.slug ? 'bg-secondary' : ''">
                 </Link>
             </div>
         </div>
@@ -119,8 +118,7 @@ watch(pageParam, (newValue) => {
                     <SelectContent>
                         <SelectGroup>
                             <SelectLabel>Sections</SelectLabel>
-                            <SelectItem v-for="page in props.pages" :key="page.slug" :value="page.slug">
-                                {{ page.title }}
+                            <SelectItem v-for="page in props.pages" :key="page.slug" v-html="page.title" :value="page.slug">
                             </SelectItem>
                         </SelectGroup>
                     </SelectContent>
@@ -128,7 +126,7 @@ watch(pageParam, (newValue) => {
             </div>
             <div class="w-full text-center text-xl mb-4">
                 <img src='/Images/page_banner_top.png' alt="Banner Top" class="w-3/4 lg:w-1/2 mx-auto" />
-                {{ props.title }}
+                <span v-html="props.title"></span>
                 <img src='/Images/page_banner_bottom.png' alt="Banner Bottom" class="w-3/4 lg:w-1/2 mx-auto" />
             </div>
             <div class="min-h-full">

@@ -59,7 +59,7 @@ const props =defineProps({
     <div class="min-h-full mx-2 lg:mx-0">
         <Card>
             <CardHeader>
-                <CardTitle>{{ props.title }}</CardTitle>
+                <CardTitle><span v-html="props.title"></span></CardTitle>
             </CardHeader>
             <CardContent>
                 <div class="grid w-full mx-auto" :class="props.right_column && props.right_column.length > 0 ? 'grid-cols-2' : 'grid-cols-1'">

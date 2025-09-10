@@ -39,6 +39,43 @@ class ContentBuilder
         return preg_replace('/{{.*?}}/', '', self::removeInlineTags($content));
     }
 
+    public static function parseTitleTags(string $title): string
+    {
+        return str_replace([
+            '{{crow /}}',
+            '{{magic /}}',
+            '{{warding /}}',
+            '{{mask /}}',
+            '{{melee /}}',
+            '{{missile /}}',
+            '{{negative /}}',
+            '{{fortitude /}}',
+            '{{positive /}}',
+            '{{pulse /}}',
+            '{{ram /}}',
+            '{{signatureaction /}}',
+            '{{soulstone /}}',
+            '{{tome /}}',
+            '{{unusualdefense /}}',
+        ], [
+            '<span class="font-[symbolFont] text-2xl">c</span>',
+            '<span class="font-[symbolFont] text-2xl">q</span>',
+            '<span class="font-[symbolFont] text-2xl">x</span>',
+            '<span class="font-[symbolFont] text-2xl">m</span>',
+            '<span class="font-[symbolFont] text-2xl">y</span>',
+            '<span class="font-[symbolFont] text-2xl">z</span>',
+            '<span class="font-[symbolFont] text-2xl">-</span>',
+            '<span class="font-[symbolFont] text-2xl">u</span>',
+            '<span class="font-[symbolFont] text-2xl">+</span>',
+            '<span class="font-[symbolFont] text-2xl">p</span>',
+            '<span class="font-[symbolFont] text-2xl">r</span>',
+            '<span class="font-[symbolFont] text-2xl">f</span>',
+            '<span class="font-[symbolFont] text-2xl">s</span>',
+            '<span class="font-[symbolFont] text-2xl">t</span>',
+            '<span class="font-[symbolFont] text-2xl">v</span>',
+        ], $title);
+    }
+
     public static function removeInlineTags(string $content): string
     {
         return str_replace([
@@ -93,16 +130,19 @@ class ContentBuilder
                 ->withTrashed()
                 ->get()
                 ->keyBy('slug')
-                ->map(fn ($model) => [
-                    'slug' => $model->newestVersion->slug ?? $model->slug,
-                    'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,
-                    'inline' => ! in_array($key, $this->blockTags),
-                    'image' => $model->newestVersion->image ?? $model->image ?? null,
-                    'title' => $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null,
-                    'content' => (new ContentBuilder($model->newestVersion->content ?? $model->content ?? ''))->getFullyHydratedContent(),
-                    'left_column' => (new ContentBuilder($model->newestVersion->left_column ?? $model->left_column ?? ''))->getFullyHydratedContent(),
-                    'right_column' => (new ContentBuilder($model->newestVersion->right_column ?? $model->right_column ?? ''))->getFullyHydratedContent(),
-                ])
+                ->map(function ($model) use ($key) {
+                    $title = $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null;
+                    return [
+                        'slug' => $model->newestVersion->slug ?? $model->slug,
+                        'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,
+                        'inline' => ! in_array($key, $this->blockTags),
+                        'image' => $model->newestVersion->image ?? $model->image ?? null,
+                        'title' => $title ? ContentBuilder::parseTitleTags($title) : $title,
+                        'content' => (new ContentBuilder($model->newestVersion->content ?? $model->content ?? ''))->getFullyHydratedContent(),
+                        'left_column' => (new ContentBuilder($model->newestVersion->left_column ?? $model->left_column ?? ''))->getFullyHydratedContent(),
+                        'right_column' => (new ContentBuilder($model->newestVersion->right_column ?? $model->right_column ?? ''))->getFullyHydratedContent(),
+                    ];
+                })
                 ->toArray();
         }
 

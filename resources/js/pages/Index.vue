@@ -11,8 +11,6 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 
-const raw_test = ref('{{b}}Test{{/b}} This is normal text blah {{i}}Blah{{/i}} blah {{indexTooltip=7-measuring-example-1}}Measuring Example 1  (Published){{/indexTooltip}}');
-
 const props = defineProps({
     wyrd_news: {
         type: [Object, Array],

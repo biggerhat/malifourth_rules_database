@@ -34,7 +34,7 @@ class IndexAdminController extends Controller
         $changeNotes = $request->get('change_notes') ?? null;
 
         return [
-            'title' => ContentBuilder::parseTitleTags($request->get('title') ?? ''),
+            'title' => $request->get('title') ?? '',
             'content' => (new ContentBuilder($content))->getFullyHydratedContent(),
             'change_notes' => $changeNotes ? (new ContentBuilder($changeNotes))->getFullyHydratedContent() : null,
         ];
@@ -47,7 +47,7 @@ class IndexAdminController extends Controller
         $content = (new ContentBuilder($index->content ?? ''))->getFullyHydratedContent();
 
         return [
-            'title' => ContentBuilder::parseTitleTags($index->title),
+            'title' => $index->title,
             'type' => $index->type->value,
             'content' => $content,
             'image' => $index->image,

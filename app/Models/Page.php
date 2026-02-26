@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Interfaces\HasBatching;
 use App\Interfaces\HasPublisher;
 use App\Observers\PageObserver;
+use App\Traits\HasContentReferences;
 use App\Traits\UsesVersionControl;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Page extends Model implements HasBatching, HasPublisher
 {
     /** @use HasFactory<\Database\Factories\PageFactory> */
+    use HasContentReferences;
     use HasFactory;
 
     use LogsActivity;

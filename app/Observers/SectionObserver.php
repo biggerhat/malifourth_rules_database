@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Actions\Content\SyncContentReferencesAction;
 use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;
@@ -26,6 +27,12 @@ class SectionObserver
             'slug' => $section->id.'-'.Str::slug($section->title),
         ]);
 
+        SyncContentReferencesAction::handle($section);
+    }
+
+    public function updated(Section $section): void
+    {
+        SyncContentReferencesAction::handle($section);
     }
 
     public function updating(Section $section): void

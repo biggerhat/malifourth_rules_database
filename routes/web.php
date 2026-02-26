@@ -14,9 +14,12 @@ Route::get('/', IndexPageController::class)->name('index');
 
 Route::prefix('rules')->name('rules.')->group(function () {
     Route::get('/', [PageController::class, 'index'])->name('index');
-    Route::get('/{page}', [PageController::class, 'view'])->name('page.view')->withTrashed();
     Route::get('/indices/{index}', [IndexController::class, 'view'])->name('index.view')->withTrashed();
     Route::get('/sections/{section}', [SectionController::class, 'view'])->name('section.view')->withTrashed();
+    Route::get('/pages/{page}/history', [PageController::class, 'viewHistory'])->name('page.history')->withTrashed();
+    Route::get('/sections/{section}/history', [SectionController::class, 'viewHistory'])->name('section.history')->withTrashed();
+    Route::get('/indices/{index}/history', [IndexController::class, 'viewHistory'])->name('index.history')->withTrashed();
+    Route::get('/{page}', [PageController::class, 'view'])->name('page.view')->withTrashed();
 });
 
 Route::get('/search', [SearchController::class, 'view'])->name('search');

@@ -6,6 +6,7 @@ use App\Enums\IndexTypeEnum;
 use App\Interfaces\HasBatching;
 use App\Interfaces\HasPublisher;
 use App\Observers\IndexObserver;
+use App\Traits\HasContentReferences;
 use App\Traits\UsesVersionControl;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,6 +22,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Index extends Model implements HasBatching, HasPublisher
 {
     /** @use HasFactory<\Database\Factories\IndexFactory> */
+    use HasContentReferences;
     use HasFactory;
 
     use LogsActivity;

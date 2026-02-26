@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Interfaces\HasBatching;
 use App\Interfaces\HasPublisher;
 use App\Observers\SectionObserver;
+use App\Traits\HasContentReferences;
 use App\Traits\UsesVersionControl;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class Section extends Model implements HasBatching, HasPublisher
 {
     /** @use HasFactory<\Database\Factories\SectionFactory> */
+    use HasContentReferences;
     use HasFactory;
 
     use LogsActivity;

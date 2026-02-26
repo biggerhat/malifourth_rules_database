@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
 import Card from "@/components/ui/card/Card.vue";
 import CardContent from "@/components/ui/card/CardContent.vue";
 import CardHeader from "@/components/ui/card/CardHeader.vue";
 import CardTitle from "@/components/ui/card/CardTitle.vue";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
@@ -88,6 +90,27 @@ const props = defineProps({
         default() {
             return null;
         }
+    },
+    references: {
+        type: Object,
+        required: false,
+        default() {
+            return null;
+        }
+    },
+    viewing_old_version: {
+        type: Boolean,
+        required: false,
+        default() {
+            return false;
+        }
+    },
+    current_version_url: {
+        type: String,
+        required: false,
+        default() {
+            return null;
+        }
     }
 });
 
@@ -111,8 +134,8 @@ watch(pageParam, (newValue) => {
 <template>
     <Head :title="props.title" />
 
-    <div class="grid grid-cols-1 lg:grid-cols-8 lg:gap-2 px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md">
-        <div class="lg:col-span-2 hidden lg:block">
+    <div class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
+        <div v-if="!props.viewing_old_version" class="lg:col-span-2 hidden lg:block">
             <Card class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
                 <CardHeader class="pb-0">
                     <CardTitle class="text-sm">Table of Contents</CardTitle>
@@ -129,8 +152,14 @@ watch(pageParam, (newValue) => {
                 </CardContent>
             </Card>
         </div>
-        <div class="lg:col-span-6">
-            <div class="lg:hidden block mb-4 mx-2">
+        <div :class="props.viewing_old_version ? '' : 'lg:col-span-6'">
+            <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">
+                <AlertDescription>
+                    You are viewing an older version of this content.
+                    <Link :href="props.current_version_url" class="underline font-medium ml-1">View the current version &rarr;</Link>
+                </AlertDescription>
+            </Alert>
+            <div v-if="!props.viewing_old_version" class="lg:hidden block mb-4 mx-2">
                 <Select v-model="pageParam">
                     <SelectTrigger class="w-full">
                         <SelectValue placeholder="Select a Section" />
@@ -152,7 +181,7 @@ watch(pageParam, (newValue) => {
             <div class="py-2">
                 <ParsedContent :content="props.content" />
             </div>
-            <div class="flex flex-col sm:flex-row items-stretch border rounded-lg mt-8 mb-4 divide-y sm:divide-y-0 sm:divide-x">
+            <div v-if="!props.viewing_old_version" class="flex flex-col sm:flex-row items-stretch border rounded-lg mt-8 mb-4 divide-y sm:divide-y-0 sm:divide-x">
                 <button
                     @click="router.get(route('rules.page.view', props.previous_page))"
                     :disabled="!previous_page"
@@ -177,6 +206,13 @@ watch(pageParam, (newValue) => {
                     <ChevronRight class="size-5 shrink-0 hidden sm:block" />
                 </button>
             </div>
+
+            <ContentReferences
+                v-if="props.references"
+                :references="props.references.references"
+                :referenced_by="props.references.referenced_by"
+                :revision_history="props.references.revision_history"
+            />
         </div>
 
         <ScrollToTop />

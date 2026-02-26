@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rules;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Services\ContentBuilder\ContentBuilder;
+use App\Services\ContentReferencesService;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
@@ -38,6 +39,7 @@ class PageController extends Controller
             'published_by' => $page->publishedBy->name,
             'previous_page' => $page->previousPage()?->slug,
             'next_page' => $page->nextPage()?->slug,
+            'references' => ContentReferencesService::getForModel($page),
         ]);
     }
 
@@ -69,6 +71,37 @@ class PageController extends Controller
             'published_by' => $page->publishedBy->name,
             'previous_page' => $page->previousPage()?->slug,
             'next_page' => $page->nextPage()?->slug,
+            'references' => ContentReferencesService::getForModel($page),
+        ]);
+    }
+
+    public function viewHistory(Request $request, Page $page)
+    {
+        $page->loadMissing('newestVersion', 'publishedBy');
+
+        $currentVersion = $page->newestVersion ?? $page;
+
+        if ($currentVersion->id === $page->id) {
+            return redirect()->route('rules.page.view', $page->slug);
+        }
+
+        if (! $page->published_at) {
+            return response('', 404);
+        }
+
+        $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
+
+        return inertia('Rules/PageView', [
+            'title' => ContentBuilder::parseTitleTags($page->title),
+            'slug' => $page->slug,
+            'content' => $content,
+            'page_number' => $page->page_number,
+            'book_page_numbers' => $page->book_page_numbers,
+            'published_at' => $page->published_at->format('m-d-Y'),
+            'published_by' => $page->publishedBy->name,
+            'references' => ContentReferencesService::getForModel($page),
+            'viewing_old_version' => true,
+            'current_version_url' => route('rules.page.view', $currentVersion->slug),
         ]);
     }
 }

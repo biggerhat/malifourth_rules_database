@@ -9,15 +9,13 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label'
-import { valueUpdater } from '@/lib/utils'
 import InputError from "@/components/InputError.vue";
 import {LoaderCircle} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from "@/components/ui/checkbox";
-import RichTextEditor from "@/components/RichTextEditor.vue";
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { h, ref } from 'vue';
-import type { ColumnDef, ColumnFiltersState } from '@tanstack/vue-table';
+import type { ColumnDef } from '@tanstack/vue-table';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AdminActions from '@/components/AdminActions.vue';
@@ -44,6 +42,7 @@ import {
 import {hasPermission} from "@/composables/hasPermission";
 import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
 import DraggableContent from "@/components/DraggableContent.vue";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import axios from "axios";
 
 const props = defineProps({
@@ -151,6 +150,7 @@ const columns: ColumnDef<Batches>[] = [
         },
     },{
         accessorKey: 'approved',
+        enableGlobalFilter: false,
         header: () => h('div', {class: 'text-center'}, 'Approved'),
         cell: ({ row }) => {
             const batchable = row.original;
@@ -160,6 +160,7 @@ const columns: ColumnDef<Batches>[] = [
     },{
         id: 'actions',
         enableHiding: false,
+        enableGlobalFilter: false,
         header: () => h('div', {}, 'Actions'),
         cell: ({ row }) => {
             const batchable = row.original;
@@ -194,17 +195,17 @@ const columns: ColumnDef<Batches>[] = [
     },
 ];
 
-const columnFilters = ref<ColumnFiltersState>([])
+const globalFilter = ref('')
 
 const table = useVueTable({
     get data() { return props.batchables },
     get columns() { return columns },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: 'includesString',
     state: {
-        get columnFilters() { return columnFilters.value },
+        get globalFilter() { return globalFilter.value },
     }
 });
 
@@ -220,93 +221,109 @@ const table = useVueTable({
         </CardHeader>
         <CardContent>
             <form @submit.prevent>
-                <div class="grid items-center w-full gap-4">
-                    <div class="flex flex-col space-y-1.5">
-                        <Label for="title">Batch</Label>
-                        <Input id="title" type="text" required autofocus :tabindex="1" autocomplete="title" v-model="form.title" placeholder="Batch Name" />
-                        <InputError :message="form.errors.title" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5">
-                        <DraggableContent
-                            v-if="viewData"
-                            @update:content-order="releaseNotesUpdate"
-                            @update:new-content="releaseNotesNewContent"
-                            :content="viewData.release_notes ?? []"
-                            label="Release Notes"
-                            :indices="props.indices"
-                            :sections="props.sections"
-                            :pages="props.pages"
-                            :key="viewData.release_notes"
-                        />
-                        <InputError :message="form.errors.release_notes" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5">
-                        <Label for="internal_notes">Internal Notes</Label>
-                        <Textarea class="min-h-48" id="internal_notes" v-model="form.internal_notes" placeholder="Add Internal Notes" />
-                        <InputError :message="form.errors.internal_notes" />
-                    </div>
-
-                    <!-- Batchables Table -->
-                    <div class="container mx-auto mt-6" v-if="props.batchables">
-                        <div class="flex items-center justify-between py-4">
-                            <Input class="max-w-sm" placeholder="Filter Batch Entries"
-                                   :model-value="table.getColumn('title')?.getFilterValue() as string"
-                                   @update:model-value="table.getColumn('title')?.setFilterValue($event)" />
+                <Tabs default-value="details">
+                    <TabsList>
+                        <TabsTrigger value="details">Details</TabsTrigger>
+                        <TabsTrigger value="content">Content</TabsTrigger>
+                        <TabsTrigger v-if="props.batchables" value="items">Items</TabsTrigger>
+                        <TabsTrigger value="notes">Notes</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="details" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="title">Batch</Label>
+                                <Input id="title" type="text" required autofocus :tabindex="1" autocomplete="title" v-model="form.title" placeholder="Batch Name" />
+                                <InputError :message="form.errors.title" />
+                            </div>
                         </div>
-                        <div class="border rounded-md">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                                        <TableHead v-for="header in headerGroup.headers" :key="header.id">
-                                            <FlexRender
-                                                v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
-                                                :props="header.getContext()"
-                                            />
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    <template v-if="table.getRowModel().rows?.length">
-                                        <TableRow
-                                            v-for="row in table.getRowModel().rows" :key="row.id"
-                                            :data-state="row.getIsSelected() ? 'selected' : undefined"
-                                        >
-                                            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-                                                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
-                                            </TableCell>
+                    </TabsContent>
+                    <TabsContent value="content" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5">
+                                <DraggableContent
+                                    v-if="viewData"
+                                    @update:content-order="releaseNotesUpdate"
+                                    @update:new-content="releaseNotesNewContent"
+                                    :content="viewData.release_notes ?? []"
+                                    label="Release Notes"
+                                    :indices="props.indices"
+                                    :sections="props.sections"
+                                    :pages="props.pages"
+                                    :key="viewData.release_notes"
+                                />
+                                <InputError :message="form.errors.release_notes" />
+                            </div>
+                        </div>
+                    </TabsContent>
+                    <TabsContent v-if="props.batchables" value="items" force-mount class="data-[state=inactive]:hidden">
+                        <div class="container mx-auto mt-6">
+                            <div class="flex items-center justify-between py-4">
+                                <Input class="max-w-sm" placeholder="Search..."
+                                       v-model="globalFilter" />
+                            </div>
+                            <div class="border rounded-md">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+                                            <TableHead v-for="header in headerGroup.headers" :key="header.id">
+                                                <FlexRender
+                                                    v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
+                                                    :props="header.getContext()"
+                                                />
+                                            </TableHead>
                                         </TableRow>
-                                    </template>
-                                    <template v-else>
-                                        <TableRow>
-                                            <TableCell :colspan="columns.length" class="h-24 text-center">
-                                                No results.
-                                            </TableCell>
-                                        </TableRow>
-                                    </template>
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <template v-if="table.getRowModel().rows?.length">
+                                            <TableRow
+                                                v-for="row in table.getRowModel().rows" :key="row.id"
+                                                :data-state="row.getIsSelected() ? 'selected' : undefined"
+                                            >
+                                                <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                                                    <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                                                </TableCell>
+                                            </TableRow>
+                                        </template>
+                                        <template v-else>
+                                            <TableRow>
+                                                <TableCell :colspan="columns.length" class="h-24 text-center">
+                                                    No results.
+                                                </TableCell>
+                                            </TableRow>
+                                        </template>
+                                    </TableBody>
+                                </Table>
+                            </div>
+                            <div class="flex items-center justify-end py-4 space-x-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    :disabled="!table.getCanPreviousPage()"
+                                    @click="table.previousPage()"
+                                >
+                                    Previous
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    :disabled="!table.getCanNextPage()"
+                                    @click="table.nextPage()"
+                                >
+                                    Next
+                                </Button>
+                            </div>
                         </div>
-                        <div class="flex items-center justify-end py-4 space-x-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                :disabled="!table.getCanPreviousPage()"
-                                @click="table.previousPage()"
-                            >
-                                Previous
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                :disabled="!table.getCanNextPage()"
-                                @click="table.nextPage()"
-                            >
-                                Next
-                            </Button>
+                    </TabsContent>
+                    <TabsContent value="notes" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="internal_notes">Internal Notes</Label>
+                                <Textarea class="min-h-48" id="internal_notes" v-model="form.internal_notes" placeholder="Add Internal Notes" />
+                                <InputError :message="form.errors.internal_notes" />
+                            </div>
                         </div>
-                    </div>
-
-                </div>
+                    </TabsContent>
+                </Tabs>
                 <div class="flex justify-end mt-6">
                     <Button type="submit" @click="submit" class="my-auto" tabindex="5" :disabled="form.processing">
                         <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />

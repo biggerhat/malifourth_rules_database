@@ -17,7 +17,6 @@ import InputError from "@/components/InputError.vue";
 import {LoaderCircle, CircleX, CheckCheckIcon, ChevronsUpDown, Search, Check, Component, Eye} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from "@/components/ui/checkbox";
-import RichTextEditor from "@/components/RichTextEditor.vue";
 import {hasPermission} from "@/composables/hasPermission";
 import {
     Dialog, DialogClose,
@@ -48,8 +47,8 @@ import {
 import {Switch} from "@/components/ui/switch";
 import axios from "axios";
 import sectionView from "@/pages/Rules/SectionView.vue";
-import DragDropEditor from "@/components/DragDropEditor.vue";
 import DraggableContent from "@/components/DraggableContent.vue";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
 const props = defineProps({
     section: {
@@ -182,68 +181,85 @@ const replaceBrWithNewline = (text) => {
         </CardHeader>
         <CardContent>
             <form @submit.prevent>
-                <div class="grid items-center w-full gap-4">
-                    <div class="flex flex-col space-y-1.5">
-                        <Label for="title">Section</Label>
-                        <Input id="title" type="text" required autofocus :tabindex="1" autocomplete="title" v-model="form.title" placeholder="Section Title" />
-                        <InputError :message="form.errors.title" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
-                            <div>
-                                <div class="flex flex-col space-y-1.5">
-                                    <DraggableContent
-                                        v-if="viewData"
-                                        @update:content-order="leftColumnUpdate"
-                                        @update:new-content="leftColumnNewContent"
-                                        :content="viewData.left_column ?? []"
-                                        label="Left Column"
-                                        :indices="props.indices"
-                                        :sections="props.sections"
-                                        :pages="props.pages"
-                                        :key="viewData.left_column"
-                                    />
-                                    <InputError :message="form.errors.left_column" />
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex flex-col space-y-1.5">
-                                    <DraggableContent
-                                        v-if="viewData"
-                                        @update:content-order="rightColumnUpdate"
-                                        @update:new-content="rightColumnNewContent"
-                                        :content="viewData.right_column ?? []"
-                                        label="Right Column"
-                                        :indices="props.indices"
-                                        :sections="props.sections"
-                                        :pages="props.pages"
-                                        :key="viewData.right_column"
-                                    />
-                                    <InputError :message="form.errors.right_column" />
-                                </div>
+                <Tabs default-value="details">
+                    <TabsList>
+                        <TabsTrigger value="details">Details</TabsTrigger>
+                        <TabsTrigger value="content">Content</TabsTrigger>
+                        <TabsTrigger value="notes">Notes</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="details" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="title">Section</Label>
+                                <Input id="title" type="text" required autofocus :tabindex="1" autocomplete="title" v-model="form.title" placeholder="Section Title" />
+                                <InputError :message="form.errors.title" />
                             </div>
                         </div>
-                    </div>
-                    <div class="flex flex-col space-y-1.5" v-if="(props.section && props.section?.published_at) || props.section?.approval?.change_notes">
-                        <DraggableContent
-                            v-if="viewData"
-                            @update:content-order="changeNotesUpdate"
-                            @update:new-content="changeNotesNewContent"
-                            :content="viewData.change_notes ?? []"
-                            label="Change Notes"
-                            :indices="props.indices"
-                            :sections="props.sections"
-                            :pages="props.pages"
-                            :key="viewData.change_notes"
-                        />
-                        <InputError :message="form.errors.change_notes" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5">
-                        <Label for="internal_notes">Internal Notes</Label>
-                        <Textarea class="min-h-48" id="internal_notes" v-model="form.internal_notes" placeholder="Add Internal Notes" />
-                        <InputError :message="form.errors.internal_notes" />
-                    </div>
-                </div>
+                    </TabsContent>
+                    <TabsContent value="content" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
+                                    <div>
+                                        <div class="flex flex-col space-y-1.5">
+                                            <DraggableContent
+                                                v-if="viewData"
+                                                @update:content-order="leftColumnUpdate"
+                                                @update:new-content="leftColumnNewContent"
+                                                :content="viewData.left_column ?? []"
+                                                label="Left Column"
+                                                :indices="props.indices"
+                                                :sections="props.sections"
+                                                :pages="props.pages"
+                                                :key="viewData.left_column"
+                                            />
+                                            <InputError :message="form.errors.left_column" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex flex-col space-y-1.5">
+                                            <DraggableContent
+                                                v-if="viewData"
+                                                @update:content-order="rightColumnUpdate"
+                                                @update:new-content="rightColumnNewContent"
+                                                :content="viewData.right_column ?? []"
+                                                label="Right Column"
+                                                :indices="props.indices"
+                                                :sections="props.sections"
+                                                :pages="props.pages"
+                                                :key="viewData.right_column"
+                                            />
+                                            <InputError :message="form.errors.right_column" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col space-y-1.5" v-if="(props.section && props.section?.published_at) || props.section?.approval?.change_notes">
+                                <DraggableContent
+                                    v-if="viewData"
+                                    @update:content-order="changeNotesUpdate"
+                                    @update:new-content="changeNotesNewContent"
+                                    :content="viewData.change_notes ?? []"
+                                    label="Change Notes"
+                                    :indices="props.indices"
+                                    :sections="props.sections"
+                                    :pages="props.pages"
+                                    :key="viewData.change_notes"
+                                />
+                                <InputError :message="form.errors.change_notes" />
+                            </div>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="notes" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="internal_notes">Internal Notes</Label>
+                                <Textarea class="min-h-48" id="internal_notes" v-model="form.internal_notes" placeholder="Add Internal Notes" />
+                                <InputError :message="form.errors.internal_notes" />
+                            </div>
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </form>
         </CardContent>
         <CardFooter>

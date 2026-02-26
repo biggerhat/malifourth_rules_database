@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import { h, ref } from 'vue';
-import type { ColumnDef, ColumnFiltersState } from '@tanstack/vue-table';
+import type { ColumnDef } from '@tanstack/vue-table';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { valueUpdater } from '@/lib/utils'
 import AdminActions from '@/components/AdminActions.vue';
 import {Ban, Check} from "lucide-vue-next";
 
@@ -50,12 +49,14 @@ const columns: ColumnDef<Approvals>[] = [
         },
     },{
         accessorKey: 'published_at',
+        enableGlobalFilter: false,
         header: () => h('div', {class: 'text-center'}, 'Published'),
         cell: ({ row }) => {
             return h('div', {}, row.getValue('published_at') ? h(Check, {class: 'text-green-500 mx-auto'}) : h(Ban, {class: 'text-red-500 mx-auto'}))
         },
     },{
         accessorKey: 'approved',
+        enableGlobalFilter: false,
         header: () => h('div', {class: 'text-center'}, 'Approved'),
         cell: ({ row }) => {
             const approval = row.original;
@@ -65,6 +66,7 @@ const columns: ColumnDef<Approvals>[] = [
     },{
         id: 'actions',
         enableHiding: false,
+        enableGlobalFilter: false,
         header: () => h('div', {}, 'Actions'),
         cell: ({ row }) => {
             const approval = row.original;
@@ -83,17 +85,17 @@ const props = defineProps<{
     approvals: TData[]
 }>();
 
-const columnFilters = ref<ColumnFiltersState>([])
+const globalFilter = ref('')
 
 const table = useVueTable({
     get data() { return props.approvals },
     get columns() { return columns },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: 'includesString',
     state: {
-        get columnFilters() { return columnFilters.value },
+        get globalFilter() { return globalFilter.value },
     }
 });
 </script>
@@ -103,9 +105,8 @@ const table = useVueTable({
 
     <div class="container mx-auto mt-6">
         <div class="flex items-center justify-between py-4">
-            <Input class="max-w-sm" placeholder="Filter Approvals"
-                   :model-value="table.getColumn('title')?.getFilterValue() as string"
-                   @update:model-value=" table.getColumn('title')?.setFilterValue($event)" />
+            <Input class="max-w-sm" placeholder="Search..."
+                   v-model="globalFilter" />
         </div>
         <div class="border rounded-md">
             <Table>

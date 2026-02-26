@@ -129,6 +129,57 @@ class PageAdminController extends Controller
         return to_route('admin.pages.index')->withMessage($page->title.' has been published!');
     }
 
+    public function bulkApprove(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $items = Page::with('approval')->whereIn('id', $validated['ids'])->get();
+        $count = 0;
+
+        foreach ($items as $item) {
+            if ($item->approval && ! $item->approval->approved_at) {
+                $item->approval->update([
+                    'approved_at' => now(),
+                    'approved_by' => $request->user()->id,
+                ]);
+                $count++;
+            }
+        }
+
+        return redirect()->back()->withMessage("{$count} page(s) approved.");
+    }
+
+    public function bulkPublish(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $items = Page::with('approval')->whereIn('id', $validated['ids'])->get();
+        $count = 0;
+        $errors = [];
+
+        foreach ($items as $item) {
+            try {
+                $item->publish($request->user());
+                $count++;
+            } catch (\Exception $e) {
+                $errors[] = $item->title.': '.$e->getMessage();
+            }
+        }
+
+        $message = "{$count} page(s) published.";
+        if (! empty($errors)) {
+            $message .= ' Errors: '.implode('; ', $errors);
+        }
+
+        return redirect()->back()->withMessage($message);
+    }
+
+    public function bulkDelete(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $count = Page::whereIn('id', $validated['ids'])->whereNull('published_at')->delete();
+
+        return redirect()->back()->withMessage("{$count} page(s) deleted.");
+    }
+
     private function validateAndSave(Request $request, ?Page $page = null): Page
     {
         $validated = $request->validate([

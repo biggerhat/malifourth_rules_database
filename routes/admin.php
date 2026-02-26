@@ -51,6 +51,9 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/update/{index}', 'update')->name('update')->middleware(['permission:edit_index']);
         Route::post('/delete/{index}', 'delete')->name('delete')->middleware(['permission:delete_index']);
         Route::post('/publish/{index}', 'publish')->name('publish')->middleware(['permission:publish_index']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_index']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_index']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_index']);
     });
 
     Route::controller(SectionAdminController::class)->prefix('sections')->name('sections.')->group(function () {
@@ -64,6 +67,9 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/update/{section}', 'update')->name('update')->middleware(['permission:edit_section']);
         Route::post('/delete/{section}', 'delete')->name('delete')->middleware(['permission:delete_section']);
         Route::post('/publish/{section}', 'publish')->name('publish')->middleware(['permission:publish_section']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_section']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_section']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_section']);
     });
 
     Route::controller(PageAdminController::class)->prefix('pages')->name('pages.')->group(function () {
@@ -77,6 +83,9 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/update/{page}', 'update')->name('update')->middleware(['permission:edit_page']);
         Route::post('/delete/{page}', 'delete')->name('delete')->middleware(['permission:delete_page']);
         Route::post('/publish/{page}', 'publish')->name('publish')->middleware(['permission:publish_page']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_page']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_page']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_page']);
         Route::prefix('order')->name('order.')->group(function () {
             Route::get('/', [PageOrderController::class, 'index'])->name('index');
             Route::post('/update', [PageOrderController::class, 'update'])->name('update');
@@ -94,6 +103,9 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/update/{season}', 'update')->name('update')->middleware(['permission:edit_season']);
         Route::post('/delete/{season}', 'delete')->name('delete')->middleware(['permission:delete_season']);
         Route::post('/publish/{season}', 'publish')->name('publish')->middleware(['permission:publish_season']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_season']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_season']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_season']);
     });
 
     Route::controller(ApprovalAdminController::class)->prefix('approvals')->name('approvals.')->group(function () {

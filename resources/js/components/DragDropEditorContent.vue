@@ -1,27 +1,8 @@
 <script setup lang="ts">
 import { defineProps, h, ref } from 'vue';
-import IndexTooltip from '@/components/IndexTooltip.vue';
-import Warding from '@/components/symbols/Warding.vue';
-import Crow from '@/components/symbols/Crow.vue';
-import Magic from '@/components/symbols/Magic.vue';
-import Mask from '@/components/symbols/Mask.vue';
-import Melee from '@/components/symbols/Melee.vue';
-import Missile from '@/components/symbols/Missile.vue';
-import Negative from '@/components/symbols/Negative.vue';
-import Fortitude from '@/components/symbols/Fortitude.vue';
-import Positive from '@/components/symbols/Positive.vue';
-import Pulse from '@/components/symbols/Pulse.vue';
-import Ram from '@/components/symbols/Ram.vue';
-import SignatureAction from '@/components/symbols/SignatureAction.vue';
-import Soulstone from '@/components/symbols/Soulstone.vue';
-import Tome from '@/components/symbols/Tome.vue';
-import UnusualDefense from '@/components/symbols/UnusualDefense.vue';
+import { COMPONENT_MAP } from '@/lib/content-tags';
+import { segmentsToCustomTags, customTagsToSegments } from '@/lib/tag-serializer';
 import ParsedContent from '@/components/ParsedContent.vue';
-import IndexContent from '@/components/IndexContent.vue';
-import SectionContent from '@/components/SectionContent.vue';
-import SectionLink from '@/components/SectionLink.vue';
-import PageLink from '@/components/PageLink.vue';
-import ExternalLink from '@/components/ExternalLink.vue';
 import { CircleEllipsisIcon, CircleMinusIcon, CirclePlusIcon, CircleXIcon } from 'lucide-vue-next';
 import DragDropTextContent from '@/components/DragDropTextContent.vue';
 import {
@@ -49,60 +30,25 @@ const props = defineProps({
     indices: {
         type: [Object, Array],
         required: false,
-        default() {
-            return {};
-        },
+        default() { return {}; },
     },
     pages: {
         type: [Object, Array],
         required: false,
-        default() {
-            return {};
-        },
+        default() { return {}; },
     },
     sections: {
         type: [Object, Array],
         required: false,
-        default() {
-            return {};
-        },
+        default() { return {}; },
     },
 });
 
-// Maps tag names to component files
-const componentMap = {
-    indexTooltip: IndexTooltip,
-    index: IndexContent,
-    section: SectionContent,
-    sectionLink: SectionLink,
-    pageLink: PageLink,
-    Link: ExternalLink,
-    crow: Crow,
-    magic: Magic,
-    warding: Warding,
-    mask: Mask,
-    melee: Melee,
-    missile: Missile,
-    negative: Negative,
-    fortitude: Fortitude,
-    positive: Positive,
-    pulse: Pulse,
-    ram: Ram,
-    signatureaction: SignatureAction,
-    soulstone: Soulstone,
-    tome: Tome,
-    unusualdefense: UnusualDefense,
-};
-
-const editorOpen = ref(false);
-
-// Fallback component for unknown tags
 const UnknownTag = {
     props: ['text'],
     template: `<span style="color: red;">[Unknown tag]</span>`,
 };
 
-// Determines the component to use for a content item
 function resolveComponent(item) {
     if (item.text !== undefined) {
         return {
@@ -114,10 +60,9 @@ function resolveComponent(item) {
     }
 
     const tag = Object.keys(item)[0];
-    return componentMap[tag] || UnknownTag;
+    return COMPONENT_MAP[tag] || UnknownTag;
 }
 
-// Extracts props from a content item and supports recursive rendering
 function getProps(item) {
     if (item.text !== undefined) {
         return { text: item.text };
@@ -125,16 +70,16 @@ function getProps(item) {
 
     const tag = Object.keys(item)[0];
     const data = item[tag];
-
-    const props = { ...data };
+    const itemProps = { ...data };
 
     if (Array.isArray(data.text)) {
-        props.text = h(ParsedContent, { content: data.text });
+        itemProps.text = h(ParsedContent, { content: data.text });
     }
 
-    return props;
+    return itemProps;
 }
 
+const editorOpen = ref(false);
 const collapsed = ref(false);
 
 const toggleCollapse = () => {
@@ -145,192 +90,17 @@ const emit = defineEmits(['update:elementContent', 'delete:element']);
 
 const normalizedContent = ref(null);
 const openEditor = () => {
-    normalizedContent.value = jsonToCustomTags(props.element.text);
+    normalizedContent.value = segmentsToCustomTags(props.element.text);
     editorOpen.value = true;
 };
-
-const jsonToCustomTags = (segments) => {
-    let content = '';
-    segments.forEach((seg) => {
-        switch (seg.type) {
-            case 'strong':
-                content += `{{b}}${seg.content}{{/b}}`;
-                break;
-            case 'i':
-                content += `{{i}}${seg.content}{{/i}}`;
-                break;
-            case 'u':
-                content += `{{u}}${seg.content}{{/i}}`;
-                break;
-            case 'hr':
-                content += `{{hr /}}`;
-            case 'br':
-                content += '\n';
-                break;
-            case 'text':
-                content += seg.content;
-                break;
-            case 'indexTooltip':
-                content += `{{indexTooltip=${seg.content.slug}}}${seg.content.text}{{/indexTooltip}}`;
-                break;
-            case 'sectionLink':
-                content += `{{sectionLink=${seg.content.slug}}}${seg.content.text}{{/sectionLink}}`;
-                break;
-            case 'pageLink':
-                content += `{{pageLink=${seg.content.slug}}}${seg.content.text}{{/pageLink}}`;
-                break;
-            case 'Link':
-                content += `{{Link=${seg.content.slug}}}${seg.content.text}{{/Link}}`;
-                break;
-            case 'crow':
-                content += '{{crow /}}';
-                break;
-            case 'magic':
-                content += '{{magic /}}';
-                break;
-            case 'warding':
-                content += '{{warding /}}';
-                break;
-            case 'mask':
-                content += '{{mask /}}';
-                break;
-            case 'melee':
-                content += '{{melee /}}';
-                break;
-            case 'missile':
-                content += '{{missile /}}';
-                break;
-            case 'negative':
-                content += '{{negative /}}';
-                break;
-            case 'fortitude':
-                content += '{{fortitude /}}';
-                break;
-            case 'positive':
-                content += '{{positive /}}';
-                break;
-            case 'pulse':
-                content += '{{pulse /}}';
-                break;
-            case 'ram':
-                content += '{{ram /}}';
-                break;
-            case 'signatureaction':
-                content += '{{signatureaction /}}';
-                break;
-            case 'soulstone':
-                content += '{{soulstone /}}';
-                break;
-            case 'tome':
-                content += '{{tome /}}';
-                break;
-            case 'unusualdefense':
-                content += '{{unusualdefense /}}';
-                break;
-            default:
-                content += '';
-                break;
-        }
-        content += ' ';
-    });
-
-    return content;
-};
-
-function customTagsToJson(str) {
-    const result = [];
-    const stack = [];
-
-    // Normalize <br />
-    str = str.replace(/<br\s*\/?>/gi, "{{__br__}}");
-
-    const tagPattern = /\{\{(\/?[a-zA-Z]+|[a-zA-Z]+=[^}]+|[a-zA-Z]+\s*\/|__br__)\}\}/g;
-
-    let lastIndex = 0;
-    let match;
-
-    while ((match = tagPattern.exec(str)) !== null) {
-        const before = str.slice(lastIndex, match.index);
-
-        // Only push plain text if NOT inside an open tag
-        if (before && stack.length === 0) {
-            result.push({ type: "text", content: before });
-        }
-
-        const tag = match[1];
-        lastIndex = tagPattern.lastIndex;
-
-        if (tag === "__br__") {
-            result.push({ type: "br", content: "" });
-            continue;
-        }
-
-        // Closing tag
-        if (tag.startsWith("/")) {
-            const open = stack.pop();
-            if (open) {
-                const inner = str.slice(open.end, match.index);
-                switch (open.type) {
-                    case "b":
-                        result.push({ type: "strong", content: inner });
-                        break;
-                    case "i":
-                    case "u":
-                        result.push({ type: open.type, content: inner });
-                        break;
-                    case "indexTooltip":
-                    case "sectionLink":
-                    case "pageLink":
-                    case "Link":
-                        result.push({
-                            type: open.type,
-                            content: {
-                                slug: open.slug,
-                                text: inner,
-                                inline: true
-                            }
-                        });
-                        break;
-                    default:
-                        result.push({ type: "text", content: inner });
-                }
-            }
-        }
-        // Self-closing tags (like {{mask /}})
-        else if (tag.endsWith("/")) {
-            const type = tag.replace("/", "").trim();
-            result.push({ type, content: { inline: true } });
-        }
-        // Opening tag with slug (e.g. {{indexTooltip=slug}})
-        else if (tag.includes("=")) {
-            const [type, slug] = tag.split("=");
-            stack.push({ type, slug, end: tagPattern.lastIndex });
-        }
-        // Simple opening tags ({{b}}, {{i}}, {{u}})
-        else {
-            stack.push({ type: tag, end: tagPattern.lastIndex });
-        }
-    }
-
-    // Remaining plain text outside tags
-    if (lastIndex < str.length && stack.length === 0) {
-        result.push({ type: "text", content: str.slice(lastIndex) });
-    }
-
-    return result;
-}
 
 const removeElement = (uniqueIndex) => {
     emit('delete:element', uniqueIndex);
 };
 
-const updateTextOrder = (newOrder) => {
-    emit('update:elementContent', { text: newOrder, uniqueIndex: props.uniqueIndex });
-};
-
 const changeTextContent = (content) => {
     let normalized = content.replace(/\n/g, "<br />");
-    emit('update:elementContent', { text: customTagsToJson(normalized), uniqueIndex: props.uniqueIndex });
+    emit('update:elementContent', { text: customTagsToSegments(normalized), uniqueIndex: props.uniqueIndex });
     editorOpen.value = false;
 };
 </script>
@@ -362,7 +132,7 @@ const changeTextContent = (content) => {
         </div>
         <transition name="fade">
             <div class="px-1" v-show="!collapsed">
-                <DragDropTextContent @update:text-order="updateTextOrder" v-if="element.text !== undefined" :content="element.text" />
+                <DragDropTextContent v-if="element.text !== undefined" :content="element.text" :root="true" />
                 <component v-else :is="resolveComponent(element)" v-bind="getProps(element)" />
             </div>
         </transition>

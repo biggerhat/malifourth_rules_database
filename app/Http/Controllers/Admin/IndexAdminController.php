@@ -136,6 +136,57 @@ class IndexAdminController extends Controller
         return to_route('admin.indices.index')->withMessage($index->title.' has been published!');
     }
 
+    public function bulkApprove(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $items = Index::with('approval')->whereIn('id', $validated['ids'])->get();
+        $count = 0;
+
+        foreach ($items as $item) {
+            if ($item->approval && ! $item->approval->approved_at) {
+                $item->approval->update([
+                    'approved_at' => now(),
+                    'approved_by' => $request->user()->id,
+                ]);
+                $count++;
+            }
+        }
+
+        return redirect()->back()->withMessage("{$count} index(es) approved.");
+    }
+
+    public function bulkPublish(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $items = Index::with('approval')->whereIn('id', $validated['ids'])->get();
+        $count = 0;
+        $errors = [];
+
+        foreach ($items as $item) {
+            try {
+                $item->publish($request->user());
+                $count++;
+            } catch (\Exception $e) {
+                $errors[] = $item->title.': '.$e->getMessage();
+            }
+        }
+
+        $message = "{$count} index(es) published.";
+        if (! empty($errors)) {
+            $message .= ' Errors: '.implode('; ', $errors);
+        }
+
+        return redirect()->back()->withMessage($message);
+    }
+
+    public function bulkDelete(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $count = Index::whereIn('id', $validated['ids'])->whereNull('published_at')->delete();
+
+        return redirect()->back()->withMessage("{$count} index(es) deleted.");
+    }
+
     private function validateAndSave(Request $request, ?Index $index = null): Index
     {
         $validated = $request->validate([

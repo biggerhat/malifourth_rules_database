@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import { h, ref } from 'vue';
-import type { ColumnDef, ColumnFiltersState } from '@tanstack/vue-table';
+import type { ColumnDef } from '@tanstack/vue-table';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { valueUpdater } from '@/lib/utils'
 import AdminActions from '@/components/AdminActions.vue';
 import { hasPermission } from "@/composables/hasPermission";
 
@@ -49,6 +48,7 @@ const columns: ColumnDef<Users>[] = [
     },{
         id: 'actions',
         enableHiding: false,
+        enableGlobalFilter: false,
         header: () => h('div', {}, 'Actions'),
         cell: ({ row }) => {
             const user = row.original;
@@ -67,17 +67,17 @@ const props = defineProps<{
     users: TData[]
 }>();
 
-const columnFilters = ref<ColumnFiltersState>([])
+const globalFilter = ref('')
 
 const table = useVueTable({
     get data() { return props.users },
     get columns() { return columns },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: 'includesString',
     state: {
-        get columnFilters() { return columnFilters.value },
+        get globalFilter() { return globalFilter.value },
     }
 });
 </script>
@@ -87,9 +87,8 @@ const table = useVueTable({
 
     <div class="container mx-auto mt-6">
         <div class="flex items-center justify-between py-4">
-            <Input class="max-w-sm" placeholder="Filter Users"
-                   :model-value="table.getColumn('name')?.getFilterValue() as string"
-                   @update:model-value=" table.getColumn('name')?.setFilterValue($event)" />
+            <Input class="max-w-sm" placeholder="Search..."
+                   v-model="globalFilter" />
             <Button @click="router.get(route('admin.users.create'))" v-if="hasPermission('add_user')">
                 Create New User
             </Button>

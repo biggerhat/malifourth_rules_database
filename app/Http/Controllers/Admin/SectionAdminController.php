@@ -131,6 +131,57 @@ class SectionAdminController extends Controller
         return to_route('admin.sections.index')->withMessage($section->title.' has been published!');
     }
 
+    public function bulkApprove(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $items = Section::with('approval')->whereIn('id', $validated['ids'])->get();
+        $count = 0;
+
+        foreach ($items as $item) {
+            if ($item->approval && ! $item->approval->approved_at) {
+                $item->approval->update([
+                    'approved_at' => now(),
+                    'approved_by' => $request->user()->id,
+                ]);
+                $count++;
+            }
+        }
+
+        return redirect()->back()->withMessage("{$count} section(s) approved.");
+    }
+
+    public function bulkPublish(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $items = Section::with('approval')->whereIn('id', $validated['ids'])->get();
+        $count = 0;
+        $errors = [];
+
+        foreach ($items as $item) {
+            try {
+                $item->publish($request->user());
+                $count++;
+            } catch (\Exception $e) {
+                $errors[] = $item->title.': '.$e->getMessage();
+            }
+        }
+
+        $message = "{$count} section(s) published.";
+        if (! empty($errors)) {
+            $message .= ' Errors: '.implode('; ', $errors);
+        }
+
+        return redirect()->back()->withMessage($message);
+    }
+
+    public function bulkDelete(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $count = Section::whereIn('id', $validated['ids'])->whereNull('published_at')->delete();
+
+        return redirect()->back()->withMessage("{$count} section(s) deleted.");
+    }
+
     private function validateAndSave(Request $request, ?Section $section = null): Section
     {
         $validated = $request->validate([

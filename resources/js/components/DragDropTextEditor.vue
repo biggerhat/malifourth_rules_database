@@ -1,88 +1,41 @@
 <script setup lang="ts">
-import {
-    Check,
-    LetterTextIcon,
-    X,
-    Bold,
-    Italic,
-    Underline,
-    Minus,
-    SquareMinus,
-    MousePointerClick, SquarePlus, Link2
-} from "lucide-vue-next";
-import { ref, onMounted, nextTick, watch, computed } from "vue";
-import Mask from "@/components/symbols/Mask.vue";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger} from "@/components/ui/sheet";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import Missile from "@/components/symbols/Missile.vue";
-import Crow from "@/components/symbols/Crow.vue";
-import Ram from "@/components/symbols/Ram.vue";
-import Melee from "@/components/symbols/Melee.vue";
-import Fortitude from "@/components/symbols/Fortitude.vue";
-import Tome from "@/components/symbols/Tome.vue";
-import SignatureAction from "@/components/symbols/SignatureAction.vue";
-import Pulse from "@/components/symbols/Pulse.vue";
-import Warding from "@/components/symbols/Warding.vue";
-import Magic from "@/components/symbols/Magic.vue";
-import UnusualDefense from "@/components/symbols/UnusualDefense.vue";
-import Negative from "@/components/symbols/Negative.vue";
-import Soulstone from "@/components/symbols/Soulstone.vue";
-import Positive from "@/components/symbols/Positive.vue";
+import { Check, X, Bold, Italic, Underline, Minus } from "lucide-vue-next";
+import { ref, onMounted, computed, toRef } from "vue";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { SymbolBar, TooltipSheet, LinkSheet } from "@/components/editor";
+import { useFilteredEntities } from "@/composables/useFilteredEntities";
 
 const props = defineProps({
     content: {
         type: [Object, Array, String],
         required: false,
-        default() {
-            return "";
-        }
+        default() { return ""; }
     },
     uniqueIndex: {
         type: String,
         required: false,
-        default() {
-            return null;
-        }
+        default() { return null; }
     },
     indices: {
         type: [Object, Array],
         required: false,
-        default() {
-            return {};
-        }
+        default() { return {}; }
     },
     pages: {
         type: [Object, Array],
         required: false,
-        default() {
-            return {};
-        }
+        default() { return {}; }
     },
     sections: {
         type: [Object, Array],
         required: false,
-        default() {
-            return {};
-        }
+        default() { return {}; }
     }
 });
 
-const currentTheme = computed(() => {
-    return localStorage.appearance;
-});
+const emits = defineEmits(['closeEditor', 'saveContent']);
 
-const emits = defineEmits([
-    'closeEditor',
-    'saveContent',
-]);
-
-const closeEditor = () => {
-    emits('closeEditor');
-}
+const closeEditor = () => { emits('closeEditor'); };
 
 const editor = ref(null);
 const selectedText = ref("");
@@ -113,7 +66,6 @@ function wrapWithTag(tag, tagText = "", tagSlug = null) {
     let closingTag = `{{/${tag}}}`;
 
     if (caretStart.value !== caretEnd.value) {
-        // wrap selected text
         const newVal =
             val.slice(0, caretStart.value) +
             openingTag +
@@ -122,17 +74,12 @@ function wrapWithTag(tag, tagText = "", tagSlug = null) {
             val.slice(caretEnd.value);
 
         editor.value.value = newVal;
-
-        // Move caret after wrapped text
         const newCaret = caretEnd.value + tag.length + 5;
         editor.value.setSelectionRange(newCaret, newCaret);
     } else {
-        // insert tag at caret
         const insertion = `${openingTag}${tagText}${closingTag}`;
         editor.value.value =
             val.slice(0, caretStart.value) + insertion + val.slice(caretStart.value);
-
-        // move caret inside inserted tags
         const newCaret = caretStart.value + tag.length + 4;
         editor.value.setSelectionRange(newCaret, newCaret);
     }
@@ -150,7 +97,6 @@ function insertTag(tag) {
     editor.value.value =
         val.slice(0, caretStart.value) + insertion + val.slice(caretStart.value);
 
-    // move caret inside inserted tags
     const newCaret = caretStart.value + tag.length + 6;
     editor.value.setSelectionRange(newCaret, newCaret);
 
@@ -159,16 +105,25 @@ function insertTag(tag) {
     updateCaret();
 }
 
-onMounted(() => {
-    text.value = props.content;
-});
+onMounted(() => { text.value = props.content; });
 
 function save() {
     const normalized = text.value.replace(/\n/g, "<br />");
     emits('saveContent', normalized);
 }
 
-//Link Functions
+// Filtered entities
+const {
+    indexFilterText, filteredIndices,
+    sectionFilterText, filteredSections,
+    pageFilterText, filteredPages,
+} = useFilteredEntities(
+    toRef(props, 'indices'),
+    toRef(props, 'sections'),
+    toRef(props, 'pages'),
+);
+
+// Link state
 const linkSheetOpen = ref(false);
 const linkText = ref("");
 const linkUrl = ref(null);
@@ -178,51 +133,30 @@ const selectedPage = ref(null);
 const openLinkSheet = () => {
     linkText.value = selectedText.value;
     linkSheetOpen.value = true;
-}
+};
 
 const insertSectionLink = () => {
-    if (!selectedSection.value) {
-        return;
-    }
-
-    wrapWithTag(
-        'sectionLink',
-        linkText.value.length > 0 ? linkText.value : selectedSection.value.title,
-        selectedSection.value.slug,
-    );
+    if (!selectedSection.value) return;
+    wrapWithTag('sectionLink', linkText.value.length > 0 ? linkText.value : selectedSection.value.title, selectedSection.value.slug);
     linkSheetOpen.value = false;
     clearValues();
-}
+};
 
 const insertPageLink = () => {
-    if (!selectedPage.value) {
-        return;
-    }
-
-    wrapWithTag(
-        'pageLink',
-        linkText.value.length > 0 ? linkText.value : selectedPage.value.title,
-        selectedPage.value.slug,
-    );
+    if (!selectedPage.value) return;
+    wrapWithTag('pageLink', linkText.value.length > 0 ? linkText.value : selectedPage.value.title, selectedPage.value.slug);
     linkSheetOpen.value = false;
     clearValues();
-}
+};
 
 const insertExternalLink = () => {
-    if (!linkUrl.value) {
-        return;
-    }
-
-    wrapWithTag(
-        'Link',
-        linkText.value.length > 0 ? linkText.value : linkUrl.value,
-        linkUrl.value,
-    );
+    if (!linkUrl.value) return;
+    wrapWithTag('Link', linkText.value.length > 0 ? linkText.value : linkUrl.value, linkUrl.value);
     linkSheetOpen.value = false;
     clearValues();
-}
+};
 
-//Tooltip Functions
+// Tooltip state
 const tooltipSheetOpen = ref(false);
 const tooltipText = ref("");
 const selectedIndex = ref(null);
@@ -236,72 +170,19 @@ const clearValues = () => {
     sectionFilterText.value = "";
     pageFilterText.value = "";
     linkText.value = "";
-}
+};
 
 const openTooltipSheet = () => {
     tooltipText.value = selectedText.value;
     tooltipSheetOpen.value = true;
-}
+};
 
 const insertTooltip = () => {
-    if (!selectedIndex.value) {
-        return;
-    }
-
-    wrapWithTag(
-        'indexTooltip',
-        tooltipText.value.length > 0 ? tooltipText.value : selectedIndex.value.title,
-        selectedIndex.value.slug,
-    );
+    if (!selectedIndex.value) return;
+    wrapWithTag('indexTooltip', tooltipText.value.length > 0 ? tooltipText.value : selectedIndex.value.title, selectedIndex.value.slug);
     tooltipSheetOpen.value = false;
     clearValues();
 };
-
-//Filtered Props
-const indexFilterText = ref('');
-const filteredIndices = computed(() => {
-    const filter = indexFilterText.value;
-
-    if (!filter.length) {
-        return props.indices;
-    }
-
-    const filtered = props.indices;
-
-    return filtered.filter(index => {
-        return index.title.toLowerCase().includes(filter.toLowerCase());
-    });
-});
-
-const sectionFilterText = ref('');
-const filteredSections = computed(() => {
-    const filter = sectionFilterText.value;
-
-    if (!filter.length) {
-        return props.sections;
-    }
-
-    const filtered = props.sections;
-
-    return filtered.filter(section => {
-        return section.title.toLowerCase().includes(filter.toLowerCase());
-    });
-});
-
-const pageFilterText = ref('');
-const filteredPages = computed(() => {
-    const filter = pageFilterText.value;
-
-    if (!filter.length) {
-        return props.pages;
-    }
-
-    const filtered = props.pages;
-
-    return filtered.filter(page => {
-        return page.title.toLowerCase().includes(filter.toLowerCase());
-    });
-});
 </script>
 
 <template>
@@ -313,223 +194,71 @@ const filteredPages = computed(() => {
                         <TooltipTrigger>
                             <div class="bg-primary rounded !p-1 mx-1 border border-primary" :class="boldToggled ? 'bg-secondary border-secondary text-primary' : 'text-secondary'" @click="wrapWithTag('b')"><Bold class="mx-auto w-4 h-4" /></div>
                         </TooltipTrigger>
-                        <TooltipContent>
-                            Bold
-                        </TooltipContent>
+                        <TooltipContent>Bold</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
-                            <div class="bg-primary rounded !p-1 mx-1 border border-primary" :class="boldToggled ? 'bg-secondary border-secondary text-primary' : 'text-secondary'" @click="wrapWithTag('i')"><Italic class="mx-auto w-4 h-4" /></div>
+                            <div class="bg-primary rounded !p-1 mx-1 border border-primary" :class="italicToggled ? 'bg-secondary border-secondary text-primary' : 'text-secondary'" @click="wrapWithTag('i')"><Italic class="mx-auto w-4 h-4" /></div>
                         </TooltipTrigger>
-                        <TooltipContent>
-                            Italic
-                        </TooltipContent>
+                        <TooltipContent>Italic</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
-                            <div class="bg-primary rounded !p-1 mx-1 border border-primary" :class="boldToggled ? 'bg-secondary border-secondary text-primary' : 'text-secondary'" @click="wrapWithTag('u')"><Underline class="mx-auto w-4 h-4" /></div>
+                            <div class="bg-primary rounded !p-1 mx-1 border border-primary" :class="underlineToggled ? 'bg-secondary border-secondary text-primary' : 'text-secondary'" @click="wrapWithTag('u')"><Underline class="mx-auto w-4 h-4" /></div>
                         </TooltipTrigger>
-                        <TooltipContent>
-                            Underline
-                        </TooltipContent>
+                        <TooltipContent>Underline</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger>
-                            <div class="bg-primary rounded !p-1 mx-1 border border-primary" :class="boldToggled ? 'bg-secondary border-secondary text-primary' : 'text-secondary'" @click="insertTag('hr')"><Minus class="mx-auto w-4 h-4" /></div>
+                            <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="insertTag('hr')"><Minus class="mx-auto w-4 h-4" /></div>
                         </TooltipTrigger>
-                        <TooltipContent>
-                            Horizontal Line
-                        </TooltipContent>
+                        <TooltipContent>Horizontal Line</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
-                <Sheet :open="tooltipSheetOpen">
-                    <SheetTrigger>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <div class="bg-primary rounded !p-1 mx-1 border border-primary" :class="boldToggled ? 'bg-secondary border-secondary text-primary' : 'text-secondary'" @click="openTooltipSheet"><MousePointerClick class="mx-auto w-4 h-4" /></div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    Add Index Tooltip
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </SheetTrigger>
-                    <SheetContent>
-                        <SheetHeader>
-                            <SheetTitle>Add Index Tooltip</SheetTitle>
-                            <SheetDescription class="text-primary">
-                                <div class="flex flex-col w-full mt-4 space-y-1.5">
-                                    <Label for="label">Tooltip Label</Label>
-                                    <Input id="label" type="text" autofocus v-model="tooltipText" placeholder="Tooltip Label" />
-                                </div>
-                                <div class="flex flex-col w-full mt-4 space-y-1.5">
-                                    <Label>Selected Index</Label>
-                                    <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedIndex">
-                                        <div @click="tooltipText = selectedIndex.title" class="my-auto">{{ selectedIndex.display_name }}</div>
-                                        <SquareMinus class="my-auto" @click="selectedIndex = null" />
-                                    </div>
-                                    <div v-else class="w-full p-2 my-1 text-red-500">
-                                        None
-                                    </div>
-                                </div>
-                                <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
-                                    <Button :disabled="!selectedIndex" class="bg-green-500" @click="insertTooltip">Add Tooltip</Button>
-                                    <Button class="bg-red-500" @click="tooltipSheetOpen = false;clearValues()">Cancel</Button>
-                                </div>
-
-                                <div class="flex flex-col w-full mt-12 space-y-1.5">
-                                    <hr class="border-primary" />
-                                    <Label for="indexFilter">Select An Index</Label>
-                                    <Input id="indexFilter" type="text" v-model="indexFilterText" placeholder="Search..." />
-                                </div>
-                                <div class="max-h-100 overflow-y-auto">
-                                    <div v-for="index in filteredIndices" :key="index.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
-                                        <div @click="indexText = index.title" class="my-auto">{{ index.display_name }}</div>
-                                        <SquarePlus class="my-auto" @click="selectedIndex = index" />
-                                    </div>
-                                </div>
-                            </SheetDescription>
-                        </SheetHeader>
-                    </SheetContent>
-                </Sheet>
-                <Sheet :open="linkSheetOpen">
-                    <SheetTrigger>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <div class="bg-primary rounded !p-1 mx-1 border border-primary text-secondary" @click="openLinkSheet"><Link2 class="mx-auto w-4 h-4" /></div>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    Add Link
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </SheetTrigger>
-                    <SheetContent>
-                        <SheetHeader>
-                            <SheetTitle>Add Link</SheetTitle>
-                            <SheetDescription class="text-primary">
-                                <Tabs default-value="account" class="w-full">
-                                    <TabsList class="grid w-full grid-cols-3">
-                                        <TabsTrigger value="section">
-                                            Section
-                                        </TabsTrigger>
-                                        <TabsTrigger value="page">
-                                            Page
-                                        </TabsTrigger>
-                                        <TabsTrigger value="external">
-                                            External
-                                        </TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="section">
-                                        <div class="flex flex-col w-full mt-4 space-y-1.5">
-                                            <Label for="label">Label</Label>
-                                            <Input id="label" type="text" autofocus v-model="linkText" placeholder="Add Label" />
-                                        </div>
-                                        <div class="flex flex-col w-full mt-4 space-y-1.5">
-                                            <Label>Selected Section</Label>
-                                            <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedSection">
-                                                <div @click="sectionText = selectedSection.title" class="my-auto">{{ selectedSection.display_name }}</div>
-                                                <SquareMinus class="my-auto" @click="selectedSection = null" />
-                                            </div>
-                                            <div v-else class="w-full p-2 my-1 text-red-500">
-                                                None
-                                            </div>
-                                        </div>
-                                        <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
-                                            <Button :disabled="!selectedSection" class="bg-green-500" @click="insertSectionLink">Add Link</Button>
-                                            <Button class="bg-red-500" @click="linkSheetOpen = false;clearValues()">Cancel</Button>
-                                        </div>
-
-                                        <div class="flex flex-col w-full mt-12 space-y-1.5">
-                                            <hr class="border-primary" />
-                                            <Label for="sectionFilter">Select A Section</Label>
-                                            <Input id="sectionFilter" type="text" v-model="sectionFilterText" placeholder="Search..." />
-                                        </div>
-                                        <div class="max-h-100 overflow-y-auto">
-                                            <div v-for="section in filteredSections" :key="section.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
-                                                <div @click="sectionText = section.title" class="my-auto">{{ section.display_name }}</div>
-                                                <SquarePlus class="my-auto" @click="selectedSection = section" />
-                                            </div>
-                                        </div>
-                                    </TabsContent>
-                                    <TabsContent value="page">
-                                        <div class="flex flex-col w-full mt-4 space-y-1.5">
-                                            <Label for="label">Label</Label>
-                                            <Input id="label" type="text" autofocus v-model="linkText" placeholder="Add Label" />
-                                        </div>
-                                        <div class="flex flex-col w-full mt-4 space-y-1.5">
-                                            <Label>Selected Page</Label>
-                                            <div class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary" v-if="selectedPage">
-                                                <div @click="pageText = selectedPage.title" class="my-auto">{{ selectedPage.display_name }}</div>
-                                                <SquareMinus class="my-auto" @click="selectedPage = null" />
-                                            </div>
-                                            <div v-else class="w-full p-2 my-1 text-red-500">
-                                                None
-                                            </div>
-                                        </div>
-                                        <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
-                                            <Button :disabled="!selectedPage" class="bg-green-500" @click="insertPageLink">Add Link</Button>
-                                            <Button class="bg-red-500" @click="linkSheetOpen = false;clearValues()">Cancel</Button>
-                                        </div>
-
-                                        <div class="flex flex-col w-full mt-12 space-y-1.5">
-                                            <hr class="border-primary" />
-                                            <Label for="pageFilter">Select A Page</Label>
-                                            <Input id="pageFilter" type="text" v-model="pageFilterText" placeholder="Search..." />
-                                        </div>
-                                        <div class="max-h-100 overflow-y-auto">
-                                            <div v-for="page in filteredPages" :key="page.id" class="w-full p-2 border border-secondary my-1 flex justify-between hover:bg-secondary">
-                                                <div @click="pageText = page.title" class="my-auto">{{ page.display_name }}</div>
-                                                <SquarePlus class="my-auto" @click="selectedPage = page" />
-                                            </div>
-                                        </div>
-                                    </TabsContent>
-                                    <TabsContent value="external">
-                                        <div class="flex flex-col w-full mt-4 space-y-1.5">
-                                            <Label for="label">Label</Label>
-                                            <Input id="label" type="text" autofocus v-model="linkText" placeholder="Add Label" />
-                                        </div>
-                                        <div class="flex flex-col w-full mt-4 space-y-1.5">
-                                            <Label for="url">URL</Label>
-                                            <Input id="url" type="text" v-model="linkUrl" placeholder="Add URL" />
-                                        </div>
-                                        <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
-                                            <Button :disabled="!linkUrl || !linkText" class="bg-green-500" @click="insertExternalLink">Add Link</Button>
-                                            <Button class="bg-red-500" @click="linkSheetOpen = false;clearValues()">Cancel</Button>
-                                        </div>
-                                    </TabsContent>
-                                </Tabs>
-                            </SheetDescription>
-                        </SheetHeader>
-                    </SheetContent>
-                </Sheet>
+                <TooltipSheet
+                    :open="tooltipSheetOpen"
+                    :filtered-indices="filteredIndices"
+                    :index-filter-text="indexFilterText"
+                    :tooltip-text="tooltipText"
+                    :selected-index="selectedIndex"
+                    @open-sheet="openTooltipSheet"
+                    @insert-tooltip="insertTooltip"
+                    @cancel="tooltipSheetOpen = false; clearValues()"
+                    @update:index-filter-text="indexFilterText = $event"
+                    @update:tooltip-text="tooltipText = $event"
+                    @update:selected-index="selectedIndex = $event"
+                />
+                <LinkSheet
+                    :open="linkSheetOpen"
+                    :link-text="linkText"
+                    :link-url="linkUrl"
+                    :selected-section="selectedSection"
+                    :selected-page="selectedPage"
+                    :filtered-sections="filteredSections"
+                    :filtered-pages="filteredPages"
+                    :section-filter-text="sectionFilterText"
+                    :page-filter-text="pageFilterText"
+                    @open-sheet="openLinkSheet"
+                    @insert-section-link="insertSectionLink"
+                    @insert-page-link="insertPageLink"
+                    @insert-external-link="insertExternalLink"
+                    @cancel="linkSheetOpen = false; clearValues()"
+                    @update:link-text="linkText = $event"
+                    @update:link-url="linkUrl = $event"
+                    @update:selected-section="selectedSection = $event"
+                    @update:selected-page="selectedPage = $event"
+                    @update:section-filter-text="sectionFilterText = $event"
+                    @update:page-filter-text="pageFilterText = $event"
+                />
             </div>
         </div>
-        <div class="flex gap-1 mb-2">
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('crow')"><Crow /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('magic')"><Magic /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('warding')"><Warding /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('mask')"><Mask /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('melee')"><Melee /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('missile')"><Missile /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('negative')"><Negative /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('fortitude')"><Fortitude /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('positive')"><Positive /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('pulse')"><Pulse /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('ram')"><Ram /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('signatureaction')"><SignatureAction /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('soulstone')"><Soulstone /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('tome')"><Tome /></div>
-            <div class="bg-primary rounded min-w-6 border border-primary text-secondary text-center" @click="insertTag('unusualdefense')"><UnusualDefense /></div>
-        </div>
+        <SymbolBar @insert-tag="insertTag" />
         <textarea
             class="rounded border border-secondary w-full min-h-60 p-1"
             ref="editor"

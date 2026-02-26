@@ -27,10 +27,10 @@ import { Label } from '@/components/ui/label'
 import InputError from "@/components/InputError.vue";
 import {LoaderCircle, CircleX, CheckCheckIcon, ChevronsUpDown, Search, Check} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
-import RichTextEditor from "@/components/RichTextEditor.vue";
 import {hasPermission} from "@/composables/hasPermission";
 import axios from "axios";
 import DraggableContent from "@/components/DraggableContent.vue";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
 const props = defineProps({
     index: {
@@ -154,72 +154,89 @@ const changeNotesNewContent = (content) => {
         </CardHeader>
         <CardContent>
             <form @submit.prevent>
-                <div class="grid items-center w-full gap-4">
-                    <div class="flex flex-col space-y-1.5">
-                        <Label for="title">Index</Label>
-                        <Input id="title" type="text" required autofocus :tabindex="1" autocomplete="title" v-model="form.title" placeholder="Index Title" />
-                        <InputError :message="form.errors.title" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5">
-                        <Label for="type">Index Type</Label>
-                        <div class="flex">
-                            <Select id="type" v-model="form.type" :disabled="props.index">
-                                <SelectTrigger class="w-full">
-                                    <SelectValue placeholder="Select Index Type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem v-for="type in props.index_types" :value="type.value" :key="type.value">
-                                        {{ type.name }}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <CircleX class="text-destructive my-auto ml-2" v-if="form.type && !props.index" @click="form.type = null" />
+                <Tabs default-value="details">
+                    <TabsList>
+                        <TabsTrigger value="details">Details</TabsTrigger>
+                        <TabsTrigger value="content">Content</TabsTrigger>
+                        <TabsTrigger value="notes">Notes</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="details" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="title">Index</Label>
+                                <Input id="title" type="text" required autofocus :tabindex="1" autocomplete="title" v-model="form.title" placeholder="Index Title" />
+                                <InputError :message="form.errors.title" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="type">Index Type</Label>
+                                <div class="flex">
+                                    <Select id="type" v-model="form.type" :disabled="props.index">
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue placeholder="Select Index Type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem v-for="type in props.index_types" :value="type.value" :key="type.value">
+                                                {{ type.name }}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <CircleX class="text-destructive my-auto ml-2" v-if="form.type && !props.index" @click="form.type = null" />
+                                </div>
+                                <InputError :message="form.errors.type" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5" v-if="props.index?.image">
+                                <Label for="current_image">Current Image</Label>
+                                <img id="current_image" :src="props.index?.image" :alt="props.index?.title" class="w-75" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5" v-if="form.type === 'image'">
+                                <Label for="image" v-if="props.index">New Image</Label>
+                                <Label for="image" v-else>Image</Label>
+                                <Input id="image" type="file" accept=".jpeg, .jpg, .png" @input="form.image = $event.target.files[0]" />
+                            </div>
                         </div>
-                        <InputError :message="form.errors.type" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5" v-if="props.index?.image">
-                        <Label for="current_image">Current Image</Label>
-                        <img id="current_image" :src="props.index?.image" :alt="props.index?.title" class="w-75" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5" v-if="form.type === 'image'">
-                        <Label for="image" v-if="props.index">New Image</Label>
-                        <Label for="image" v-else>Image</Label>
-                        <Input id="image" type="file" accept=".jpeg, .jpg, .png" @input="form.image = $event.target.files[0]" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5" v-if="form.type === 'text'">
-                        <DraggableContent
-                            v-if="viewData"
-                            @update:content-order="contentUpdate"
-                            @update:new-content="contentNewContent"
-                            :content="viewData.content ?? []"
-                            label="Index Content"
-                            :indices="props.indices"
-                            :sections="props.sections"
-                            :pages="props.pages"
-                            :key="viewData.content"
-                        />
-                        <InputError :message="form.errors.content" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5" v-if="(props.index && props.index?.published_at) || props.index?.approval?.change_notes">
-                        <DraggableContent
-                            v-if="viewData"
-                            @update:content-order="changeNotesUpdate"
-                            @update:new-content="changeNotesNewContent"
-                            :content="viewData.change_notes ?? []"
-                            label="Change Notes"
-                            :indices="props.indices"
-                            :sections="props.sections"
-                            :pages="props.pages"
-                            :key="viewData.change_notes"
-                        />
-                        <InputError :message="form.errors.change_notes" />
-                    </div>
-                    <div class="flex flex-col space-y-1.5">
-                        <Label for="internal_notes">Internal Notes</Label>
-                        <Textarea class="min-h-48" id="internal_notes" v-model="form.internal_notes" placeholder="Add Internal Notes" />
-                        <InputError :message="form.errors.internal_notes" />
-                    </div>
-                </div>
+                    </TabsContent>
+                    <TabsContent value="content" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5" v-if="form.type === 'text'">
+                                <DraggableContent
+                                    v-if="viewData"
+                                    @update:content-order="contentUpdate"
+                                    @update:new-content="contentNewContent"
+                                    :content="viewData.content ?? []"
+                                    label="Index Content"
+                                    :indices="props.indices"
+                                    :sections="props.sections"
+                                    :pages="props.pages"
+                                    :key="viewData.content"
+                                />
+                                <InputError :message="form.errors.content" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5" v-if="(props.index && props.index?.published_at) || props.index?.approval?.change_notes">
+                                <DraggableContent
+                                    v-if="viewData"
+                                    @update:content-order="changeNotesUpdate"
+                                    @update:new-content="changeNotesNewContent"
+                                    :content="viewData.change_notes ?? []"
+                                    label="Change Notes"
+                                    :indices="props.indices"
+                                    :sections="props.sections"
+                                    :pages="props.pages"
+                                    :key="viewData.change_notes"
+                                />
+                                <InputError :message="form.errors.change_notes" />
+                            </div>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="notes" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="internal_notes">Internal Notes</Label>
+                                <Textarea class="min-h-48" id="internal_notes" v-model="form.internal_notes" placeholder="Add Internal Notes" />
+                                <InputError :message="form.errors.internal_notes" />
+                            </div>
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </form>
         </CardContent>
         <CardFooter>

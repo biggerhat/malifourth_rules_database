@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import { h, ref } from 'vue';
-import type { ColumnDef, ColumnFiltersState } from '@tanstack/vue-table';
+import { computed, h, ref } from 'vue';
+import type { ColumnDef } from '@tanstack/vue-table';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { valueUpdater } from '@/lib/utils'
+import { Checkbox } from "@/components/ui/checkbox";
+import { valueUpdater } from '@/lib/utils';
 import AdminActions from '@/components/AdminActions.vue';
+import BulkActionBar from '@/components/BulkActionBar.vue';
 import {Ban, Check} from "lucide-vue-next";
 import { hasPermission } from "@/composables/hasPermission";
 
@@ -30,6 +32,18 @@ import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
 
 const columns: ColumnDef<Sections>[] = [
     {
+        id: 'select',
+        header: ({ table }) => h(Checkbox, {
+            'checked': table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate'),
+            'onUpdate:checked': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
+        }),
+        cell: ({ row }) => h(Checkbox, {
+            'checked': row.getIsSelected(),
+            'onUpdate:checked': (value: boolean) => row.toggleSelected(!!value),
+        }),
+        enableGlobalFilter: false,
+    },
+    {
         accessorKey: 'title',
         header: () => h('div', {}, 'Section'),
         cell: ({ row }) => {
@@ -45,7 +59,8 @@ const columns: ColumnDef<Sections>[] = [
             return h('div', {}, row.getValue('title'));
         },
     },{
-        accessorKey: 'batch',
+        accessorFn: (row) => row.batch?.title ?? '',
+        id: 'batch',
         header: () => h('div', {}, 'Batch'),
         cell: ({ row }) => {
             const section = row.original;
@@ -53,12 +68,14 @@ const columns: ColumnDef<Sections>[] = [
         },
     },{
         accessorKey: 'published_at',
+        enableGlobalFilter: false,
         header: () => h('div', {class: 'text-center'}, 'Published'),
         cell: ({ row }) => {
             return h('div', {}, row.getValue('published_at') ? h(Check, {class: 'text-green-500 mx-auto'}) : h(Ban, {class: 'text-red-500 mx-auto'}))
         },
     },{
         accessorKey: 'approved',
+        enableGlobalFilter: false,
         header: () => h('div', {class: 'text-center'}, 'Approved'),
         cell: ({ row }) => {
             const section = row.original;
@@ -68,6 +85,7 @@ const columns: ColumnDef<Sections>[] = [
     },{
         id: 'actions',
         enableHiding: false,
+        enableGlobalFilter: false,
         header: () => h('div', {}, 'Actions'),
         cell: ({ row }) => {
             const section = row.original;
@@ -91,19 +109,29 @@ const props = defineProps<{
     sections: TData[]
 }>();
 
-const columnFilters = ref<ColumnFiltersState>([])
+const globalFilter = ref('')
+const rowSelection = ref({})
 
 const table = useVueTable({
     get data() { return props.sections },
     get columns() { return columns },
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: 'includesString',
+    enableRowSelection: true,
+    onRowSelectionChange: updaterOrValue => valueUpdater(updaterOrValue, rowSelection),
     state: {
-        get columnFilters() { return columnFilters.value },
+        get globalFilter() { return globalFilter.value },
+        get rowSelection() { return rowSelection.value },
     }
 });
+
+const selectedIds = computed(() =>
+    Object.keys(rowSelection.value).map(idx => props.sections[Number(idx)]?.id).filter(Boolean)
+);
+
+const clearSelection = () => { rowSelection.value = {} };
 </script>
 
 <template>
@@ -111,13 +139,23 @@ const table = useVueTable({
 
     <div class="container mx-auto mt-6">
         <div class="flex items-center justify-between py-4">
-            <Input class="max-w-sm" placeholder="Filter Sections"
-                   :model-value="table.getColumn('title')?.getFilterValue() as string"
-                   @update:model-value=" table.getColumn('title')?.setFilterValue($event)" />
+            <Input class="max-w-sm" placeholder="Search..."
+                   v-model="globalFilter" />
             <Button @click="router.get(route('admin.sections.create'))" v-if="hasPermission('add_section')">
                 Create New Section
             </Button>
         </div>
+        <BulkActionBar
+            v-if="Object.keys(rowSelection).length > 0"
+            :selected-count="selectedIds.length"
+            :selected-ids="selectedIds"
+            model-name="section"
+            :bulk-approve-route="route('admin.sections.bulk-approve')"
+            :bulk-publish-route="route('admin.sections.bulk-publish')"
+            :bulk-delete-route="route('admin.sections.bulk-delete')"
+            @clear="clearSelection"
+            class="mb-4"
+        />
         <div class="border rounded-md">
             <Table>
                 <TableHeader>

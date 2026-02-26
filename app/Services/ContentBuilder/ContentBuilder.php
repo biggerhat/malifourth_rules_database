@@ -8,6 +8,48 @@ use App\Models\Section;
 
 class ContentBuilder
 {
+    public const SYMBOL_TAGS = [
+        'crow', 'magic', 'warding', 'mask', 'melee',
+        'missile', 'negative', 'fortitude', 'positive', 'pulse',
+        'ram', 'signatureaction', 'soulstone', 'tome', 'unusualdefense',
+    ];
+
+    public const SYMBOL_FONT_MAP = [
+        'crow' => 'c',
+        'magic' => 'q',
+        'warding' => 'x',
+        'mask' => 'm',
+        'melee' => 'y',
+        'missile' => 'z',
+        'negative' => '-',
+        'fortitude' => 'u',
+        'positive' => '+',
+        'pulse' => 'p',
+        'ram' => 'r',
+        'signatureaction' => 'f',
+        'soulstone' => 's',
+        'tome' => 't',
+        'unusualdefense' => 'v',
+    ];
+
+    public const SYMBOL_READABLE_MAP = [
+        'crow' => '[crow]',
+        'magic' => '[magic]',
+        'warding' => '[warding]',
+        'mask' => '[mask]',
+        'melee' => '[melee]',
+        'missile' => '[missile]',
+        'negative' => '[negative]',
+        'fortitude' => '[fortitude]',
+        'positive' => '[positive]',
+        'pulse' => '[pulse]',
+        'ram' => '[ram]',
+        'signatureaction' => '[signature action]',
+        'soulstone' => '[soulstone]',
+        'tome' => '[tome]',
+        'unusualdefense' => '[unusual defense]',
+    ];
+
     public array $parsedContent = [];
 
     public string $jsonContent;
@@ -41,78 +83,31 @@ class ContentBuilder
 
     public static function parseTitleTags(string $title): string
     {
-        return str_replace([
-            '{{crow /}}',
-            '{{magic /}}',
-            '{{warding /}}',
-            '{{mask /}}',
-            '{{melee /}}',
-            '{{missile /}}',
-            '{{negative /}}',
-            '{{fortitude /}}',
-            '{{positive /}}',
-            '{{pulse /}}',
-            '{{ram /}}',
-            '{{signatureaction /}}',
-            '{{soulstone /}}',
-            '{{tome /}}',
-            '{{unusualdefense /}}',
-        ], [
-            '<span class="font-[symbolFont] text-2xl">c</span>',
-            '<span class="font-[symbolFont] text-2xl">q</span>',
-            '<span class="font-[symbolFont] text-2xl">x</span>',
-            '<span class="font-[symbolFont] text-2xl">m</span>',
-            '<span class="font-[symbolFont] text-2xl">y</span>',
-            '<span class="font-[symbolFont] text-2xl">z</span>',
-            '<span class="font-[symbolFont] text-2xl">-</span>',
-            '<span class="font-[symbolFont] text-2xl">u</span>',
-            '<span class="font-[symbolFont] text-2xl">+</span>',
-            '<span class="font-[symbolFont] text-2xl">p</span>',
-            '<span class="font-[symbolFont] text-2xl">r</span>',
-            '<span class="font-[symbolFont] text-2xl">f</span>',
-            '<span class="font-[symbolFont] text-2xl">s</span>',
-            '<span class="font-[symbolFont] text-2xl">t</span>',
-            '<span class="font-[symbolFont] text-2xl">v</span>',
-        ], $title);
+        $search = [];
+        $replace = [];
+
+        foreach (self::SYMBOL_FONT_MAP as $tag => $char) {
+            $search[] = "{{{$tag} /}}";
+            $replace[] = '<span class="font-[symbolFont] text-2xl">'.$char.'</span>';
+        }
+
+        return str_replace($search, $replace, $title);
     }
 
     public static function removeInlineTags(string $content): string
     {
-        return str_replace([
-            '{{crow /}}',
-            '{{magic /}}',
-            '{{warding /}}',
-            '{{mask /}}',
-            '{{melee /}}',
-            '{{missile /}}',
-            '{{negative /}}',
-            '{{fortitude /}}',
-            '{{positive /}}',
-            '{{pulse /}}',
-            '{{ram /}}',
-            '{{signatureaction /}}',
-            '{{soulstone /}}',
-            '{{tome /}}',
-            '{{unusualdefense /}}',
-            '<br />',
-        ], [
-            '[crow]',
-            '[magic]',
-            '[warding]',
-            '[mask]',
-            '[melee]',
-            '[missile]',
-            '[negative]',
-            '[fortitude]',
-            '[positive]',
-            '[pulse]',
-            '[ram]',
-            '[signature action]',
-            '[soulstone]',
-            '[tome]',
-            '[unusual defense]',
-            '',
-        ], $content);
+        $search = [];
+        $replace = [];
+
+        foreach (self::SYMBOL_READABLE_MAP as $tag => $readable) {
+            $search[] = "{{{$tag} /}}";
+            $replace[] = $readable;
+        }
+
+        $search[] = '<br />';
+        $replace[] = '';
+
+        return str_replace($search, $replace, $content);
     }
 
     public function getFullyHydratedContent(): array
@@ -284,7 +279,6 @@ class ContentBuilder
             }
 
             // Opening tag
-            //            if (preg_match('/^\{\{(\w+)(=([^\s\/}]+))?((?:\s+\w+=(?:"[^"]*"|\'[^\']*\'|\S+))*)\}\}$/', $token, $match)) {
             if (preg_match('/^\{\{(\w+)(=([^\s}]+))?((?:\s+\w+=(?:"[^"]*"|\'[^\']*\'|\S+))*)\}\}$/', $token, $match)) {
                 $tag = $match[1];
                 $slug = $match[3];

@@ -13,7 +13,7 @@ import { getInitials } from '@/composables/useInitials';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-vue-next';
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, onUnmounted, ref} from 'vue';
 import { router } from "@inertiajs/vue3";
 import {
     Command,
@@ -55,6 +55,8 @@ const commandRoute = (route) => {
     open.value = false;
 };
 
+const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+
 function toggleDialog() {
     if (!commandSearch.value.length) {
         axios.get(route('command'))
@@ -64,6 +66,21 @@ function toggleDialog() {
     }
     open.value = true;
 }
+
+const handleKeydown = (e: KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        toggleDialog();
+    }
+};
+
+onMounted(() => {
+    document.addEventListener('keydown', handleKeydown);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown);
+});
 
 const page = usePage();
 const auth = computed(() => page.props.auth);
@@ -257,7 +274,12 @@ const rightNavItems: NavItem[] = [];
                                 </div>
                             </DialogContent>
                         </Dialog>
-                        <BookOpen @click="toggleDialog" class="inline-block cursor-pointer" />
+                        <Button variant="ghost" size="icon" class="group h-9 w-9 cursor-pointer" @click="toggleDialog">
+                            <BookOpen class="size-5 opacity-80 group-hover:opacity-100" />
+                        </Button>
+                        <kbd class="hidden lg:inline-flex items-center rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground" @click="toggleDialog">
+                            {{ isMac ? '⌘K' : 'Ctrl K' }}
+                        </kbd>
 
                         <div class="hidden space-x-1 lg:flex">
 

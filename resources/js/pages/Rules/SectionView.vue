@@ -1,19 +1,13 @@
 <script setup lang="ts">
 import ParsedContent from "@/components/ParsedContent.vue";
+import ScrollToTop from "@/components/ScrollToTop.vue";
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
-    CardHeader,
-    CardTitle,
 } from '@/components/ui/card'
-import DraggableContent from "@/components/DraggableContent.vue";
-import {router} from "@inertiajs/vue3";
-import ScrollToTop from "@/components/ScrollToTop.vue";
-import Button from "@/components/ui/button/Button.vue";
 
-const props =defineProps({
+const props = defineProps({
     title: {
         type: String,
         required: false,
@@ -50,30 +44,34 @@ const props =defineProps({
         }
     }
 });
-
 </script>
 
 <template>
     <Head :title="props.title" />
 
-    <div class="min-h-full mx-2 lg:mx-0">
+    <div class="max-w-5xl mx-auto px-2 sm:px-4 text-primary leading-6 text-md">
+        <div class="w-full text-center text-xl py-4">
+            <img src='/Images/page_banner_top.png' alt="Banner Top" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+            <span v-html="props.title"></span>
+            <img src='/Images/page_banner_bottom.png' alt="Banner Bottom" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+        </div>
+
         <Card>
-            <CardHeader>
-                <CardTitle><span v-html="props.title"></span></CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div class="grid w-full mx-auto" :class="props.right_column && props.right_column.length > 0 ? 'grid-cols-2' : 'grid-cols-1'">
-                    <div class="px-2">
+            <CardContent class="pt-6">
+                <div class="grid grid-cols-1 gap-6" :class="props.right_column && props.right_column.length > 0 ? 'lg:grid-cols-2' : ''">
+                    <div>
                         <ParsedContent :content="props.left_column" />
                     </div>
-                    <div v-if="props.right_column && props.right_column.length > 0" class="lg:border-l lg:border-secondary px-2">
+                    <div v-if="props.right_column && props.right_column.length > 0" class="lg:border-l lg:border-border lg:pl-6">
                         <ParsedContent :content="props.right_column" />
                     </div>
                 </div>
             </CardContent>
-            <CardFooter class="mt-20 text-sm italic text-end">
-                <div class="w-full text-end">Last Updated: {{ props.published_at }}<br />by {{ props.published_by}}</div>
+            <CardFooter class="border-t pt-4 text-xs text-muted-foreground italic justify-end">
+                Last Updated: {{ props.published_at }} by {{ props.published_by }}
             </CardFooter>
         </Card>
+
+        <ScrollToTop />
     </div>
 </template>

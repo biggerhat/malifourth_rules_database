@@ -121,6 +121,20 @@ enum PermissionEnum: string
     #[PermissionGroup(PermissionGroupEnum::Strategy)]
     case PublishStrategy = 'publish_strategy';
 
+
+    #[PermissionGroup(PermissionGroupEnum::Question)]
+    case View = 'view_question';
+    #[PermissionGroup(PermissionGroupEnum::Question)]
+    case Add = 'add_question';
+    #[PermissionGroup(PermissionGroupEnum::Question)]
+    case Edit = 'edit_question';
+    #[PermissionGroup(PermissionGroupEnum::Question)]
+    case Delete = 'delete_question';
+    #[PermissionGroup(PermissionGroupEnum::Question)]
+    case Approve = 'approve_question';
+    #[PermissionGroup(PermissionGroupEnum::Question)]
+    case Publish = 'publish_question';
+
     //    case View = 'view_';
     //    case Add = 'add_';
     //    case Edit = 'edit_';

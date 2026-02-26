@@ -5,6 +5,7 @@ namespace App\Enums;
 use App\Models\Batch;
 use App\Models\Index;
 use App\Models\Page;
+use App\Models\Question;
 use App\Models\Scheme;
 use App\Models\Season;
 use App\Models\Section;
@@ -24,6 +25,7 @@ enum ApprovablesEnum: string
     case Section = 'section';
     case Scheme = 'scheme';
     case Strategy = 'strategy';
+    case Question = 'question';
 
     public static function fromClass(string $className): ?self
     {
@@ -35,6 +37,7 @@ enum ApprovablesEnum: string
             Section::class => self::Section,
             Scheme::class => self::Scheme,
             Strategy::class => self::Strategy,
+            Question::class => self::Question,
             default => null,
         };
     }
@@ -49,6 +52,7 @@ enum ApprovablesEnum: string
             self::Section => 'admin.sections',
             self::Scheme => 'admin.schemes',
             self::Strategy => 'admin.strategies',
+            self::Question => 'admin.questions',
         };
     }
 
@@ -58,6 +62,7 @@ enum ApprovablesEnum: string
             self::Index => 'indexView',
             self::Section => 'sectionView',
             self::Page => 'pageView',
+            self::Question => 'questionView',
             default => null,
         };
     }

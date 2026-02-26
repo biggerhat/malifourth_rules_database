@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BatchAdminController;
 use App\Http\Controllers\Admin\IndexAdminController;
 use App\Http\Controllers\Admin\PageAdminController;
 use App\Http\Controllers\Admin\PageOrderController;
+use App\Http\Controllers\Admin\QuestionAdminController;
 use App\Http\Controllers\Admin\RoleAdminController;
 use App\Http\Controllers\Admin\SeasonAdminController;
 use App\Http\Controllers\Admin\SectionAdminController;
@@ -94,6 +95,19 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/update/{season}', 'update')->name('update')->middleware(['permission:edit_season']);
         Route::post('/delete/{season}', 'delete')->name('delete')->middleware(['permission:delete_season']);
         Route::post('/publish/{season}', 'publish')->name('publish')->middleware(['permission:publish_season']);
+    });
+
+    Route::controller(QuestionAdminController::class)->prefix('questions')->name('questions.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware(['permission:view_question']);
+        Route::get('/view/{question}', 'view')->name('view')->middleware(['permission:view_question']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_question']);
+        Route::get('/list', 'list')->name('list');
+        Route::get('/create', 'create')->name('create')->middleware(['permission:add_question']);
+        Route::get('/edit/{question}', 'edit')->name('edit')->middleware(['permission:edit_question']);
+        Route::post('/store', 'store')->name('store')->middleware(['permission:add_question']);
+        Route::post('/update/{question}', 'update')->name('update')->middleware(['permission:edit_question']);
+        Route::post('/delete/{question}', 'delete')->name('delete')->middleware(['permission:delete_question']);
+        Route::post('/publish/{question}', 'publish')->name('publish')->middleware(['permission:publish_question']);
     });
 
     Route::controller(ApprovalAdminController::class)->prefix('approvals')->name('approvals.')->group(function () {

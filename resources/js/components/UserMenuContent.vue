@@ -79,6 +79,12 @@ defineProps<Props>();
                 Pages
             </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true" v-if="hasPermission('view_faq')">
+            <Link class="block w-full" :href="route('admin.faqs.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                FAQs
+            </Link>
+        </DropdownMenuItem>
     </DropdownMenuGroup>
     <DropdownMenuSeparator />
     <DropdownMenuGroup>

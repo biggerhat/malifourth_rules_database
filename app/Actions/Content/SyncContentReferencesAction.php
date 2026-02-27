@@ -2,6 +2,7 @@
 
 namespace App\Actions\Content;
 
+use App\Models\Faq;
 use App\Models\Index;
 use App\Models\Page;
 use App\Models\Section;
@@ -14,9 +15,11 @@ class SyncContentReferencesAction
     {
         $fields = match (true) {
             $model instanceof Section => ['left_column', 'right_column'],
+            $model instanceof Faq => ['answer'],
             default => ['content'],
         };
 
+        $faqSlugs = [];
         $indexSlugs = [];
         $sectionSlugs = [];
         $pageSlugs = [];
@@ -32,6 +35,7 @@ class SyncContentReferencesAction
 
             foreach ($tagSlugs as $tag => $slugs) {
                 match ($tag) {
+                    'faqLink' => $faqSlugs = array_merge($faqSlugs, $slugs),
                     'index', 'indexTooltip' => $indexSlugs = array_merge($indexSlugs, $slugs),
                     'section', 'sectionLink' => $sectionSlugs = array_merge($sectionSlugs, $slugs),
                     'pageLink' => $pageSlugs = array_merge($pageSlugs, $slugs),
@@ -40,10 +44,12 @@ class SyncContentReferencesAction
             }
         }
 
+        $faqIds = self::resolveIds(Faq::class, $faqSlugs);
         $indexIds = self::resolveIds(Index::class, $indexSlugs);
         $sectionIds = self::resolveIds(Section::class, $sectionSlugs);
         $pageIds = self::resolveIds(Page::class, $pageSlugs);
 
+        $model->referencedFaqs()->sync($faqIds);
         $model->referencedIndices()->sync($indexIds);
         $model->referencedSections()->sync($sectionIds);
         $model->referencedPages()->sync($pageIds);

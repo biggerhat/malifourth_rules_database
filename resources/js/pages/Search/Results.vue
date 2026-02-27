@@ -26,6 +26,13 @@ const props = defineProps({
             return {};
         }
     },
+    faqs: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
 })
 
 const activeTab = ref("pages")
@@ -39,6 +46,7 @@ const activeTab = ref("pages")
                 <TabsTrigger value="pages">Pages ({{ props.pages.length }})</TabsTrigger>
                 <TabsTrigger value="sections">Sections ({{ props.sections.length }})</TabsTrigger>
                 <TabsTrigger value="indices">Indices ({{ props.indices.length }})</TabsTrigger>
+                <TabsTrigger value="faqs">FAQs ({{ props.faqs.length }})</TabsTrigger>
             </TabsList>
 
             <!-- Posts -->
@@ -75,6 +83,17 @@ const activeTab = ref("pages")
                     </Card>
                 </div>
                 <p v-else class="text-gray-500">No indices found.</p>
+            </TabsContent>
+
+            <TabsContent value="faqs">
+                <div v-if="props.faqs.length" class="grid gap-4">
+                    <Card v-for="faq in props.faqs" :key="faq.id" class="shadow-md">
+                        <CardHeader>
+                            <CardTitle><Link :href="route('rules.faq.view', faq.slug)"><span v-html="faq.title"></span></Link></CardTitle>
+                        </CardHeader>
+                    </Card>
+                </div>
+                <p v-else class="text-gray-500">No FAQs found.</p>
             </TabsContent>
         </Tabs>
     </div>

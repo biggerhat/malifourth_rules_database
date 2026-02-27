@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Rules;
 
 use App\Http\Controllers\Controller;
+use App\Models\Faq;
 use App\Models\Index;
 use App\Models\Page;
 use App\Models\Section;
@@ -61,11 +62,27 @@ class SearchController extends Controller
             ];
         });
 
+        $faqs = Faq::query()->when($queryParameters, function ($q) use ($queryParameters) {
+            foreach ($queryParameters as $parameter) {
+                $q->where(function ($subQ) use ($parameter) {
+                    $subQ->where('title', 'LIKE', "%{$parameter}%")
+                        ->orWhere('searchable_text', 'LIKE', "%{$parameter}%");
+                });
+            }
+        })->get()->map(function ($faq) {
+            return [
+                'id' => $faq->id,
+                'title' => ContentBuilder::parseTitleTags($faq->title),
+                'slug' => $faq->slug,
+            ];
+        });
+
         return inertia('Search/Results', [
             'query' => $queryString,
             'pages' => $pages,
             'sections' => $sections,
             'indices' => $indices,
+            'faqs' => $faqs,
         ]);
     }
 

@@ -113,8 +113,8 @@ const mainNavItems: NavItem[] = [
         external: false,
     },{
         title: 'FAQ',
-        href: route('faq.index'),
-        route: 'faq.index',
+        href: route('rules.faq.index'),
+        route: 'rules.faq.index',
         icon: LayoutGrid,
         external: false,
     },{
@@ -346,6 +346,12 @@ const rightNavItems: NavItem[] = [];
                 <CommandGroup heading="Indices">
                     <CommandItem v-for="index in commandSearch.indices" v-bind:key="index.slug" @select="commandRoute(index.route)" value="index.slug">
                         <span v-html="index.title"></span>
+                    </CommandItem>
+                </CommandGroup>
+                <CommandSeparator />
+                <CommandGroup heading="FAQs">
+                    <CommandItem v-for="faq in commandSearch.faqs" v-bind:key="faq.slug" @select="commandRoute(faq.route)" value="faq.slug">
+                        <span v-html="faq.title"></span>
                     </CommandItem>
                 </CommandGroup>
             </CommandList>

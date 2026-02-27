@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ApprovalAdminController;
 use App\Http\Controllers\Admin\BatchAdminController;
+use App\Http\Controllers\Admin\FaqAdminController;
 use App\Http\Controllers\Admin\IndexAdminController;
 use App\Http\Controllers\Admin\PageAdminController;
 use App\Http\Controllers\Admin\PageOrderController;
@@ -106,6 +107,22 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_season']);
         Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_season']);
         Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_season']);
+    });
+
+    Route::controller(FaqAdminController::class)->prefix('faqs')->name('faqs.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware(['permission:view_faq']);
+        Route::get('/view/{faq}', 'view')->name('view')->middleware(['permission:view_faq']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_faq']);
+        Route::get('/list', 'list')->name('list');
+        Route::get('/create', 'create')->name('create')->middleware(['permission:add_faq']);
+        Route::get('/edit/{faq}', 'edit')->name('edit')->middleware(['permission:edit_faq']);
+        Route::post('/store', 'store')->name('store')->middleware(['permission:add_faq']);
+        Route::post('/update/{faq}', 'update')->name('update')->middleware(['permission:edit_faq']);
+        Route::post('/delete/{faq}', 'delete')->name('delete')->middleware(['permission:delete_faq']);
+        Route::post('/publish/{faq}', 'publish')->name('publish')->middleware(['permission:publish_faq']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_faq']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_faq']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_faq']);
     });
 
     Route::controller(ApprovalAdminController::class)->prefix('approvals')->name('approvals.')->group(function () {

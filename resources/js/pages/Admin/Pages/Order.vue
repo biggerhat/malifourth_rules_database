@@ -11,7 +11,6 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import Button from "@/components/ui/button/Button.vue";
-import {hasPermission} from "@/composables/hasPermission";
 import axios from "axios";
 import {
     Drawer,
@@ -21,7 +20,7 @@ import {
     DrawerFooter,
     DrawerTrigger
 } from "@/components/ui/drawer";
-import {Component, Eye} from "lucide-vue-next";
+import {Eye} from "lucide-vue-next";
 import PageContent from "@/components/PageContent.vue";
 
 const props = defineProps({

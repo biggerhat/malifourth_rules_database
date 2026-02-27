@@ -99,7 +99,7 @@ const removeElement = (uniqueIndex) => {
 };
 
 const changeTextContent = (content) => {
-    let normalized = content.replace(/\n/g, "<br />");
+    const normalized = content.replace(/\n/g, "<br />");
     emit('update:elementContent', { text: customTagsToSegments(normalized), uniqueIndex: props.uniqueIndex });
     editorOpen.value = false;
 };

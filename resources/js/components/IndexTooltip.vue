@@ -5,7 +5,7 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip'
-import { onMounted, computed, defineProps } from "vue";
+import { computed, defineProps } from "vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 
 const props = defineProps({

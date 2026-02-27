@@ -11,17 +11,20 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class IndexFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'title' => $this->faker->text(50),
-            'type' => $this->faker->randomElement(IndexTypeEnum::cases()),
-            'published_by' => User::factory(),
+            'title' => fake()->sentence(3),
+            'type' => fake()->randomElement(IndexTypeEnum::cases()),
+            'content' => '<p>'.implode('</p><p>', fake()->paragraphs(2)).'</p>',
         ];
+    }
+
+    public function published(): static
+    {
+        return $this->state(fn () => [
+            'published_at' => now(),
+            'published_by' => User::factory(),
+        ]);
     }
 }

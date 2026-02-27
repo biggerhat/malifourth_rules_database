@@ -127,6 +127,7 @@ class ContentBuilder
                 ->keyBy('slug')
                 ->map(function ($model) use ($key) {
                     $title = $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null;
+
                     return [
                         'slug' => $model->newestVersion->slug ?? $model->slug,
                         'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,

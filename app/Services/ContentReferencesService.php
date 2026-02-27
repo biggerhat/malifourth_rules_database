@@ -88,6 +88,7 @@ class ContentReferencesService
                 ? strip_tags(preg_replace('/{{.*?}}/', '', $version->approval->change_notes))
                 : null,
             'current' => $version->id === $currentVersion->id,
+            'active' => $version->id === $model->id,
             'url' => self::getRevisionUrl($version, $currentVersion),
         ])->all();
     }

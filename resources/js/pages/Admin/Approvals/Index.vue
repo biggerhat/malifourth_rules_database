@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { h, ref } from 'vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { Button } from "@/components/ui/button";

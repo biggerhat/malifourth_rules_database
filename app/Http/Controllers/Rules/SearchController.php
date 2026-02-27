@@ -17,18 +17,18 @@ class SearchController extends Controller
         $queryParameters = $this->parseQueryString($queryString);
 
         $pages = Page::query()->when($queryParameters, function ($q) use ($queryParameters) {
-                foreach ($queryParameters as $parameter) {
-                    $q->where(function ($subQ) use ($parameter) {
-                        $subQ->where('title', 'LIKE', "%{$parameter}%")
-                            ->orWhere('searchable_text', 'LIKE', "%{$parameter}%");
-                    });
-                }
-            })->get()->map(function ($page) {
-                return [
-                    'id' => $page->id,
-                    'title' => ContentBuilder::parseTitleTags($page->title),
-                    'slug' => $page->slug,
-                ];
+            foreach ($queryParameters as $parameter) {
+                $q->where(function ($subQ) use ($parameter) {
+                    $subQ->where('title', 'LIKE', "%{$parameter}%")
+                        ->orWhere('searchable_text', 'LIKE', "%{$parameter}%");
+                });
+            }
+        })->get()->map(function ($page) {
+            return [
+                'id' => $page->id,
+                'title' => ContentBuilder::parseTitleTags($page->title),
+                'slug' => $page->slug,
+            ];
         });
 
         $sections = Section::query()->when($queryParameters, function ($q) use ($queryParameters) {
@@ -72,6 +72,7 @@ class SearchController extends Controller
     private function parseQueryString(string $query): array
     {
         preg_match_all('/"([^"]+)"|\S+/', $query, $matches);
+
         return array_map(function ($m1, $m2) {
             return $m1 !== '' ? $m1 : $m2;
         }, $matches[1], $matches[0]);

@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger
-} from '@/components/ui/tooltip'
-import { onMounted, computed, defineProps } from "vue";
-import ParsedContent from "@/components/ParsedContent.vue";
+import { defineProps } from "vue";
 
 const props = defineProps({
     slug: String,

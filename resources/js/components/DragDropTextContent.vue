@@ -3,7 +3,7 @@ import { COMPONENT_MAP, isSymbolTag } from '@/lib/content-tags';
 
 defineOptions({ name: 'DragDropTextContent' });
 
-const props = defineProps({
+defineProps({
     content: {
         type: [Object, Array, String],
         required: false,

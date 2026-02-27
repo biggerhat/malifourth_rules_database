@@ -1,12 +1,11 @@
 <script setup lang='ts'>
-import { ref, onMounted } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { onMounted } from 'vue';
+import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
@@ -40,27 +39,10 @@ const props = defineProps({
     }
 });
 
-const checkedPermissions = ref([]);
-
 const form = useForm({
     name: '',
     permissions: [],
 });
-
-const allPermissionsOn = ref(false);
-const toggleAllPermissionsOn = () => {
-    props.permissions.forEach((permission) => {
-        if (!form.permissions.includes(permission)) {
-            togglePermission(permission);
-        }
-    })
-    allPermissionsOn.value = true;
-}
-
-const toggleAllPermissionsOff = () => {
-    form.permissions = [];
-    allPermissionsOn.value = false;
-}
 
 const togglePermission = (permission) => {
     for(let i = 0; i < form.permissions.length; i++) {

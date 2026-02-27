@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { h, defineProps } from 'vue';
+import { h } from 'vue';
 import { COMPONENT_MAP } from '@/lib/content-tags';
 import ParsedContent from '@/components/ParsedContent.vue';
 
-const props = defineProps({
+defineProps({
     content: {
         type: [Object, Array, String],
         required: true

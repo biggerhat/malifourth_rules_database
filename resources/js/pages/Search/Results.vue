@@ -1,6 +1,5 @@
-<script setup>
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+<script setup lang="ts">
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { ref } from "vue"
 
@@ -47,7 +46,7 @@ const activeTab = ref("pages")
                 <div v-if="props.pages.length" class="grid gap-4">
                     <Card v-for="page in props.pages" :key="page.id" class="shadow-md">
                         <CardHeader>
-                            <CardTitle><Link :href="route('rules.page.view', page.slug)" v-html="page.title"></Link></CardTitle>
+                            <CardTitle><Link :href="route('rules.page.view', page.slug)"><span v-html="page.title"></span></Link></CardTitle>
                         </CardHeader>
                     </Card>
                 </div>
@@ -59,7 +58,7 @@ const activeTab = ref("pages")
                 <div v-if="props.sections.length" class="grid gap-4">
                     <Card v-for="section in props.sections" :key="section.id" class="shadow-md">
                         <CardHeader>
-                            <CardTitle><Link :href="route('rules.section.view', section.slug)" v-html="section.title"></Link></CardTitle>
+                            <CardTitle><Link :href="route('rules.section.view', section.slug)"><span v-html="section.title"></span></Link></CardTitle>
                         </CardHeader>
                     </Card>
                 </div>
@@ -71,7 +70,7 @@ const activeTab = ref("pages")
                 <div v-if="props.indices.length" class="grid gap-4">
                     <Card v-for="index in props.indices" :key="index.id" class="shadow-md">
                         <CardHeader>
-                            <CardTitle><Link :href="route('rules.index.view', index.slug)" v-html="index.title"></Link></CardTitle>
+                            <CardTitle><Link :href="route('rules.index.view', index.slug)"><span v-html="index.title"></span></Link></CardTitle>
                         </CardHeader>
                     </Card>
                 </div>

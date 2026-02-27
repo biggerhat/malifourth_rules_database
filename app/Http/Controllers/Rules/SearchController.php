@@ -72,7 +72,7 @@ class SearchController extends Controller
         })->get()->map(function ($faq) {
             return [
                 'id' => $faq->id,
-                'title' => ContentBuilder::parseTitleTags($faq->title),
+                'title' => ContentBuilder::toPlainText($faq->title),
                 'slug' => $faq->slug,
             ];
         });

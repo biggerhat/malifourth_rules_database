@@ -17,6 +17,13 @@ const props = defineProps({
             return '';
         }
     },
+    title_text: {
+        type: String,
+        required: false,
+        default() {
+            return '';
+        }
+    },
     type: {
         type: String,
         required: false,
@@ -77,7 +84,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <Head :title="props.title" />
+    <Head :title="props.title_text || props.title" />
 
     <div class="max-w-4xl mx-auto px-2 sm:px-4 text-primary leading-6 text-md">
         <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">

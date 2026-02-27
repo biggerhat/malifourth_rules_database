@@ -81,6 +81,15 @@ class ContentBuilder
         return preg_replace('/{{.*?}}/', '', self::removeInlineTags($content));
     }
 
+    public static function toPlainText(string $content): string
+    {
+        $text = preg_replace('/\{\{.*?\}\}/', '', $content);
+        $text = str_replace('<br />', ' ', $text);
+        $text = preg_replace('/\s+/', ' ', $text);
+
+        return trim($text);
+    }
+
     public static function parseTitleTags(string $title): string
     {
         $search = [];

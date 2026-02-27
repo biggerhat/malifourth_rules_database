@@ -13,16 +13,16 @@ class FaqObserver
     {
         $answer = preg_replace('/\s+/', ' ', $faq->answer ?? '');
         $title = preg_replace('/\s+/', ' ', $faq->title ?? '');
-        $faq->slug = Str::slug(ContentBuilder::toSearchable($title));
+        $faq->slug = Str::slug($faq->category?->value ?? 'faq');
         $faq->title = $title;
         $faq->answer = $answer;
-        $faq->searchable_text = ContentBuilder::toSearchable($title).' '.ContentBuilder::toSearchable($answer);
+        $faq->searchable_text = ContentBuilder::toPlainText($title).' '.ContentBuilder::toPlainText($answer);
     }
 
     public function created(Faq $faq): void
     {
         $faq->updateQuietly([
-            'slug' => $faq->id.'-'.Str::slug(ContentBuilder::toSearchable($faq->title)),
+            'slug' => $faq->id.'-'.Str::slug($faq->category?->value ?? 'faq'),
         ]);
 
         SyncContentReferencesAction::handle($faq);
@@ -32,10 +32,10 @@ class FaqObserver
     {
         $answer = preg_replace('/\s+/', ' ', $faq->answer);
         $title = preg_replace('/\s+/', ' ', $faq->title ?? '');
-        $faq->slug = $faq->id.'-'.Str::slug(ContentBuilder::toSearchable($title));
+        $faq->slug = $faq->id.'-'.Str::slug($faq->category?->value ?? 'faq');
         $faq->title = $title;
         $faq->answer = $answer;
-        $faq->searchable_text = ContentBuilder::toSearchable($title).' '.ContentBuilder::toSearchable($answer ?? '');
+        $faq->searchable_text = ContentBuilder::toPlainText($title).' '.ContentBuilder::toPlainText($answer ?? '');
     }
 
     public function updated(Faq $faq): void

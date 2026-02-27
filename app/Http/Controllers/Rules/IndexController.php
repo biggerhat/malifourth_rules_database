@@ -23,6 +23,7 @@ class IndexController extends Controller
 
         return inertia('Rules/IndexView', [
             'title' => ContentBuilder::parseTitleTags($index->title),
+            'title_text' => ContentBuilder::toPlainText($index->title),
             'type' => $index->type->value,
             'content' => $content,
             'image' => $index->image,
@@ -50,6 +51,7 @@ class IndexController extends Controller
 
         return inertia('Rules/IndexView', [
             'title' => ContentBuilder::parseTitleTags($index->title),
+            'title_text' => ContentBuilder::toPlainText($index->title),
             'type' => $index->type->value,
             'content' => $content,
             'image' => $index->image,

@@ -24,6 +24,7 @@ class SectionController extends Controller
 
         return inertia('Rules/SectionView', [
             'title' => ContentBuilder::parseTitleTags($section->title),
+            'title_text' => ContentBuilder::toPlainText($section->title),
             'left_column' => $leftColumn,
             'right_column' => $rightColumn,
             'published_at' => $section->published_at->format('m-d-Y'),
@@ -51,6 +52,7 @@ class SectionController extends Controller
 
         return inertia('Rules/SectionView', [
             'title' => ContentBuilder::parseTitleTags($section->title),
+            'title_text' => ContentBuilder::toPlainText($section->title),
             'left_column' => $leftColumn,
             'right_column' => $rightColumn,
             'published_at' => $section->published_at->format('m-d-Y'),

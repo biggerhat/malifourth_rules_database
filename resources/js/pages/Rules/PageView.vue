@@ -35,6 +35,13 @@ const props = defineProps({
             return '';
         }
     },
+    title_text: {
+        type: String,
+        required: false,
+        default() {
+            return '';
+        }
+    },
     slug: {
         type: String,
         required: false,
@@ -132,7 +139,7 @@ watch(pageParam, () => {
 </script>
 
 <template>
-    <Head :title="props.title" />
+    <Head :title="props.title_text || props.title" />
 
     <div class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
         <div v-if="!props.viewing_old_version" class="lg:col-span-2 hidden lg:block">

@@ -33,6 +33,7 @@ class Batch extends Model implements HasPublisher
     protected $guarded = ['id'];
 
     public array $batchables = [
+        'faqs',
         'indices',
         'pages',
         'sections',
@@ -59,6 +60,11 @@ class Batch extends Model implements HasPublisher
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function faqs(): HasMany
+    {
+        return $this->hasMany(Faq::class, 'batch_id', 'id');
     }
 
     public function indices(): HasMany

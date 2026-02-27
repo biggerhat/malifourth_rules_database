@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Faq;
 use App\Models\Index;
 use App\Models\Page;
 use App\Models\Section;
@@ -14,9 +15,11 @@ class ContentReferencesService
     {
         $model->loadMissing([
             'newestVersion',
+            'referencedFaqs',
             'referencedIndices',
             'referencedSections',
             'referencedPages',
+            'referencedByFaqs',
             'referencedByIndices',
             'referencedBySections',
             'referencedByPages',
@@ -45,6 +48,10 @@ class ContentReferencesService
             $items[] = self::formatItem($index, 'Index');
         }
 
+        foreach ($model->referencedFaqs as $faq) {
+            $items[] = self::formatItem($faq, 'FAQ');
+        }
+
         return $items;
     }
 
@@ -62,6 +69,10 @@ class ContentReferencesService
 
         foreach ($model->referencedByIndices as $index) {
             $items[] = self::formatItem($index, 'Index');
+        }
+
+        foreach ($model->referencedByFaqs as $faq) {
+            $items[] = self::formatItem($faq, 'FAQ');
         }
 
         return $items;
@@ -98,6 +109,9 @@ class ContentReferencesService
         $isCurrent = $version->id === $currentVersion->id;
 
         return match (true) {
+            $version instanceof Faq => $isCurrent
+                ? route('rules.faq.view', $currentVersion->slug)
+                : route('rules.faq.history', $version->slug),
             $version instanceof Page => $isCurrent
                 ? route('rules.page.view', $currentVersion->slug)
                 : route('rules.page.history', $version->slug),
@@ -113,6 +127,7 @@ class ContentReferencesService
     private static function formatItem(Model $model, string $type): array
     {
         $route = match ($type) {
+            'FAQ' => route('rules.faq.view', $model->slug),
             'Page' => route('rules.page.view', $model->slug),
             'Section' => route('rules.section.view', $model->slug),
             'Index' => route('rules.index.view', $model->slug),

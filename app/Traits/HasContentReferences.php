@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Models\Faq;
 use App\Models\Index;
 use App\Models\Page;
 use App\Models\Section;
@@ -9,6 +10,11 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasContentReferences
 {
+    public function referencedFaqs(): MorphToMany
+    {
+        return $this->morphToMany(Faq::class, 'faqable');
+    }
+
     public function referencedIndices(): MorphToMany
     {
         return $this->morphToMany(Index::class, 'indexable');
@@ -22,6 +28,11 @@ trait HasContentReferences
     public function referencedPages(): MorphToMany
     {
         return $this->morphToMany(Page::class, 'pageable');
+    }
+
+    public function referencedByFaqs(): MorphToMany
+    {
+        return $this->morphedByMany(Faq::class, $this->getReferenceMorphName());
     }
 
     public function referencedByIndices(): MorphToMany
@@ -42,6 +53,7 @@ trait HasContentReferences
     private function getReferenceMorphName(): string
     {
         return match (static::class) {
+            Faq::class => 'faqable',
             Index::class => 'indexable',
             Section::class => 'sectionable',
             Page::class => 'pageable',

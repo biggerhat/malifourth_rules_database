@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Models\Batch;
+use App\Models\Faq;
 use App\Models\Index;
 use App\Models\Page;
 use App\Models\Scheme;
@@ -24,11 +25,13 @@ enum ApprovablesEnum: string
     case Section = 'section';
     case Scheme = 'scheme';
     case Strategy = 'strategy';
+    case Faq = 'faq';
 
     public static function fromClass(string $className): ?self
     {
         return match ($className) {
             Batch::class => self::Batch,
+            Faq::class => self::Faq,
             Index::class => self::Index,
             Page::class => self::Page,
             Season::class => self::Season,
@@ -43,6 +46,7 @@ enum ApprovablesEnum: string
     {
         return match ($this) {
             self::Batch => 'admin.batches',
+            self::Faq => 'admin.faqs',
             self::Index => 'admin.indices',
             self::Page => 'admin.pages',
             self::Season => 'admin.seasons',

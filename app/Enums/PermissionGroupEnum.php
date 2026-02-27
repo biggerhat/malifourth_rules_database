@@ -19,4 +19,5 @@ enum PermissionGroupEnum: string
     case Season = 'season';
     case Scheme = 'scheme';
     case Strategy = 'strategy';
+    case Faq = 'faq';
 }

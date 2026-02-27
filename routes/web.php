@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CommandController;
 use App\Http\Controllers\IndexController as IndexPageController;
+use App\Http\Controllers\Rules\FaqController;
 use App\Http\Controllers\Rules\IndexController;
 use App\Http\Controllers\Rules\PageController;
 use App\Http\Controllers\Rules\SearchController;
@@ -14,6 +15,9 @@ Route::get('/', IndexPageController::class)->name('index');
 
 Route::prefix('rules')->name('rules.')->group(function () {
     Route::get('/', [PageController::class, 'index'])->name('index');
+    Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
+    Route::get('/faq/{faq}', [FaqController::class, 'view'])->name('faq.view')->withTrashed();
+    Route::get('/faq/{faq}/history', [FaqController::class, 'viewHistory'])->name('faq.history')->withTrashed();
     Route::get('/indices/{index}', [IndexController::class, 'view'])->name('index.view')->withTrashed();
     Route::get('/sections/{section}', [SectionController::class, 'view'])->name('section.view')->withTrashed();
     Route::get('/pages/{page}/history', [PageController::class, 'viewHistory'])->name('page.history')->withTrashed();
@@ -29,7 +33,7 @@ Route::get('/gaining_grounds', function () {
 })->name('gaining-grounds.index');
 
 Route::get('/faq', function () {
-    return inertia('ComingSoon');
+    return redirect()->route('rules.faq.index');
 })->name('faq.index');
 
 Route::get('/errata', function () {

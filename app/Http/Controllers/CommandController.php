@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Faq;
 use App\Models\Index;
 use App\Models\Page;
 use App\Models\Section;
@@ -37,10 +38,19 @@ class CommandController extends Controller
             ];
         });
 
+        $faqs = Faq::published()->orderBy('title', 'ASC')->get()->map(function (Faq $faq) {
+            return [
+                'title' => ContentBuilder::parseTitleTags($faq->title),
+                'slug' => $faq->slug,
+                'route' => route('rules.faq.view', ['faq' => $faq->slug]),
+            ];
+        });
+
         return response()->json([
             'pages' => $pages,
             'sections' => $sections,
             'indices' => $indices,
+            'faqs' => $faqs,
         ]);
     }
 }

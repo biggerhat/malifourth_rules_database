@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,15 +10,20 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class SectionFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            //
+            'title' => fake()->sentence(3),
+            'left_column' => '<p>'.implode('</p><p>', fake()->paragraphs(2)).'</p>',
+            'right_column' => '<p>'.implode('</p><p>', fake()->paragraphs(2)).'</p>',
         ];
+    }
+
+    public function published(): static
+    {
+        return $this->state(fn () => [
+            'published_at' => now(),
+            'published_by' => User::factory(),
+        ]);
     }
 }

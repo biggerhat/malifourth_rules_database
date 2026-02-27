@@ -8,7 +8,7 @@ import { LetterTextIcon } from "lucide-vue-next";
 import DragDropTextEditor from "@/components/DragDropTextEditor.vue";
 import { ElementSheet } from "@/components/editor";
 import { useFilteredEntities } from "@/composables/useFilteredEntities";
-import { blocksToCustomTags, htmlToCustomTags } from "@/lib/tag-serializer";
+import { blocksToCustomTags } from "@/lib/tag-serializer";
 
 const props = defineProps({
     content: {
@@ -67,7 +67,7 @@ const removeElement = (uniqueIndex) => {
     const index = parsedContent.value.findIndex(item => item.uniqueIndex === uniqueIndex);
     if (index !== -1) {
         parsedContent.value.splice(index, 1);
-        let currentContent = blocksToCustomTags(parsedContent.value);
+        const currentContent = blocksToCustomTags(parsedContent.value);
         emit('update:newContent', currentContent);
     }
 };

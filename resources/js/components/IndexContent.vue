@@ -1,16 +1,5 @@
 <script setup lang="ts">
 import ParsedContent from "@/components/ParsedContent.vue";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
-import {hasPermission} from "@/composables/hasPermission";
-import {CircleX} from "lucide-vue-next";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
 import {
     Drawer,
@@ -21,8 +10,6 @@ import {
     DrawerHeader, DrawerTitle,
     DrawerTrigger
 } from "@/components/ui/drawer";
-import {Switch} from "@/components/ui/switch";
-import {Label} from "@/components/ui/label";
 
 const props =defineProps({
     title: {
@@ -79,7 +66,7 @@ const props =defineProps({
             </DrawerTrigger>
             <DrawerContent class="max-w-lg mx-auto">
                 <DrawerHeader>
-                    <DrawerTitle v-html="props.title"></DrawerTitle>
+                    <DrawerTitle><span v-html="props.title"></span></DrawerTitle>
                     <DrawerDescription>
                         <img :src="props.image" :alt="props.title" class="mx-auto" v-if="props.type === 'image'" />
                     </DrawerDescription>

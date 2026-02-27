@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Check, X, Bold, Italic, Underline, Minus } from "lucide-vue-next";
-import { ref, onMounted, computed, toRef } from "vue";
+import { ref, onMounted, toRef } from "vue";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { SymbolBar, TooltipSheet, LinkSheet } from "@/components/editor";
 import { useFilteredEntities } from "@/composables/useFilteredEntities";
@@ -63,7 +63,7 @@ function wrapWithTag(tag, tagText = "", tagSlug = null) {
     } else {
         openingTag += `}}`;
     }
-    let closingTag = `{{/${tag}}}`;
+    const closingTag = `{{/${tag}}}`;
 
     if (caretStart.value !== caretEnd.value) {
         const newVal =

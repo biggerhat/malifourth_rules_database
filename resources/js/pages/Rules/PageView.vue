@@ -126,7 +126,7 @@ const nextPageTitle = computed(() => {
     return props.pages.find(p => p.slug === props.next_page)?.title ?? null;
 });
 
-watch(pageParam, (newValue) => {
+watch(pageParam, () => {
     window.location.href = route('rules.page.view', pageParam.value);
 });
 </script>
@@ -144,11 +144,10 @@ watch(pageParam, (newValue) => {
                     <Link
                         v-for="page in props.pages"
                         :key="page.slug"
-                        v-html="page.title"
                         :href="route('rules.page.view', page.slug)"
                         class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
                         :class="page.slug === props.slug ? 'bg-primary text-primary-foreground' : ''"
-                    />
+                    ><span v-html="page.title"></span></Link>
                 </CardContent>
             </Card>
         </div>
@@ -167,7 +166,8 @@ watch(pageParam, (newValue) => {
                     <SelectContent>
                         <SelectGroup>
                             <SelectLabel>Sections</SelectLabel>
-                            <SelectItem v-for="page in props.pages" :key="page.slug" v-html="page.title" :value="page.slug">
+                            <SelectItem v-for="page in props.pages" :key="page.slug" :value="page.slug">
+                                <span v-html="page.title"></span>
                             </SelectItem>
                         </SelectGroup>
                     </SelectContent>

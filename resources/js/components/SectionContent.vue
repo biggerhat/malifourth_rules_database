@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import ParsedContent from "@/components/ParsedContent.vue";
-import { Share2, Clipboard } from "lucide-vue-next";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {getInitials} from "@/composables/useInitials";
-import UserInfo from "@/components/UserInfo.vue";
+import { Clipboard } from "lucide-vue-next";
 import { ref } from "vue";
 import { toast } from "vue-sonner";
 

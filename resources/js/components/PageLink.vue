@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed, defineProps } from "vue";
+import { defineProps } from "vue";
 
 const props = defineProps({
     slug: String,

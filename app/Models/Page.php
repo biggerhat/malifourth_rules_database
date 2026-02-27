@@ -22,8 +22,8 @@ class Page extends Model implements HasBatching, HasPublisher
 {
     /** @use HasFactory<\Database\Factories\PageFactory> */
     use HasContentReferences;
-    use HasFactory;
 
+    use HasFactory;
     use LogsActivity;
     use SoftDeletes;
     use UsesVersionControl;

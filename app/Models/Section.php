@@ -22,8 +22,8 @@ class Section extends Model implements HasBatching, HasPublisher
 {
     /** @use HasFactory<\Database\Factories\SectionFactory> */
     use HasContentReferences;
-    use HasFactory;
 
+    use HasFactory;
     use LogsActivity;
     use SoftDeletes;
     use UsesVersionControl;

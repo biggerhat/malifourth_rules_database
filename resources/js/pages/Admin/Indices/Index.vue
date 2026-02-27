@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { valueUpdater } from '@/lib/utils';
 import AdminActions from '@/components/AdminActions.vue';
 import BulkActionBar from '@/components/BulkActionBar.vue';
-import {Ban, Check, Info } from "lucide-vue-next";
+import {Ban, Check} from "lucide-vue-next";
 import { hasPermission } from "@/composables/hasPermission";
 
 import {

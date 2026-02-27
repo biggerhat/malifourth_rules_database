@@ -15,7 +15,6 @@ use App\Models\Page;
 use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
-use Illuminate\Mail\Mailables\Content;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Str;

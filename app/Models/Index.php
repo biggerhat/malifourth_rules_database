@@ -23,8 +23,8 @@ class Index extends Model implements HasBatching, HasPublisher
 {
     /** @use HasFactory<\Database\Factories\IndexFactory> */
     use HasContentReferences;
-    use HasFactory;
 
+    use HasFactory;
     use LogsActivity;
     use SoftDeletes;
     use UsesVersionControl;

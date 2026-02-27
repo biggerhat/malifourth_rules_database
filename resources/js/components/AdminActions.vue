@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
-import {Pencil, Trash2, CheckCheckIcon, Send, Eye, Component, Info} from "lucide-vue-next";
+import {Pencil, Trash2, CheckCheckIcon, Send, Eye} from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { hasPermission } from "@/composables/hasPermission";
 import {
@@ -21,7 +21,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog'
-import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import axios from 'axios';
 import {
@@ -29,8 +28,7 @@ import {
     DrawerClose,
     DrawerContent,
     DrawerDescription,
-    DrawerFooter, DrawerHeader,
-    DrawerTitle,
+    DrawerFooter,
     DrawerTrigger
 } from "@/components/ui/drawer";
 

@@ -1,20 +1,18 @@
 <script setup lang='ts'>
-import { ref, onMounted } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { onMounted } from 'vue';
+import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils'
-import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxItemIndicator, ComboboxList, ComboboxTrigger } from '@/components/ui/combobox';
+import { Combobox, ComboboxAnchor, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxList, ComboboxTrigger } from '@/components/ui/combobox';
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import InputError from "@/components/InputError.vue";
 import {LoaderCircle, ChevronsUpDown, Check, CircleX, Search } from "lucide-vue-next";
 

@@ -19,10 +19,11 @@ interface RevisionItem {
     published_by: string | null;
     change_notes: string | null;
     current: boolean;
+    active: boolean;
     url: string;
 }
 
-const props = defineProps({
+defineProps({
     references: {
         type: Array as PropType<ReferenceItem[]>,
         required: false,
@@ -98,13 +99,14 @@ const typeBadgeClass = (type: string) => {
             <ul class="space-y-1">
                 <li v-for="(rev, idx) in revision_history" :key="'rev-' + idx">
                     <Link
-                        v-if="!rev.current"
+                        v-if="!rev.active"
                         :href="rev.url"
                         class="flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-muted transition-colors"
                     >
                         <div class="flex items-center gap-2 min-w-0">
                             <span class="shrink-0 text-xs text-muted-foreground tabular-nums">v{{ revision_history.length - idx }}</span>
                             <span v-html="rev.title" class="truncate"></span>
+                            <span v-if="rev.current" class="shrink-0 rounded px-1.5 py-0.5 text-xs font-medium bg-primary/10 text-primary">Current</span>
                         </div>
                         <div class="shrink-0 text-xs text-muted-foreground ml-4">
                             <span v-if="rev.published_at">{{ rev.published_at }}</span>
@@ -119,7 +121,7 @@ const typeBadgeClass = (type: string) => {
                         <div class="flex items-center gap-2 min-w-0">
                             <span class="shrink-0 text-xs text-muted-foreground tabular-nums">v{{ revision_history.length - idx }}</span>
                             <span v-html="rev.title" class="truncate"></span>
-                            <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-medium bg-primary/10 text-primary">Current</span>
+                            <span v-if="rev.current" class="shrink-0 rounded px-1.5 py-0.5 text-xs font-medium bg-primary/10 text-primary">Current</span>
                         </div>
                         <div class="shrink-0 text-xs text-muted-foreground ml-4">
                             <span v-if="rev.published_at">{{ rev.published_at }}</span>

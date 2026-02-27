@@ -1,6 +1,6 @@
 <script setup lang='ts'>
 import { ref, onMounted } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -14,28 +14,9 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import InputError from "@/components/InputError.vue";
-import {LoaderCircle, CircleX, CheckCheckIcon, ChevronsUpDown, Search, Check} from "lucide-vue-next";
+import {CircleX} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from "@/components/ui/checkbox";
 import {hasPermission} from "@/composables/hasPermission";
-import {
-    Dialog, DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter, DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {cn} from "@/lib/utils";
-import {
-    Combobox,
-    ComboboxAnchor,
-    ComboboxEmpty,
-    ComboboxGroup, ComboboxInput,
-    ComboboxItem,
-    ComboboxList, ComboboxTrigger
-} from "@/components/ui/combobox";
 import {
     Drawer, DrawerClose, DrawerContent,
     DrawerDescription,
@@ -196,6 +177,10 @@ const changeNotesNewContent = (content) => {
                                 />
                                 <InputError :message="form.errors.content" />
                             </div>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="notes" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
                             <div class="flex flex-col space-y-1.5" v-if="(props.page && props.page?.published_at) || props.page?.approval?.change_notes">
                                 <DraggableContent
                                     v-if="viewData"
@@ -210,10 +195,6 @@ const changeNotesNewContent = (content) => {
                                 />
                                 <InputError :message="form.errors.change_notes" />
                             </div>
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="notes" force-mount class="data-[state=inactive]:hidden">
-                        <div class="grid items-center w-full gap-4 pt-4">
                             <div class="flex flex-col space-y-1.5">
                                 <Label for="internal_notes">Internal Notes</Label>
                                 <Textarea class="min-h-48" id="internal_notes" v-model="form.internal_notes" placeholder="Add Internal Notes" />

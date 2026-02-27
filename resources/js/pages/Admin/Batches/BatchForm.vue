@@ -4,7 +4,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
@@ -12,8 +11,7 @@ import { Label } from '@/components/ui/label'
 import InputError from "@/components/InputError.vue";
 import {LoaderCircle} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from "@/components/ui/checkbox";
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
 import { h, ref } from 'vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import { Button } from "@/components/ui/button";
@@ -39,7 +37,6 @@ import {
     getFilteredRowModel,
     useVueTable,
 } from '@tanstack/vue-table';
-import {hasPermission} from "@/composables/hasPermission";
 import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
 import DraggableContent from "@/components/DraggableContent.vue";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'

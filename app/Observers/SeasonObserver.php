@@ -2,7 +2,6 @@
 
 namespace App\Observers;
 
-use App\Models\Page;
 use App\Models\Season;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;

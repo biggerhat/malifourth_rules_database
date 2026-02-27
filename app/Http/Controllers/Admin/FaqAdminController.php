@@ -50,7 +50,7 @@ class FaqAdminController extends Controller
         return [
             'faq' => [
                 'title' => (new ContentBuilder($faq->title))->getFullyHydratedContent(),
-                'title_text' => ContentBuilder::toSearchable($faq->title),
+                'title_text' => ContentBuilder::toPlainText($faq->title),
                 'category' => $faq->category->value,
                 'category_label' => $faq->category->label(),
                 'answer' => $answer,

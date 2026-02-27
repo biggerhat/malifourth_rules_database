@@ -31,6 +31,7 @@ class PageController extends Controller
                 ];
             }),
             'title' => ContentBuilder::parseTitleTags($page->title),
+            'title_text' => ContentBuilder::toPlainText($page->title),
             'slug' => $page->slug,
             'content' => $content,
             'page_number' => $page->page_number,
@@ -63,6 +64,7 @@ class PageController extends Controller
                 ];
             }),
             'title' => ContentBuilder::parseTitleTags($page->title),
+            'title_text' => ContentBuilder::toPlainText($page->title),
             'slug' => $page->slug,
             'content' => $content,
             'page_number' => $page->page_number,
@@ -93,6 +95,7 @@ class PageController extends Controller
 
         return inertia('Rules/PageView', [
             'title' => ContentBuilder::parseTitleTags($page->title),
+            'title_text' => ContentBuilder::toPlainText($page->title),
             'slug' => $page->slug,
             'content' => $content,
             'page_number' => $page->page_number,

@@ -40,7 +40,7 @@ class CommandController extends Controller
 
         $faqs = Faq::published()->orderBy('title', 'ASC')->get()->map(function (Faq $faq) {
             return [
-                'title' => ContentBuilder::parseTitleTags($faq->title),
+                'title' => ContentBuilder::toPlainText($faq->title),
                 'slug' => $faq->slug,
                 'route' => route('rules.faq.view', ['faq' => $faq->slug]),
             ];

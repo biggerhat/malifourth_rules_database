@@ -93,7 +93,7 @@ class FaqController extends Controller
     {
         return [
             'title' => (new ContentBuilder($faq->title))->getFullyHydratedContent(),
-            'title_text' => ContentBuilder::toSearchable($faq->title),
+            'title_text' => ContentBuilder::toPlainText($faq->title),
             'slug' => $faq->slug,
             'category' => $faq->category->value,
             'category_label' => $faq->category->label(),

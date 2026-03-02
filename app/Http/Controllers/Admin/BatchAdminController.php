@@ -128,6 +128,7 @@ class BatchAdminController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'release_notes' => ['nullable', 'string'],
             'internal_notes' => ['nullable', 'string'],
+            'is_public' => ['required', 'boolean'],
         ]);
 
         $validated['created_by'] = $request->user()->id;

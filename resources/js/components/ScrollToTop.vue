@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import Button from "@/components/ui/button/Button.vue";
+import { ArrowUp } from 'lucide-vue-next'
 
 const showButton = ref(false)
 
@@ -23,14 +23,14 @@ onUnmounted(() => {
 
 <template>
     <transition name="fade">
-        <Button
+        <button
             v-if="showButton"
             @click="scrollToTop"
-            class="fixed bottom-20 right-6 z-50 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 opacity-70 hover:opacity-100 transition"
+            class="fixed bottom-6 right-4 sm:bottom-8 sm:right-6 z-50 size-10 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg opacity-70 hover:opacity-100 transition"
             aria-label="Scroll to Top"
         >
-            ↑
-        </Button>
+            <ArrowUp class="size-4" />
+        </button>
     </transition>
 </template>
 

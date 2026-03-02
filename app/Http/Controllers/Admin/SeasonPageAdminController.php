@@ -1,0 +1,250 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Actions\Approvals\CreateApprovalAction;
+use App\Enums\MessageTypeEnum;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\FaqListResource;
+use App\Http\Resources\IndexListResource;
+use App\Http\Resources\PageListResource;
+use App\Http\Resources\SeasonListResource;
+use App\Http\Resources\SeasonPageListResource;
+use App\Http\Resources\SectionListResource;
+use App\Models\Batch;
+use App\Models\Faq;
+use App\Models\Index;
+use App\Models\Page;
+use App\Models\Season;
+use App\Models\SeasonPage;
+use App\Models\Section;
+use App\Services\ContentBuilder\ContentBuilder;
+use Illuminate\Http\Request;
+
+class SeasonPageAdminController extends Controller
+{
+    public function list(Request $request)
+    {
+        return SeasonPageListResource::collection(
+            SeasonPage::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+        )->toArray($request);
+    }
+
+    public function preview(Request $request)
+    {
+        $content = $request->get('content') ?? '';
+        $changeNotes = $request->get('change_notes') ?? null;
+
+        return [
+            'title' => $request->get('title') ?? '',
+            'content' => (new ContentBuilder($content))->getFullyHydratedContent(),
+            'change_notes' => $changeNotes ? (new ContentBuilder($changeNotes))->getFullyHydratedContent() : null,
+        ];
+    }
+
+    public function view(Request $request, SeasonPage $seasonPage)
+    {
+        $seasonPage->loadMissing('newestVersion', 'publishedBy');
+
+        return [
+            'title' => $seasonPage->title,
+            'content' => (new ContentBuilder($seasonPage->content ?? ''))->getFullyHydratedContent(),
+            'published_at' => $seasonPage->published_at?->format('m-d-Y'),
+            'published_by' => $seasonPage->publishedBy?->name,
+        ];
+    }
+
+    public function index(Request $request): \Inertia\Response|\Inertia\ResponseFactory
+    {
+        return inertia('Admin/SeasonPages/Index', [
+            'seasonPages' => SeasonPage::with('approval', 'batch', 'season')
+                ->orderBy('id', 'DESC')
+                ->orderBy('title', 'ASC')
+                ->get(),
+        ]);
+    }
+
+    public function create(Request $request): \Inertia\Response|\Inertia\ResponseFactory
+    {
+        return inertia('Admin/SeasonPages/SeasonPageForm', [
+            'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
+            'seasons' => SeasonListResource::collection(
+                Season::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'indices' => IndexListResource::collection(
+                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'sections' => SectionListResource::collection(
+                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'pages' => PageListResource::collection(
+                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'faqs' => FaqListResource::collection(
+                Faq::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+        ]);
+    }
+
+    public function edit(Request $request, SeasonPage $seasonPage): \Inertia\Response|\Inertia\ResponseFactory
+    {
+        return inertia('Admin/SeasonPages/SeasonPageForm', [
+            'seasonPage' => $seasonPage->loadMissing('approval'),
+            'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
+            'seasons' => SeasonListResource::collection(
+                Season::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'indices' => IndexListResource::collection(
+                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'sections' => SectionListResource::collection(
+                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'pages' => PageListResource::collection(
+                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+            'faqs' => FaqListResource::collection(
+                Faq::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
+            )->toArray($request),
+        ]);
+    }
+
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $seasonPage = $this->validateAndSave($request);
+
+        return to_route('admin.season-pages.index')->withMessage($seasonPage->title.' created successfully!');
+    }
+
+    public function update(Request $request, SeasonPage $seasonPage): \Illuminate\Http\RedirectResponse
+    {
+        $seasonPage = $this->validateAndSave($request, $seasonPage);
+
+        return to_route('admin.season-pages.index')->withMessage($seasonPage->title.' updated successfully!');
+    }
+
+    public function delete(Request $request, SeasonPage $seasonPage): \Illuminate\Http\RedirectResponse
+    {
+        $name = $seasonPage->title;
+
+        $seasonPage->delete();
+
+        return to_route('admin.season-pages.index')->withMessage($name.' has been deleted.');
+    }
+
+    public function publish(Request $request, SeasonPage $seasonPage): \Illuminate\Http\RedirectResponse
+    {
+        try {
+            $seasonPage->publish($request->user());
+        } catch (\Exception $exception) {
+            return redirect()->back()->withMessage($exception->getMessage(), messageType: MessageTypeEnum::destructive);
+        }
+
+        return to_route('admin.season-pages.index')->withMessage($seasonPage->title.' has been published!');
+    }
+
+    public function bulkApprove(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $items = SeasonPage::with('approval')->whereIn('id', $validated['ids'])->get();
+        $count = 0;
+
+        foreach ($items as $item) {
+            if ($item->approval && ! $item->approval->approved_at) {
+                $item->approval->update([
+                    'approved_at' => now(),
+                    'approved_by' => $request->user()->id,
+                ]);
+                $count++;
+            }
+        }
+
+        return redirect()->back()->withMessage("{$count} season page(s) approved.");
+    }
+
+    public function bulkPublish(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $items = SeasonPage::with('approval')->whereIn('id', $validated['ids'])->get();
+        $count = 0;
+        $errors = [];
+
+        foreach ($items as $item) {
+            try {
+                $item->publish($request->user());
+                $count++;
+            } catch (\Exception $e) {
+                $errors[] = $item->title.': '.$e->getMessage();
+            }
+        }
+
+        $message = "{$count} season page(s) published.";
+        if (! empty($errors)) {
+            $message .= ' Errors: '.implode('; ', $errors);
+        }
+
+        return redirect()->back()->withMessage($message);
+    }
+
+    public function bulkDelete(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
+        $count = SeasonPage::whereIn('id', $validated['ids'])->whereNull('published_at')->delete();
+
+        return redirect()->back()->withMessage("{$count} season page(s) deleted.");
+    }
+
+    private function validateAndSave(Request $request, ?SeasonPage $seasonPage = null): SeasonPage
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'season_id' => ['required', 'integer', 'exists:seasons,id'],
+            'sort_order' => ['required', 'integer', 'min:0'],
+            'content' => ['nullable', 'string'],
+            'internal_notes' => ['nullable', 'string'],
+            'change_notes' => ['nullable', 'string'],
+            'batch_id' => ['nullable', 'int', 'exists:batches,id'],
+            'publish_directly' => ['required', 'boolean'],
+            'approve_directly' => ['required', 'boolean'],
+        ]);
+
+        $publishDirectly = $validated['publish_directly'];
+        unset($validated['publish_directly']);
+        $approveDirectly = $validated['approve_directly'];
+        unset($validated['approve_directly']);
+        $changeNotes = preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
+        unset($validated['change_notes']);
+
+        if ($validated['content']) {
+            $validated['content'] = preg_replace("/(\r|\n)/", '', nl2br($validated['content']));
+        }
+
+        if (! $seasonPage) {
+            $seasonPage = SeasonPage::create($validated);
+        } else {
+            $seasonPage->loadMissing('approval');
+
+            if (! $seasonPage->published_at) {
+                $seasonPage->update($validated);
+                $seasonPage->approval?->delete();
+            } else {
+                $validated['previous'] = $seasonPage->id;
+                $validated['original'] = $seasonPage->original ?? $seasonPage->id;
+                $seasonPage = SeasonPage::create($validated);
+            }
+        }
+
+        CreateApprovalAction::handle(
+            $seasonPage->refresh(),
+            $request->user(),
+            changeNotes: $changeNotes,
+            approveDirectly: $approveDirectly
+        );
+
+        if ($publishDirectly) {
+            self::publish($request, $seasonPage->refresh());
+        }
+
+        return $seasonPage;
+    }
+}

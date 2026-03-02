@@ -78,7 +78,13 @@ class ContentBuilder
 
     public static function toSearchable(string $content): string
     {
-        return preg_replace('/{{.*?}}/', '', self::removeInlineTags($content));
+        $text = self::removeInlineTags($content);
+        $text = preg_replace('/\{\{.*?\}\}/', '', $text);
+        $text = strip_tags($text);
+        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('/\s+/', ' ', $text);
+
+        return trim($text);
     }
 
     public static function toPlainText(string $content): string

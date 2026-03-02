@@ -2,13 +2,18 @@
 
 use App\Http\Controllers\Admin\ApprovalAdminController;
 use App\Http\Controllers\Admin\BatchAdminController;
+use App\Http\Controllers\Admin\ErrataAdminController;
 use App\Http\Controllers\Admin\FaqAdminController;
 use App\Http\Controllers\Admin\IndexAdminController;
+use App\Http\Controllers\Admin\NavigationItemAdminController;
 use App\Http\Controllers\Admin\PageAdminController;
 use App\Http\Controllers\Admin\PageOrderController;
 use App\Http\Controllers\Admin\RoleAdminController;
+use App\Http\Controllers\Admin\SchemeAdminController;
 use App\Http\Controllers\Admin\SeasonAdminController;
+use App\Http\Controllers\Admin\SeasonPageAdminController;
 use App\Http\Controllers\Admin\SectionAdminController;
+use App\Http\Controllers\Admin\StrategyAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 
 Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(function () {
@@ -109,6 +114,54 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_season']);
     });
 
+    Route::controller(SchemeAdminController::class)->prefix('schemes')->name('schemes.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware(['permission:view_scheme']);
+        Route::get('/view/{scheme}', 'view')->name('view')->middleware(['permission:view_scheme']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_scheme']);
+        Route::get('/list', 'list')->name('list');
+        Route::get('/create', 'create')->name('create')->middleware(['permission:add_scheme']);
+        Route::get('/edit/{scheme}', 'edit')->name('edit')->middleware(['permission:edit_scheme']);
+        Route::post('/store', 'store')->name('store')->middleware(['permission:add_scheme']);
+        Route::post('/update/{scheme}', 'update')->name('update')->middleware(['permission:edit_scheme']);
+        Route::post('/delete/{scheme}', 'delete')->name('delete')->middleware(['permission:delete_scheme']);
+        Route::post('/publish/{scheme}', 'publish')->name('publish')->middleware(['permission:publish_scheme']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_scheme']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_scheme']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_scheme']);
+    });
+
+    Route::controller(SeasonPageAdminController::class)->prefix('season-pages')->name('season-pages.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware(['permission:view_season_page']);
+        Route::get('/view/{seasonPage}', 'view')->name('view')->middleware(['permission:view_season_page']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_season_page']);
+        Route::get('/list', 'list')->name('list');
+        Route::get('/create', 'create')->name('create')->middleware(['permission:add_season_page']);
+        Route::get('/edit/{seasonPage}', 'edit')->name('edit')->middleware(['permission:edit_season_page']);
+        Route::post('/store', 'store')->name('store')->middleware(['permission:add_season_page']);
+        Route::post('/update/{seasonPage}', 'update')->name('update')->middleware(['permission:edit_season_page']);
+        Route::post('/delete/{seasonPage}', 'delete')->name('delete')->middleware(['permission:delete_season_page']);
+        Route::post('/publish/{seasonPage}', 'publish')->name('publish')->middleware(['permission:publish_season_page']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_season_page']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_season_page']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_season_page']);
+    });
+
+    Route::controller(StrategyAdminController::class)->prefix('strategies')->name('strategies.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware(['permission:view_strategy']);
+        Route::get('/view/{strategy}', 'view')->name('view')->middleware(['permission:view_strategy']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_strategy']);
+        Route::get('/list', 'list')->name('list');
+        Route::get('/create', 'create')->name('create')->middleware(['permission:add_strategy']);
+        Route::get('/edit/{strategy}', 'edit')->name('edit')->middleware(['permission:edit_strategy']);
+        Route::post('/store', 'store')->name('store')->middleware(['permission:add_strategy']);
+        Route::post('/update/{strategy}', 'update')->name('update')->middleware(['permission:edit_strategy']);
+        Route::post('/delete/{strategy}', 'delete')->name('delete')->middleware(['permission:delete_strategy']);
+        Route::post('/publish/{strategy}', 'publish')->name('publish')->middleware(['permission:publish_strategy']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_strategy']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_strategy']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_strategy']);
+    });
+
     Route::controller(FaqAdminController::class)->prefix('faqs')->name('faqs.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_faq']);
         Route::get('/view/{faq}', 'view')->name('view')->middleware(['permission:view_faq']);
@@ -124,6 +177,32 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_faq']);
         Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_faq']);
     });
+
+    Route::controller(ErrataAdminController::class)->prefix('errata')->name('errata.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware(['permission:view_errata']);
+        Route::get('/view/{errata}', 'view')->name('view')->middleware(['permission:view_errata']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_errata']);
+        Route::get('/list', 'list')->name('list');
+        Route::get('/create', 'create')->name('create')->middleware(['permission:add_errata']);
+        Route::get('/edit/{errata}', 'edit')->name('edit')->middleware(['permission:edit_errata']);
+        Route::post('/store', 'store')->name('store')->middleware(['permission:add_errata']);
+        Route::post('/update/{errata}', 'update')->name('update')->middleware(['permission:edit_errata']);
+        Route::post('/delete/{errata}', 'delete')->name('delete')->middleware(['permission:delete_errata']);
+        Route::post('/publish/{errata}', 'publish')->name('publish')->middleware(['permission:publish_errata']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_errata']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_errata']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_errata']);
+    });
+
+    Route::controller(NavigationItemAdminController::class)
+        ->prefix('navigation')->name('navigation.')->group(function () {
+            Route::get('/', 'index')->name('index')->middleware(['permission:view_navigation_item']);
+            Route::get('/create', 'create')->name('create')->middleware(['permission:add_navigation_item']);
+            Route::get('/edit/{navigationItem}', 'edit')->name('edit')->middleware(['permission:edit_navigation_item']);
+            Route::post('/store', 'store')->name('store')->middleware(['permission:add_navigation_item']);
+            Route::post('/update/{navigationItem}', 'update')->name('update')->middleware(['permission:edit_navigation_item']);
+            Route::post('/delete/{navigationItem}', 'delete')->name('delete')->middleware(['permission:delete_navigation_item']);
+        });
 
     Route::controller(ApprovalAdminController::class)->prefix('approvals')->name('approvals.')->group(function () {
         Route::get('/', 'index')->name('index');

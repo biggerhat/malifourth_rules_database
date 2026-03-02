@@ -5,7 +5,9 @@ namespace App\Actions\Content;
 use App\Models\Faq;
 use App\Models\Index;
 use App\Models\Page;
+use App\Models\Scheme;
 use App\Models\Section;
+use App\Models\Strategy;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,6 +18,8 @@ class SyncContentReferencesAction
         $fields = match (true) {
             $model instanceof Section => ['left_column', 'right_column'],
             $model instanceof Faq => ['answer'],
+            $model instanceof Scheme => ['prerequisites', 'reveal', 'scoring', 'additional'],
+            $model instanceof Strategy => ['setup', 'rules', 'scoring', 'additional'],
             default => ['content'],
         };
 

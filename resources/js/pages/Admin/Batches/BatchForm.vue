@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import InputError from "@/components/InputError.vue";
 import {LoaderCircle} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
 import { Head, useForm } from '@inertiajs/vue3';
 import { h, ref } from 'vue';
 import type { ColumnDef } from '@tanstack/vue-table';
@@ -88,12 +89,14 @@ const form = useForm({
     title: '',
     release_notes: '',
     internal_notes: '',
+    is_public: false,
 });
 
 onMounted(() => {
     form.title = props.batch?.title ?? null;
     form.release_notes = props.batch?.release_notes ?? '';
     form.internal_notes = props.batch?.internal_notes ?? '';
+    form.is_public = props.batch?.is_public ?? false;
     fetchViewData();
 });
 
@@ -231,6 +234,10 @@ const table = useVueTable({
                                 <Label for="title">Batch</Label>
                                 <Input id="title" type="text" required autofocus :tabindex="1" autocomplete="title" v-model="form.title" placeholder="Batch Name" />
                                 <InputError :message="form.errors.title" />
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <Switch id="is_public" v-model="form.is_public" />
+                                <Label for="is_public">Public Errata Batch</Label>
                             </div>
                         </div>
                     </TabsContent>

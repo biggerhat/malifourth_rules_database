@@ -32,12 +32,22 @@ class Batch extends Model implements HasPublisher
 
     protected $guarded = ['id'];
 
+    protected function casts(): array
+    {
+        return [
+            'is_public' => 'boolean',
+            'published_at' => 'datetime',
+        ];
+    }
+
     public array $batchables = [
+        'errata',
         'faqs',
         'indices',
         'pages',
         'sections',
         'seasons',
+        'seasonPages',
         'schemes',
         'strategies',
     ];
@@ -60,6 +70,11 @@ class Batch extends Model implements HasPublisher
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function errata(): HasMany
+    {
+        return $this->hasMany(Errata::class, 'batch_id', 'id');
     }
 
     public function faqs(): HasMany
@@ -90,6 +105,11 @@ class Batch extends Model implements HasPublisher
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class, 'batch_id', 'id');
+    }
+
+    public function seasonPages(): HasMany
+    {
+        return $this->hasMany(SeasonPage::class, 'batch_id', 'id');
     }
 
     public function strategies(): HasMany

@@ -85,6 +85,21 @@ defineProps<Props>();
                 FAQs
             </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true" v-if="hasPermission('view_errata')">
+            <Link class="block w-full" :href="route('admin.errata.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                Errata
+            </Link>
+        </DropdownMenuItem>
+    </DropdownMenuGroup>
+    <DropdownMenuSeparator />
+    <DropdownMenuGroup>
+        <DropdownMenuItem :as-child="true">
+            <Link class="block w-full" :href="route('admin.navigation.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                Navigation
+            </Link>
+        </DropdownMenuItem>
     </DropdownMenuGroup>
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
@@ -92,6 +107,24 @@ defineProps<Props>();
             <Link class="block w-full" :href="route('admin.seasons.index')" prefetch as="button">
                 <PencilRuler class="mr-2 h-4 w-4" />
                 Seasons
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true" v-if="hasPermission('view_scheme')">
+            <Link class="block w-full" :href="route('admin.schemes.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                Schemes
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true" v-if="hasPermission('view_strategy')">
+            <Link class="block w-full" :href="route('admin.strategies.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                Strategies
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true" v-if="hasPermission('view_season_page')">
+            <Link class="block w-full" :href="route('admin.season-pages.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                Season Pages
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>

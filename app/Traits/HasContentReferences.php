@@ -2,10 +2,15 @@
 
 namespace App\Traits;
 
+use App\Models\Errata;
 use App\Models\Faq;
 use App\Models\Index;
 use App\Models\Page;
+use App\Models\Scheme;
+use App\Models\Season;
+use App\Models\SeasonPage;
 use App\Models\Section;
+use App\Models\Strategy;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasContentReferences
@@ -53,10 +58,15 @@ trait HasContentReferences
     private function getReferenceMorphName(): string
     {
         return match (static::class) {
+            Errata::class => 'errataable',
             Faq::class => 'faqable',
             Index::class => 'indexable',
             Section::class => 'sectionable',
             Page::class => 'pageable',
+            Season::class => 'seasonable',
+            Scheme::class => 'schemeable',
+            SeasonPage::class => 'season_pageable',
+            Strategy::class => 'strategyable',
         };
     }
 }

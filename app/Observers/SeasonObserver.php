@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Actions\Content\SyncContentReferencesAction;
 use App\Models\Season;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;
@@ -22,6 +23,7 @@ class SeasonObserver
             'slug' => $season->id.'-'.Str::slug($season->title),
         ]);
 
+        SyncContentReferencesAction::handle($season);
     }
 
     public function updating(Season $season): void
@@ -32,9 +34,14 @@ class SeasonObserver
         $season->searchable_text = ContentBuilder::toSearchable($content);
     }
 
+    public function updated(Season $season): void
+    {
+        SyncContentReferencesAction::handle($season);
+    }
+
     public function deleted(Season $season): void
     {
         $season->loadMissing('approval');
-        $season->approval->delete();
+        $season->approval?->delete();
     }
 }

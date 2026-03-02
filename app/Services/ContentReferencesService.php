@@ -2,10 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\Errata;
 use App\Models\Faq;
 use App\Models\Index;
 use App\Models\Page;
+use App\Models\Scheme;
+use App\Models\Season;
+use App\Models\SeasonPage;
 use App\Models\Section;
+use App\Models\Strategy;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -82,12 +87,17 @@ class ContentReferencesService
     {
         $originalId = $model->original ?? $model->id;
 
-        $versions = $model::withTrashed()
+        $query = $model::withTrashed()
             ->where('id', $originalId)
             ->orWhere('original', $originalId)
             ->with('publishedBy', 'approval')
-            ->orderByDesc('id')
-            ->get();
+            ->orderByDesc('id');
+
+        if ($model instanceof SeasonPage) {
+            $query->with('season');
+        }
+
+        $versions = $query->get();
 
         $currentVersion = $model->newestVersion ?? $model;
 
@@ -121,6 +131,21 @@ class ContentReferencesService
             $version instanceof Index => $isCurrent
                 ? route('rules.index.view', $currentVersion->slug)
                 : route('rules.index.history', $version->slug),
+            $version instanceof Season => $isCurrent
+                ? route('rules.gaining-grounds.season', $currentVersion->slug)
+                : route('rules.gaining-grounds.season.history', $version->slug),
+            $version instanceof Scheme => $isCurrent
+                ? route('rules.gaining-grounds.scheme', $currentVersion->slug)
+                : route('rules.gaining-grounds.scheme.history', $version->slug),
+            $version instanceof SeasonPage => $isCurrent
+                ? route('rules.gaining-grounds.season-page', [$currentVersion->season->slug, $currentVersion->slug])
+                : route('rules.gaining-grounds.season-page.history', [$version->season->slug, $version->slug]),
+            $version instanceof Strategy => $isCurrent
+                ? route('rules.gaining-grounds.strategy', $currentVersion->slug)
+                : route('rules.gaining-grounds.strategy.history', $version->slug),
+            $version instanceof Errata => $isCurrent
+                ? route('errata.view', $currentVersion->slug)
+                : route('errata.history', $version->slug),
         };
     }
 
@@ -131,6 +156,10 @@ class ContentReferencesService
             'Page' => route('rules.page.view', $model->slug),
             'Section' => route('rules.section.view', $model->slug),
             'Index' => route('rules.index.view', $model->slug),
+            'Season' => route('rules.gaining-grounds.season', $model->slug),
+            'Scheme' => route('rules.gaining-grounds.scheme', $model->slug),
+            'Strategy' => route('rules.gaining-grounds.strategy', $model->slug),
+            'Errata' => route('errata.view', $model->slug),
         };
 
         return [

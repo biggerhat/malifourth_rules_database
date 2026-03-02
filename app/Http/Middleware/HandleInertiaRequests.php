@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\NavigationItem;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -53,6 +54,13 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'navigationItems' => fn () => NavigationItem::active()
+                ->with('linkable:id,title,slug')
+                ->get()
+                ->map(fn ($item) => [
+                    'title' => $item->title,
+                    'href' => $item->resolvedUrl(),
+                ]),
         ];
     }
 }

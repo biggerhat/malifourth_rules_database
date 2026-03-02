@@ -35,21 +35,21 @@ const generalSearch = () => {
 </script>
 
 <template>
-    <div class="min-h-screen pt-6">
-        <img src="/Images/Logos/M4E-Logo_Bayou-B.png" alt="Malifaux Fourth Edition" />
-        <div class="relative w-full items-center text-4xl mx-auto text-center mt-6">
+    <div class="min-h-screen pt-6 px-4">
+        <img src="/Images/Logos/M4E-Logo_Bayou-B.png" alt="Malifaux Fourth Edition" class="max-w-xs sm:max-w-sm mx-auto" />
+        <div class="relative w-full text-2xl sm:text-3xl lg:text-4xl mx-auto text-center mt-6">
             Comprehensive Rules Database
         </div>
-        <div class="size-full mt-6">
-            <div class="relative w-full max-w-xl mt-12 items-center mx-auto my-auto">
+        <div class="mt-6">
+            <div class="relative w-full max-w-xl mx-auto">
                 <Input id="search" type="text" autofocus placeholder="Search..." class="pl-10" @keydown.enter="generalSearch" v-model="queryString" />
                 <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
                     <Search class="size-6 text-muted-foreground" />
                 </span>
             </div>
         </div>
-        <div class="container grid lg:grid-cols-2 mt-6 gap-2">
-            <Card class="mx-2 lg:mx-0">
+        <div class="max-w-4xl mx-auto grid sm:grid-cols-2 mt-8 gap-4">
+            <Card>
                 <CardHeader>
                     <CardTitle>Latest Updates</CardTitle>
                 </CardHeader>
@@ -57,12 +57,12 @@ const generalSearch = () => {
 
                 </CardContent>
             </Card>
-            <Card class="mx-2 lg:mx-0">
+            <Card>
                 <CardHeader class="my-auto">
                     <CardTitle><img src="/Images/wyrd-logo.png" alt="Wyrd Games" class="h-8 my-auto inline-block mr-2" />Latest Wyrd News</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <a v-for="news in props.wyrd_news" :href="news.url" :key="news.url" target="_blank" class="hover:bg-secondary px-1 py-2 block">
+                    <a v-for="news in props.wyrd_news" :href="news.url" :key="news.url" target="_blank" class="hover:bg-secondary rounded-md px-2 py-2 block text-sm">
                         {{ news.title }}
                     </a>
                 </CardContent>

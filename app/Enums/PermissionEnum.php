@@ -121,6 +121,19 @@ enum PermissionEnum: string
     #[PermissionGroup(PermissionGroupEnum::Strategy)]
     case PublishStrategy = 'publish_strategy';
 
+    #[PermissionGroup(PermissionGroupEnum::SeasonPage)]
+    case ViewSeasonPage = 'view_season_page';
+    #[PermissionGroup(PermissionGroupEnum::SeasonPage)]
+    case AddSeasonPage = 'add_season_page';
+    #[PermissionGroup(PermissionGroupEnum::SeasonPage)]
+    case EditSeasonPage = 'edit_season_page';
+    #[PermissionGroup(PermissionGroupEnum::SeasonPage)]
+    case DeleteSeasonPage = 'delete_season_page';
+    #[PermissionGroup(PermissionGroupEnum::SeasonPage)]
+    case ApproveSeasonPage = 'approve_season_page';
+    #[PermissionGroup(PermissionGroupEnum::SeasonPage)]
+    case PublishSeasonPage = 'publish_season_page';
+
     #[PermissionGroup(PermissionGroupEnum::Faq)]
     case ViewFaq = 'view_faq';
     #[PermissionGroup(PermissionGroupEnum::Faq)]
@@ -133,6 +146,28 @@ enum PermissionEnum: string
     case ApproveFaq = 'approve_faq';
     #[PermissionGroup(PermissionGroupEnum::Faq)]
     case PublishFaq = 'publish_faq';
+
+    #[PermissionGroup(PermissionGroupEnum::Errata)]
+    case ViewErrata = 'view_errata';
+    #[PermissionGroup(PermissionGroupEnum::Errata)]
+    case AddErrata = 'add_errata';
+    #[PermissionGroup(PermissionGroupEnum::Errata)]
+    case EditErrata = 'edit_errata';
+    #[PermissionGroup(PermissionGroupEnum::Errata)]
+    case DeleteErrata = 'delete_errata';
+    #[PermissionGroup(PermissionGroupEnum::Errata)]
+    case ApproveErrata = 'approve_errata';
+    #[PermissionGroup(PermissionGroupEnum::Errata)]
+    case PublishErrata = 'publish_errata';
+
+    #[PermissionGroup(PermissionGroupEnum::NavigationItem)]
+    case ViewNavigationItem = 'view_navigation_item';
+    #[PermissionGroup(PermissionGroupEnum::NavigationItem)]
+    case AddNavigationItem = 'add_navigation_item';
+    #[PermissionGroup(PermissionGroupEnum::NavigationItem)]
+    case EditNavigationItem = 'edit_navigation_item';
+    #[PermissionGroup(PermissionGroupEnum::NavigationItem)]
+    case DeleteNavigationItem = 'delete_navigation_item';
 
     //    case View = 'view_';
     //    case Add = 'add_';

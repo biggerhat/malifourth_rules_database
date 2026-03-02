@@ -98,7 +98,7 @@ const generalSearch = () => {
     searchOpen.value = false;
 }
 
-const mainNavItems: NavItem[] = [
+const staticNavItems: NavItem[] = [
     {
         title: 'Rules',
         href: route('rules.index'),
@@ -107,8 +107,8 @@ const mainNavItems: NavItem[] = [
         external: false,
     },{
         title: 'Gaining Grounds',
-        href: route('gaining-grounds.index'),
-        route: 'gaining-grounds.index',
+        href: route('rules.gaining-grounds.index'),
+        route: 'rules.gaining-grounds.index',
         icon: LayoutGrid,
         external: false,
     },{
@@ -123,32 +123,25 @@ const mainNavItems: NavItem[] = [
         route: 'errata.index',
         icon: LayoutGrid,
         external: false,
-    },{
-        title: 'Glossary',
-        href: 'https://malifauxrules.com/rules/sections/2-glossary',
-        route: 'dashboard',
-        icon: LayoutGrid,
-        external: true,
-    },{
-        title: 'Timing',
-        href: 'https://malifauxrules.com/rules/sections/378-quick-reference-timing',
-        route: 'dashboard',
-        icon: LayoutGrid,
-        external: true,
-    },{
-        title: 'Tokens',
-        href: 'https://malifauxrules.com/rules/sections/273-tokens-of-malifaux',
-        route: 'dashboard',
-        icon: LayoutGrid,
-        external: true,
-    },{
-        title: 'Markers',
-        href: 'https://malifauxrules.com/rules/sections/274-markers-of-malifaux',
-        route: 'dashboard',
-        icon: LayoutGrid,
-        external: true,
-    }
+    },
 ];
+
+const dynamicNavItems = computed<NavItem[]>(() => {
+    const items = (page.props.navigationItems as Array<{ title: string; href: string | null }>) ?? [];
+    return items
+        .filter((item) => item.href)
+        .map((item) => ({
+            title: item.title,
+            href: item.href!,
+            icon: LayoutGrid,
+            external: false,
+        }));
+});
+
+const mainNavItems = computed<NavItem[]>(() => [
+    ...staticNavItems,
+    ...dynamicNavItems.value,
+]);
 
 const rightNavItems: NavItem[] = [];
 </script>
@@ -236,7 +229,7 @@ const rightNavItems: NavItem[] = [];
                                     {{ item.title }}
                                 </a>
                                 <div
-                                    v-if="route().current(item.route)"
+                                    v-if="item.route && route().current(item.route)"
                                     class="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"
                                 ></div>
                             </NavigationMenuItem>
@@ -352,6 +345,30 @@ const rightNavItems: NavItem[] = [];
                 <CommandGroup heading="FAQs">
                     <CommandItem v-for="faq in commandSearch.faqs" v-bind:key="faq.slug" @select="commandRoute(faq.route)" value="faq.slug">
                         <span v-html="faq.title"></span>
+                    </CommandItem>
+                </CommandGroup>
+                <CommandSeparator />
+                <CommandGroup heading="Gaining Grounds">
+                    <CommandItem v-for="season in commandSearch.seasons" v-bind:key="season.slug" @select="commandRoute(season.route)" value="season.slug">
+                        <span v-html="season.title"></span>
+                    </CommandItem>
+                </CommandGroup>
+                <CommandSeparator />
+                <CommandGroup heading="Strategies">
+                    <CommandItem v-for="strategy in commandSearch.strategies" v-bind:key="strategy.slug" @select="commandRoute(strategy.route)" value="strategy.slug">
+                        <span v-html="strategy.title"></span>
+                    </CommandItem>
+                </CommandGroup>
+                <CommandSeparator />
+                <CommandGroup heading="Schemes">
+                    <CommandItem v-for="scheme in commandSearch.schemes" v-bind:key="scheme.slug" @select="commandRoute(scheme.route)" value="scheme.slug">
+                        <span v-html="scheme.title"></span>
+                    </CommandItem>
+                </CommandGroup>
+                <CommandSeparator />
+                <CommandGroup heading="Errata">
+                    <CommandItem v-for="errata in commandSearch.errata" v-bind:key="errata.slug" @select="commandRoute(errata.route)" value="errata.slug">
+                        <span v-html="errata.title"></span>
                     </CommandItem>
                 </CommandGroup>
             </CommandList>

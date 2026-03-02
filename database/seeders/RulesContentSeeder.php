@@ -23,13 +23,14 @@ class RulesContentSeeder extends Seeder
 
     public function run(): void
     {
-        $this->admin = User::factory()->create([
-            'name' => 'Test Admin',
-            'email' => 'admin@test.com',
-            'password' => Hash::make('password'),
-        ]);
+        $this->admin = User::where('email', 'admin@test.com')->first()
+            ?? User::factory()->create([
+                'name' => 'Test Admin',
+                'email' => 'admin@test.com',
+                'password' => Hash::make('password'),
+            ]);
 
-        $this->command->info('Created admin user: admin@test.com / password');
+        $this->command->info('Using admin user: admin@test.com');
 
         $pages = $this->seedPages();
         $sections = $this->seedSections();

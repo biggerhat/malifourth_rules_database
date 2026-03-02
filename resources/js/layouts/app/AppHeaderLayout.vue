@@ -18,7 +18,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <AppShell class="flex-col">
+    <AppShell variant="header" class="flex-col">
         <AppHeader :breadcrumbs="breadcrumbs" />
         <AppContent class="mt-6">
             <AlertMessage v-if="$page.props.flash?.message" :message="$page.props.flash.message" :message-title="$page.props.flash.messageTitle ?? null" :message-type="$page.props.flash.messageType ?? null" />

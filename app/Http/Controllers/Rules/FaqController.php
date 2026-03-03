@@ -22,12 +22,14 @@ class FaqController extends Controller
                 return [
                     'id' => $faq->id,
                     'title' => (new ContentBuilder($faq->title))->getFullyHydratedContent(),
+                    'title_text' => ContentBuilder::toPlainText($faq->title),
                     'slug' => $faq->slug,
                     'category' => $faq->category->value,
                     'category_label' => $faq->category->label(),
                     'category_sort' => $faq->category->sortOrder(),
                     'sort_order' => $faq->sort_order,
                     'answer' => (new ContentBuilder($faq->answer ?? ''))->getFullyHydratedContent(),
+                    'answer_text' => ContentBuilder::toSearchable($faq->answer ?? ''),
                 ];
             })
             ->sortBy(['category_sort', 'sort_order'])

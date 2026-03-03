@@ -2,15 +2,32 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
-import {
-    Card,
-    CardContent,
-    CardFooter,
-} from '@/components/ui/card'
+import Card from "@/components/ui/card/Card.vue";
+import CardContent from "@/components/ui/card/CardContent.vue";
+import CardFooter from "@/components/ui/card/CardFooter.vue";
+import CardHeader from "@/components/ui/card/CardHeader.vue";
+import CardTitle from "@/components/ui/card/CardTitle.vue";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ChevronLeft, ChevronRight, LayoutGrid } from "lucide-vue-next";
+import { ChevronRight } from "lucide-vue-next";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { ref, watch } from "vue";
 
 const props = defineProps({
+    seasons: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return [];
+        }
+    },
     season: {
         type: Object,
         required: true,
@@ -59,6 +76,14 @@ const props = defineProps({
     }
 });
 
+const seasonParam = ref(props.season.slug);
+
+watch(seasonParam, (newSlug) => {
+    if (newSlug && newSlug !== props.season.slug) {
+        window.location.href = route('rules.gaining-grounds.season', newSlug);
+    }
+});
+
 const suitAccent = (suit: string) => {
     switch (suit) {
         case 'rams': return 'border-l-red-500 dark:border-l-red-400';
@@ -78,125 +103,152 @@ const suitBadge = (suit: string) => {
         default: return 'bg-muted text-muted-foreground';
     }
 };
+
+const suitSymbol = (suit: string) => {
+    switch (suit) {
+        case 'rams': return 'r';
+        case 'crows': return 'c';
+        case 'masks': return 'm';
+        case 'tomes': return 't';
+        default: return '';
+    }
+};
 </script>
 
 <template>
     <Head :title="props.season.title" />
 
-    <div class="max-w-4xl mx-auto px-2 sm:px-4 text-primary leading-6 text-md">
-        <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">
-            <AlertDescription>
-                You are viewing an older version of this content.
-                <Link :href="props.current_version_url" class="underline font-medium ml-1">View the current version &rarr;</Link>
-            </AlertDescription>
-        </Alert>
-
-        <!-- Back link -->
-        <div class="pt-4 mb-2">
-            <Link
-                :href="route('rules.gaining-grounds.index')"
-                class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-                <ChevronLeft class="size-4" />
-                All Seasons
-            </Link>
+    <div class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
+        <!-- Sidebar: Season list (desktop) -->
+        <div v-if="!props.viewing_old_version" class="lg:col-span-2 hidden lg:block">
+            <Card class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                <CardHeader class="pb-0">
+                    <CardTitle class="text-sm">Seasons</CardTitle>
+                </CardHeader>
+                <CardContent class="px-3">
+                    <Link
+                        v-for="s in props.seasons"
+                        :key="s.id"
+                        :href="route('rules.gaining-grounds.season', s.slug)"
+                        class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
+                        :class="s.slug === props.season.slug ? 'bg-primary text-primary-foreground' : ''"
+                    >{{ s.title }}</Link>
+                </CardContent>
+            </Card>
         </div>
 
-        <!-- Banner -->
-        <div class="w-full text-center text-xl py-4">
-            <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-            <span>{{ props.season.title }}</span>
-            <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-        </div>
+        <!-- Main content -->
+        <div :class="props.viewing_old_version ? '' : 'lg:col-span-6'">
+            <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">
+                <AlertDescription>
+                    You are viewing an older version of this content.
+                    <Link :href="props.current_version_url" class="underline font-medium ml-1">View the current version &rarr;</Link>
+                </AlertDescription>
+            </Alert>
 
-        <!-- Overview link -->
-        <div v-if="!props.viewing_old_version" class="text-center mb-4">
-            <Link
-                :href="route('rules.gaining-grounds.season.overview', props.season.slug)"
-                class="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-                <LayoutGrid class="size-4" />
-                Season Overview &amp; Scheme Explorer
-            </Link>
-        </div>
-
-        <!-- Season Content -->
-        <Card v-if="props.season.content && props.season.content.length > 0" class="mb-8">
-            <CardContent>
-                <ParsedContent :content="props.season.content" />
-            </CardContent>
-            <CardFooter v-if="!props.viewing_old_version" class="border-t px-6 py-3 text-xs text-muted-foreground justify-end">
-                Last updated {{ props.season.published_at }} by {{ props.season.published_by }}
-            </CardFooter>
-        </Card>
-
-        <!-- Season Pages -->
-        <div v-if="props.seasonPages.length > 1 && !props.viewing_old_version" class="mb-8">
-            <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Pages</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <Link
-                    v-for="page in props.seasonPages"
-                    :key="page.id"
-                    :href="route('rules.gaining-grounds.season-page', [props.season.slug, page.slug])"
-                    class="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
-                >
-                    <span class="text-sm font-medium truncate">{{ page.title }}</span>
-                    <ChevronRight class="size-3.5 shrink-0 text-muted-foreground ml-auto" />
-                </Link>
+            <!-- Mobile season selector -->
+            <div v-if="!props.viewing_old_version" class="lg:hidden block mb-4 mx-2">
+                <Select v-model="seasonParam">
+                    <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select a Season" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Seasons</SelectLabel>
+                            <SelectItem v-for="s in props.seasons" :key="s.id" :value="s.slug">
+                                {{ s.title }}
+                            </SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
             </div>
-        </div>
 
-        <!-- Strategies -->
-        <div v-if="props.strategies.length > 0" class="mb-8">
-            <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Strategies</h2>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <Link
-                    v-for="strategy in props.strategies"
-                    :key="strategy.id"
-                    :href="route('rules.gaining-grounds.strategy', strategy.slug)"
-                    class="group block"
-                >
-                    <div
-                        class="rounded-lg border border-l-4 bg-card p-3 sm:p-4 h-full transition-colors hover:bg-muted/50"
-                        :class="suitAccent(strategy.suit)"
+            <!-- Banner -->
+            <div class="w-full text-center text-xl py-4">
+                <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+                <span>{{ props.season.title }}</span>
+                <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+            </div>
+
+            <!-- Season Content -->
+            <Card v-if="props.season.content && props.season.content.length > 0" class="mb-8">
+                <CardContent>
+                    <ParsedContent :content="props.season.content" />
+                </CardContent>
+                <CardFooter v-if="!props.viewing_old_version" class="border-t px-6 py-3 text-xs text-muted-foreground justify-end">
+                    Last updated {{ props.season.published_at }} by {{ props.season.published_by }}
+                </CardFooter>
+            </Card>
+
+            <!-- Season Pages -->
+            <div v-if="props.seasonPages.length > 1 && !props.viewing_old_version" class="mb-8">
+                <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Pages</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <Link
+                        v-for="page in props.seasonPages"
+                        :key="page.id"
+                        :href="route('rules.gaining-grounds.season-page', [props.season.slug, page.slug])"
+                        class="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
                     >
-                        <img v-if="strategy.front_image" :src="strategy.front_image" :alt="strategy.title" class="w-full rounded mb-3" />
-                        <div class="text-sm font-medium group-hover:underline">{{ strategy.title }}</div>
-                        <span
-                            v-if="strategy.suit_label"
-                            class="inline-block mt-1.5 text-[11px] px-1.5 py-0.5 rounded font-medium"
-                            :class="suitBadge(strategy.suit)"
+                        <span class="text-sm font-medium truncate">{{ page.title }}</span>
+                        <ChevronRight class="size-3.5 shrink-0 text-muted-foreground ml-auto" />
+                    </Link>
+                </div>
+            </div>
+
+            <!-- Strategies -->
+            <div v-if="props.strategies.length > 0" class="mb-8">
+                <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Strategies</h2>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <Link
+                        v-for="strategy in props.strategies"
+                        :key="strategy.id"
+                        :href="route('rules.gaining-grounds.strategy', strategy.slug)"
+                        class="group block"
+                    >
+                        <div
+                            class="rounded-lg border border-l-4 bg-card p-3 sm:p-4 h-full transition-colors hover:bg-muted/50"
+                            :class="suitAccent(strategy.suit)"
                         >
-                            {{ strategy.suit_label }}
-                        </span>
-                    </div>
-                </Link>
+                            <img v-if="strategy.front_image" :src="strategy.front_image" :alt="strategy.title" class="w-full rounded mb-3" />
+                            <div class="text-sm font-medium group-hover:underline">{{ strategy.title }}</div>
+                            <span
+                                v-if="strategy.suit_label"
+                                class="inline-flex items-center gap-1 mt-1.5 text-[11px] px-1.5 py-0.5 rounded font-medium"
+                                :class="suitBadge(strategy.suit)"
+                            >
+                                <span class="font-[symbolFont] text-sm">{{ suitSymbol(strategy.suit) }}</span>
+                                {{ strategy.suit_label }}
+                            </span>
+                        </div>
+                    </Link>
+                </div>
             </div>
-        </div>
 
-        <!-- Schemes -->
-        <div v-if="props.schemes.length > 0" class="mb-8">
-            <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Schemes</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                <Link
-                    v-for="scheme in props.schemes"
-                    :key="scheme.id"
-                    :href="route('rules.gaining-grounds.scheme', scheme.slug)"
-                    class="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
-                >
-                    <img v-if="scheme.front_image" :src="scheme.front_image" :alt="scheme.title" class="size-8 rounded object-cover shrink-0" />
-                    <span class="text-sm font-medium truncate">{{ scheme.title }}</span>
-                    <ChevronRight class="size-3.5 shrink-0 text-muted-foreground ml-auto" />
-                </Link>
+            <!-- Schemes -->
+            <div v-if="props.schemes.length > 0" class="mb-8">
+                <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Schemes</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    <Link
+                        v-for="scheme in props.schemes"
+                        :key="scheme.id"
+                        :href="route('rules.gaining-grounds.scheme', scheme.slug)"
+                        class="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
+                    >
+                        <img v-if="scheme.front_image" :src="scheme.front_image" :alt="scheme.title" class="size-8 rounded object-cover shrink-0" />
+                        <span class="text-sm font-medium truncate">{{ scheme.title }}</span>
+                        <ChevronRight class="size-3.5 shrink-0 text-muted-foreground ml-auto" />
+                    </Link>
+                </div>
             </div>
-        </div>
 
-        <ContentReferences
-            v-if="props.references"
-            :references="props.references.references"
-            :referenced_by="props.references.referenced_by"
-            :revision_history="props.references.revision_history"
-        />
+            <ContentReferences
+                v-if="props.references"
+                :references="props.references.references"
+                :referenced_by="props.references.referenced_by"
+                :revision_history="props.references.revision_history"
+            />
+        </div>
 
         <ScrollToTop />
     </div>

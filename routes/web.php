@@ -32,7 +32,6 @@ Route::prefix('rules')->name('rules.')->group(function () {
         Route::get('/strategies/{strategy}/history', [GainingGroundsController::class, 'viewStrategyHistory'])->name('strategy.history')->withTrashed();
         Route::get('/schemes/{scheme}', [GainingGroundsController::class, 'viewScheme'])->name('scheme')->withTrashed();
         Route::get('/schemes/{scheme}/history', [GainingGroundsController::class, 'viewSchemeHistory'])->name('scheme.history')->withTrashed();
-        Route::get('/{season}/overview', [GainingGroundsController::class, 'overview'])->name('season.overview')->withTrashed();
         Route::get('/{season}/history', [GainingGroundsController::class, 'viewSeasonHistory'])->name('season.history')->withTrashed();
         Route::get('/{season}/{seasonPage}', [GainingGroundsController::class, 'viewSeasonPage'])->name('season-page')->withTrashed();
         Route::get('/{season}/{seasonPage}/history', [GainingGroundsController::class, 'viewSeasonPageHistory'])->name('season-page.history')->withTrashed();

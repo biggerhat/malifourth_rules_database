@@ -17,6 +17,13 @@ const props = defineProps({
         default() {
             return {};
         }
+    },
+    latest_updates: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return [];
+        }
     }
 });
 
@@ -54,7 +61,18 @@ const generalSearch = () => {
                     <CardTitle>Latest Updates</CardTitle>
                 </CardHeader>
                 <CardContent>
-
+                    <Link
+                        v-for="(update, idx) in props.latest_updates"
+                        :key="idx"
+                        :href="update.href"
+                        class="hover:bg-secondary rounded-md px-2 py-2 block text-sm"
+                    >
+                        <div class="font-medium">{{ update.title }}</div>
+                        <div class="text-xs text-muted-foreground mt-0.5">{{ update.type }} &middot; {{ update.published_at }}</div>
+                    </Link>
+                    <div v-if="!props.latest_updates.length" class="text-sm text-muted-foreground">
+                        No updates yet.
+                    </div>
                 </CardContent>
             </Card>
             <Card>

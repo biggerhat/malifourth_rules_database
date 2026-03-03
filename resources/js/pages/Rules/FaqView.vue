@@ -19,8 +19,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { ChevronLeft, ExternalLink } from "lucide-vue-next";
-import { ref, watch, nextTick, onMounted } from "vue";
+import { Input } from '@/components/ui/input'
+import { ChevronLeft, ExternalLink, Search } from "lucide-vue-next";
+import { ref, computed, watch, nextTick, onMounted } from "vue";
 
 const props = defineProps({
     categories: {
@@ -61,6 +62,24 @@ const props = defineProps({
 });
 
 const isListMode = !props.faq && props.categories;
+
+const searchQuery = ref('');
+
+const filteredCategories = computed(() => {
+    if (!props.categories) return [];
+    const q = searchQuery.value.toLowerCase().trim();
+    if (!q) return props.categories;
+
+    return props.categories
+        .map(cat => ({
+            ...cat,
+            items: cat.items.filter(item =>
+                item.title_text?.toLowerCase().includes(q)
+                || item.answer_text?.toLowerCase().includes(q)
+            ),
+        }))
+        .filter(cat => cat.items.length > 0);
+});
 
 const activeCategory = ref('');
 
@@ -116,7 +135,7 @@ onMounted(() => {
                 </CardHeader>
                 <CardContent class="px-2 pb-2">
                     <button
-                        v-for="cat in props.categories"
+                        v-for="cat in filteredCategories"
                         :key="cat.key"
                         @click="scrollToCategory(cat.key)"
                         class="px-2.5 py-1.5 w-full text-left flex items-center justify-between text-sm rounded-md transition-colors hover:bg-muted"
@@ -157,7 +176,7 @@ onMounted(() => {
                         <SelectGroup>
                             <SelectLabel>Sections</SelectLabel>
                             <SelectItem
-                                v-for="cat in props.categories"
+                                v-for="cat in filteredCategories"
                                 :key="cat.key"
                                 :value="cat.key"
                             >{{ cat.label }} ({{ cat.items.length }})</SelectItem>
@@ -176,8 +195,20 @@ onMounted(() => {
 
             <!-- ═══ Listing mode ═══ -->
             <template v-if="isListMode">
+                <!-- Search bar -->
+                <div class="relative w-full max-w-md mx-auto mb-6">
+                    <Input type="text" placeholder="Filter FAQs..." class="pl-10" v-model="searchQuery" />
+                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
+                        <Search class="size-5 text-muted-foreground" />
+                    </span>
+                </div>
+
+                <div v-if="filteredCategories.length === 0" class="rounded-lg border border-dashed py-10 text-center">
+                    <p class="text-sm text-muted-foreground">No FAQs match your search.</p>
+                </div>
+
                 <div
-                    v-for="cat in props.categories"
+                    v-for="cat in filteredCategories"
                     :key="cat.key"
                     :id="`faq-category-${cat.key}`"
                     class="mb-10 scroll-mt-20"

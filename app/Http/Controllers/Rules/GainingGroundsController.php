@@ -18,17 +18,90 @@ class GainingGroundsController extends Controller
         $seasons = Season::whereNotNull('published_at')
             ->whereNull('newest')
             ->orderByDesc('published_at')
+            ->get();
+
+        $latestSeason = $seasons->first();
+
+        if (! $latestSeason) {
+            return inertia('Rules/GainingGrounds/Index', [
+                'seasons' => [],
+                'season' => null,
+                'strategies' => [],
+                'schemes' => [],
+                'seasonPages' => [],
+                'references' => null,
+            ]);
+        }
+
+        $seasonList = $seasons->map(fn (Season $season) => [
+            'id' => $season->id,
+            'title' => $season->title,
+            'slug' => $season->slug,
+        ]);
+
+        $seasonPages = SeasonPage::where('season_id', $latestSeason->id)
+            ->whereNotNull('published_at')
+            ->whereNull('newest')
+            ->orderBy('sort_order')
             ->get()
-            ->map(fn (Season $season) => [
-                'id' => $season->id,
-                'title' => $season->title,
-                'slug' => $season->slug,
-                'published_at' => $season->published_at->format('m-d-Y'),
-                'url' => $season->url,
+            ->map(fn (SeasonPage $page) => [
+                'id' => $page->id,
+                'title' => $page->title,
+                'slug' => $page->slug,
+                'sort_order' => $page->sort_order,
+            ]);
+
+        if ($seasonPages->isNotEmpty()) {
+            $firstPage = SeasonPage::where('season_id', $latestSeason->id)
+                ->whereNotNull('published_at')
+                ->whereNull('newest')
+                ->orderBy('sort_order')
+                ->first();
+            $content = (new ContentBuilder($firstPage->content ?? ''))->getFullyHydratedContent();
+        } else {
+            $content = (new ContentBuilder($latestSeason->content ?? ''))->getFullyHydratedContent();
+        }
+
+        $strategies = Strategy::where('season_id', $latestSeason->id)
+            ->whereNotNull('published_at')
+            ->whereNull('newest')
+            ->orderBy('title')
+            ->get()
+            ->map(fn (Strategy $strategy) => [
+                'id' => $strategy->id,
+                'title' => $strategy->title,
+                'slug' => $strategy->slug,
+                'suit' => $strategy->suit?->value,
+                'suit_label' => $strategy->suit?->label(),
+                'front_image' => $strategy->front_image,
+            ]);
+
+        $schemes = Scheme::where('season_id', $latestSeason->id)
+            ->whereNotNull('published_at')
+            ->whereNull('newest')
+            ->orderBy('title')
+            ->get()
+            ->map(fn (Scheme $scheme) => [
+                'id' => $scheme->id,
+                'title' => $scheme->title,
+                'slug' => $scheme->slug,
+                'front_image' => $scheme->front_image,
             ]);
 
         return inertia('Rules/GainingGrounds/Index', [
-            'seasons' => $seasons,
+            'seasons' => $seasonList,
+            'season' => [
+                'title' => $latestSeason->title,
+                'slug' => $latestSeason->slug,
+                'content' => $content,
+                'url' => $latestSeason->url,
+                'published_at' => $latestSeason->published_at->format('m-d-Y'),
+                'published_by' => $latestSeason->publishedBy?->name,
+            ],
+            'strategies' => $strategies,
+            'schemes' => $schemes,
+            'seasonPages' => $seasonPages,
+            'references' => ContentReferencesService::getForModel($latestSeason),
         ]);
     }
 
@@ -40,6 +113,16 @@ class GainingGroundsController extends Controller
         if (! $season->published_at) {
             return response('', 404);
         }
+
+        $seasons = Season::whereNotNull('published_at')
+            ->whereNull('newest')
+            ->orderByDesc('published_at')
+            ->get()
+            ->map(fn (Season $s) => [
+                'id' => $s->id,
+                'title' => $s->title,
+                'slug' => $s->slug,
+            ]);
 
         $seasonPages = SeasonPage::where('season_id', $season->id)
             ->whereNotNull('published_at')
@@ -91,6 +174,7 @@ class GainingGroundsController extends Controller
             ]);
 
         return inertia('Rules/GainingGrounds/SeasonView', [
+            'seasons' => $seasons,
             'season' => [
                 'title' => $season->title,
                 'slug' => $season->slug,
@@ -103,58 +187,6 @@ class GainingGroundsController extends Controller
             'schemes' => $schemes,
             'seasonPages' => $seasonPages,
             'references' => ContentReferencesService::getForModel($season),
-        ]);
-    }
-
-    public function overview(Request $request, Season $season)
-    {
-        $season->loadMissing('newestVersion');
-        $season = $season->newestVersion ?? $season;
-
-        if (! $season->published_at) {
-            return response('', 404);
-        }
-
-        $strategies = Strategy::where('season_id', $season->id)
-            ->whereNotNull('published_at')
-            ->whereNull('newest')
-            ->orderBy('title')
-            ->get()
-            ->map(fn (Strategy $strategy) => [
-                'id' => $strategy->id,
-                'title' => $strategy->title,
-                'slug' => $strategy->slug,
-                'suit' => $strategy->suit?->value,
-                'suit_label' => $strategy->suit?->label(),
-                'front_image' => $strategy->front_image,
-            ]);
-
-        $schemes = Scheme::where('season_id', $season->id)
-            ->whereNotNull('published_at')
-            ->whereNull('newest')
-            ->orderBy('title')
-            ->get()
-            ->map(fn (Scheme $scheme) => [
-                'id' => $scheme->id,
-                'title' => $scheme->title,
-                'slug' => $scheme->slug,
-                'front_image' => $scheme->front_image,
-                'next_scheme_1' => $scheme->next_scheme_1,
-                'next_scheme_2' => $scheme->next_scheme_2,
-                'next_scheme_3' => $scheme->next_scheme_3,
-                'prerequisites' => (new ContentBuilder($scheme->prerequisites ?? ''))->getFullyHydratedContent(),
-                'reveal' => (new ContentBuilder($scheme->reveal ?? ''))->getFullyHydratedContent(),
-                'scoring' => (new ContentBuilder($scheme->scoring ?? ''))->getFullyHydratedContent(),
-                'additional' => (new ContentBuilder($scheme->additional ?? ''))->getFullyHydratedContent(),
-            ]);
-
-        return inertia('Rules/GainingGrounds/OverviewView', [
-            'season' => [
-                'title' => $season->title,
-                'slug' => $season->slug,
-            ],
-            'strategies' => $strategies,
-            'schemes' => $schemes,
         ]);
     }
 
@@ -249,6 +281,7 @@ class GainingGroundsController extends Controller
         $content = (new ContentBuilder($season->content ?? ''))->getFullyHydratedContent();
 
         return inertia('Rules/GainingGrounds/SeasonView', [
+            'seasons' => [],
             'season' => [
                 'title' => $season->title,
                 'slug' => $season->slug,

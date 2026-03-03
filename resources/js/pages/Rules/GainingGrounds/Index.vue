@@ -1,6 +1,23 @@
 <script setup lang="ts">
+import ContentReferences from "@/components/ContentReferences.vue";
+import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import Card from "@/components/ui/card/Card.vue";
+import CardContent from "@/components/ui/card/CardContent.vue";
+import CardFooter from "@/components/ui/card/CardFooter.vue";
+import CardHeader from "@/components/ui/card/CardHeader.vue";
+import CardTitle from "@/components/ui/card/CardTitle.vue";
 import { ChevronRight } from "lucide-vue-next";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { ref, watch } from "vue";
 
 const props = defineProps({
     seasons: {
@@ -10,34 +27,213 @@ const props = defineProps({
             return [];
         }
     },
+    season: {
+        type: Object,
+        required: false,
+        default() {
+            return null;
+        }
+    },
+    strategies: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return [];
+        }
+    },
+    schemes: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return [];
+        }
+    },
+    seasonPages: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return [];
+        }
+    },
+    references: {
+        type: Object,
+        required: false,
+        default() {
+            return null;
+        }
+    },
 });
+
+const seasonParam = ref(props.season?.slug ?? '');
+
+watch(seasonParam, (newSlug) => {
+    if (newSlug && newSlug !== props.season?.slug) {
+        window.location.href = route('rules.gaining-grounds.season', newSlug);
+    }
+});
+
+const suitAccent = (suit: string) => {
+    switch (suit) {
+        case 'rams': return 'border-l-red-500 dark:border-l-red-400';
+        case 'crows': return 'border-l-green-500 dark:border-l-green-400';
+        case 'masks': return 'border-l-purple-500 dark:border-l-purple-400';
+        case 'tomes': return 'border-l-blue-500 dark:border-l-blue-400';
+        default: return '';
+    }
+};
+
+const suitBadge = (suit: string) => {
+    switch (suit) {
+        case 'rams': return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200';
+        case 'crows': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200';
+        case 'masks': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200';
+        case 'tomes': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200';
+        default: return 'bg-muted text-muted-foreground';
+    }
+};
+
+const suitSymbol = (suit: string) => {
+    switch (suit) {
+        case 'rams': return 'r';
+        case 'crows': return 'c';
+        case 'masks': return 'm';
+        case 'tomes': return 't';
+        default: return '';
+    }
+};
 </script>
 
 <template>
     <Head title="Gaining Grounds" />
 
-    <div class="max-w-4xl mx-auto px-2 sm:px-4 text-primary leading-6 text-md">
-        <div class="w-full text-center text-xl py-4">
-            <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-            <span>Gaining Grounds</span>
-            <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+    <div class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md" :class="props.season ? 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2' : 'max-w-4xl mx-auto'">
+        <!-- Sidebar: Season list (desktop) -->
+        <div v-if="props.season" class="lg:col-span-2 hidden lg:block">
+            <Card class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                <CardHeader class="pb-0">
+                    <CardTitle class="text-sm">Seasons</CardTitle>
+                </CardHeader>
+                <CardContent class="px-3">
+                    <Link
+                        v-for="s in props.seasons"
+                        :key="s.id"
+                        :href="route('rules.gaining-grounds.season', s.slug)"
+                        class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
+                        :class="s.slug === props.season.slug ? 'bg-primary text-primary-foreground' : ''"
+                    >{{ s.title }}</Link>
+                </CardContent>
+            </Card>
         </div>
 
-        <div class="space-y-2">
-            <Link
-                v-for="season in props.seasons"
-                :key="season.id"
-                :href="route('rules.gaining-grounds.season', season.slug)"
-                class="flex items-center justify-between rounded-lg border bg-card px-4 py-3 sm:px-5 sm:py-4 hover:bg-muted/50 transition-colors"
-            >
-                <div class="min-w-0">
-                    <div class="text-sm sm:text-base font-medium">{{ season.title }}</div>
-                    <div class="text-xs text-muted-foreground mt-0.5">Published {{ season.published_at }}</div>
-                </div>
-                <ChevronRight class="size-4 shrink-0 text-muted-foreground ml-3" />
-            </Link>
+        <!-- Main content -->
+        <div :class="props.season ? 'lg:col-span-6' : ''">
+            <!-- Mobile season selector -->
+            <div v-if="props.season" class="lg:hidden block mb-4 mx-2">
+                <Select v-model="seasonParam">
+                    <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select a Season" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Seasons</SelectLabel>
+                            <SelectItem v-for="s in props.seasons" :key="s.id" :value="s.slug">
+                                {{ s.title }}
+                            </SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
 
-            <div v-if="!props.seasons.length" class="rounded-lg border border-dashed py-10 text-center">
+            <!-- Banner -->
+            <div class="w-full text-center text-xl py-4">
+                <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+                <span>{{ props.season?.title ?? 'Gaining Grounds' }}</span>
+                <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+            </div>
+
+            <template v-if="props.season">
+                <!-- Season Content -->
+                <Card v-if="props.season.content && props.season.content.length > 0" class="mb-8">
+                    <CardContent>
+                        <ParsedContent :content="props.season.content" />
+                    </CardContent>
+                    <CardFooter class="border-t px-6 py-3 text-xs text-muted-foreground justify-end">
+                        Last updated {{ props.season.published_at }} by {{ props.season.published_by }}
+                    </CardFooter>
+                </Card>
+
+                <!-- Season Pages -->
+                <div v-if="props.seasonPages.length > 1" class="mb-8">
+                    <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Pages</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <Link
+                            v-for="page in props.seasonPages"
+                            :key="page.id"
+                            :href="route('rules.gaining-grounds.season-page', [props.season.slug, page.slug])"
+                            class="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
+                        >
+                            <span class="text-sm font-medium truncate">{{ page.title }}</span>
+                            <ChevronRight class="size-3.5 shrink-0 text-muted-foreground ml-auto" />
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- Strategies -->
+                <div v-if="props.strategies.length > 0" class="mb-8">
+                    <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Strategies</h2>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        <Link
+                            v-for="strategy in props.strategies"
+                            :key="strategy.id"
+                            :href="route('rules.gaining-grounds.strategy', strategy.slug)"
+                            class="group block"
+                        >
+                            <div
+                                class="rounded-lg border border-l-4 bg-card p-3 sm:p-4 h-full transition-colors hover:bg-muted/50"
+                                :class="suitAccent(strategy.suit)"
+                            >
+                                <img v-if="strategy.front_image" :src="strategy.front_image" :alt="strategy.title" class="w-full rounded mb-3" />
+                                <div class="text-sm font-medium group-hover:underline">{{ strategy.title }}</div>
+                                <span
+                                    v-if="strategy.suit_label"
+                                    class="inline-flex items-center gap-1 mt-1.5 text-[11px] px-1.5 py-0.5 rounded font-medium"
+                                    :class="suitBadge(strategy.suit)"
+                                >
+                                    <span class="font-[symbolFont] text-sm">{{ suitSymbol(strategy.suit) }}</span>
+                                    {{ strategy.suit_label }}
+                                </span>
+                            </div>
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- Schemes -->
+                <div v-if="props.schemes.length > 0" class="mb-8">
+                    <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Schemes</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        <Link
+                            v-for="scheme in props.schemes"
+                            :key="scheme.id"
+                            :href="route('rules.gaining-grounds.scheme', scheme.slug)"
+                            class="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
+                        >
+                            <img v-if="scheme.front_image" :src="scheme.front_image" :alt="scheme.title" class="size-8 rounded object-cover shrink-0" />
+                            <span class="text-sm font-medium truncate">{{ scheme.title }}</span>
+                            <ChevronRight class="size-3.5 shrink-0 text-muted-foreground ml-auto" />
+                        </Link>
+                    </div>
+                </div>
+
+                <ContentReferences
+                    v-if="props.references"
+                    :references="props.references.references"
+                    :referenced_by="props.references.referenced_by"
+                    :revision_history="props.references.revision_history"
+                />
+            </template>
+
+            <!-- Empty state -->
+            <div v-else class="rounded-lg border border-dashed py-10 text-center">
                 <p class="text-sm text-muted-foreground">No Gaining Grounds seasons have been published yet.</p>
             </div>
         </div>

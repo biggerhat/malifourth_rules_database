@@ -4,12 +4,13 @@ import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label'
 import InputError from "@/components/InputError.vue";
-import {LoaderCircle} from "lucide-vue-next";
+import {LoaderCircle, ChevronDown} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Head, useForm } from '@inertiajs/vue3';
@@ -39,9 +40,9 @@ import {
     useVueTable,
 } from '@tanstack/vue-table';
 import AdminInternalNotes from "@/components/AdminInternalNotes.vue";
-import DraggableContent from "@/components/DraggableContent.vue";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import axios from "axios";
+import TipTapEditor from "@/components/tiptap/TipTapEditor.vue";
+import { Separator } from '@/components/ui/separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const props = defineProps({
     batch: {
@@ -58,27 +59,6 @@ const props = defineProps({
             return null;
         }
     },
-    indices: {
-        type: [Object, Array],
-        required: false,
-        default() {
-            return {};
-        }
-    },
-    pages: {
-        type: [Object, Array],
-        required: false,
-        default() {
-            return {};
-        }
-    },
-    sections: {
-        type: [Object, Array],
-        required: false,
-        default() {
-            return {};
-        }
-    }
 });
 
 const back = () => {
@@ -97,26 +77,7 @@ onMounted(() => {
     form.release_notes = props.batch?.release_notes ?? '';
     form.internal_notes = props.batch?.internal_notes ?? '';
     form.is_public = props.batch?.is_public ?? false;
-    fetchViewData();
 });
-
-const viewData = ref(null);
-
-const fetchViewData = () => {
-    axios.post(route('admin.batches.preview'), { title: form.title, release_notes: form.release_notes }).then((response) => {
-        viewData.value = response.data;
-        viewData.value = JSON.parse(JSON.stringify(response.data));
-    });
-};
-
-const releaseNotesUpdate = (newOrder) => {
-    form.release_notes = newOrder;
-};
-
-const releaseNotesNewContent = (content) => {
-    form.release_notes = content;
-    fetchViewData();
-}
 
 const submit = () => {
     if (props.batch) {
@@ -216,129 +177,121 @@ const table = useVueTable({
 
     <Card>
         <CardHeader>
-            <CardTitle>Batch Form</CardTitle>
-            <CardDescription>Create and Edit Batch Information</CardDescription>
+            <CardTitle>{{ props.batch ? 'Edit' : 'New' }} Batch</CardTitle>
+            <CardDescription>
+                <span class="text-destructive" v-if="!props.batch">
+                    You are creating a new Batch item. To update an existing one, find it in the list and click Edit.
+                </span>
+                <span v-else>Editing: {{ props.batch.title }}</span>
+            </CardDescription>
         </CardHeader>
         <CardContent>
-            <form @submit.prevent>
-                <Tabs default-value="details">
-                    <TabsList>
-                        <TabsTrigger value="details">Details</TabsTrigger>
-                        <TabsTrigger value="content">Content</TabsTrigger>
-                        <TabsTrigger v-if="props.batchables" value="items">Items</TabsTrigger>
-                        <TabsTrigger value="notes">Notes</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="details" force-mount class="data-[state=inactive]:hidden">
-                        <div class="grid items-center w-full gap-4 pt-4">
-                            <div class="flex flex-col space-y-1.5">
-                                <Label for="title">Batch</Label>
-                                <Input id="title" type="text" required autofocus :tabindex="1" autocomplete="title" v-model="form.title" placeholder="Batch Name" />
-                                <InputError :message="form.errors.title" />
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <Switch id="is_public" v-model="form.is_public" />
-                                <Label for="is_public">Public Errata Batch</Label>
-                            </div>
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="content" force-mount class="data-[state=inactive]:hidden">
-                        <div class="grid items-center w-full gap-4 pt-4">
-                            <div class="flex flex-col space-y-1.5">
-                                <DraggableContent
-                                    v-if="viewData"
-                                    @update:content-order="releaseNotesUpdate"
-                                    @update:new-content="releaseNotesNewContent"
-                                    :content="viewData.release_notes ?? []"
-                                    label="Release Notes"
-                                    :indices="props.indices"
-                                    :sections="props.sections"
-                                    :pages="props.pages"
-                                    :key="viewData.release_notes"
-                                />
-                                <InputError :message="form.errors.release_notes" />
-                            </div>
-                        </div>
-                    </TabsContent>
-                    <TabsContent v-if="props.batchables" value="items" force-mount class="data-[state=inactive]:hidden">
-                        <div class="container mx-auto mt-6">
-                            <div class="flex items-center justify-between py-4">
-                                <Input class="max-w-sm" placeholder="Search..."
-                                       v-model="globalFilter" />
-                            </div>
-                            <div class="border rounded-md">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-                                            <TableHead v-for="header in headerGroup.headers" :key="header.id">
-                                                <FlexRender
-                                                    v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
-                                                    :props="header.getContext()"
-                                                />
-                                            </TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        <template v-if="table.getRowModel().rows?.length">
-                                            <TableRow
-                                                v-for="row in table.getRowModel().rows" :key="row.id"
-                                                :data-state="row.getIsSelected() ? 'selected' : undefined"
-                                            >
-                                                <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-                                                    <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
-                                                </TableCell>
-                                            </TableRow>
-                                        </template>
-                                        <template v-else>
-                                            <TableRow>
-                                                <TableCell :colspan="columns.length" class="h-24 text-center">
-                                                    No results.
-                                                </TableCell>
-                                            </TableRow>
-                                        </template>
-                                    </TableBody>
-                                </Table>
-                            </div>
-                            <div class="flex items-center justify-end py-4 space-x-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    :disabled="!table.getCanPreviousPage()"
-                                    @click="table.previousPage()"
-                                >
-                                    Previous
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    :disabled="!table.getCanNextPage()"
-                                    @click="table.nextPage()"
-                                >
-                                    Next
-                                </Button>
-                            </div>
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="notes" force-mount class="data-[state=inactive]:hidden">
-                        <div class="grid items-center w-full gap-4 pt-4">
-                            <div class="flex flex-col space-y-1.5">
-                                <Label for="internal_notes">Internal Notes</Label>
-                                <Textarea class="min-h-48" id="internal_notes" v-model="form.internal_notes" placeholder="Add Internal Notes" />
-                                <InputError :message="form.errors.internal_notes" />
-                            </div>
-                        </div>
-                    </TabsContent>
-                </Tabs>
-                <div class="flex justify-end mt-6">
-                    <Button type="submit" @click="submit" class="my-auto" tabindex="5" :disabled="form.processing">
-                        <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                        <span v-if="props.batch">Update Batch</span>
-                        <span v-else>Create Batch</span>
-                    </Button>
-                    <Button @click="back()" class="bg-destructive my-auto ml-2">
-                        Cancel
-                    </Button>
+            <form @submit.prevent class="space-y-6">
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <Label for="title">Title</Label>
+                        <Input id="title" type="text" required autofocus autocomplete="title" v-model="form.title" placeholder="Batch Name" />
+                        <InputError :message="form.errors.title" />
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <Label for="is_public">Public Errata Batch</Label>
+                        <Switch id="is_public" v-model="form.is_public" />
+                    </div>
                 </div>
+
+                <Separator />
+
+                <div class="space-y-4">
+                    <TipTapEditor v-model="form.release_notes" label="Release Notes" />
+                    <InputError :message="form.errors.release_notes" />
+                </div>
+
+                <template v-if="props.batchables">
+                    <Separator />
+
+                    <div class="container mx-auto">
+                        <div class="flex items-center justify-between py-4">
+                            <Input class="max-w-sm" placeholder="Search..."
+                                   v-model="globalFilter" />
+                        </div>
+                        <div class="border rounded-md">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+                                        <TableHead v-for="header in headerGroup.headers" :key="header.id">
+                                            <FlexRender
+                                                v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
+                                                :props="header.getContext()"
+                                            />
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <template v-if="table.getRowModel().rows?.length">
+                                        <TableRow
+                                            v-for="row in table.getRowModel().rows" :key="row.id"
+                                            :data-state="row.getIsSelected() ? 'selected' : undefined"
+                                        >
+                                            <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                                                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                                            </TableCell>
+                                        </TableRow>
+                                    </template>
+                                    <template v-else>
+                                        <TableRow>
+                                            <TableCell :colspan="columns.length" class="h-24 text-center">
+                                                No results.
+                                            </TableCell>
+                                        </TableRow>
+                                    </template>
+                                </TableBody>
+                            </Table>
+                        </div>
+                        <div class="flex items-center justify-end py-4 space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                :disabled="!table.getCanPreviousPage()"
+                                @click="table.previousPage()"
+                            >
+                                Previous
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                :disabled="!table.getCanNextPage()"
+                                @click="table.nextPage()"
+                            >
+                                Next
+                            </Button>
+                        </div>
+                    </div>
+                </template>
+
+                <Separator />
+
+                <Collapsible>
+                    <CollapsibleTrigger class="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                        <ChevronDown class="h-4 w-4" />
+                        Notes
+                    </CollapsibleTrigger>
+                    <CollapsibleContent class="space-y-4 pt-4">
+                        <div class="space-y-2">
+                            <Label for="internal_notes">Internal Notes</Label>
+                            <Textarea class="min-h-32" id="internal_notes" v-model="form.internal_notes" placeholder="Add internal notes..." />
+                            <InputError :message="form.errors.internal_notes" />
+                        </div>
+                    </CollapsibleContent>
+                </Collapsible>
             </form>
         </CardContent>
+        <CardFooter class="flex justify-between border-t pt-6">
+            <Button variant="outline" @click="back()">Cancel</Button>
+            <Button type="submit" @click="submit" :disabled="form.processing">
+                <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
+                <span v-if="props.batch">Update Batch</span>
+                <span v-else>Create Batch</span>
+            </Button>
+        </CardFooter>
     </Card>
 </template>

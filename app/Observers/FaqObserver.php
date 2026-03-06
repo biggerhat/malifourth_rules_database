@@ -11,11 +11,17 @@ class FaqObserver
 {
     public function creating(Faq $faq): void
     {
-        $answer = preg_replace('/\s+/', ' ', $faq->answer ?? '');
-        $title = preg_replace('/\s+/', ' ', $faq->title ?? '');
+        $answer = $faq->answer ?? '';
+        $title = $faq->title ?? '';
+        if (! ContentBuilder::detectTipTapJson($answer)) {
+            $answer = preg_replace('/\s+/', ' ', $answer);
+            $faq->answer = $answer;
+        }
+        if (! ContentBuilder::detectTipTapJson($title)) {
+            $title = preg_replace('/\s+/', ' ', $title);
+            $faq->title = $title;
+        }
         $faq->slug = Str::slug($faq->category?->value ?? 'faq');
-        $faq->title = $title;
-        $faq->answer = $answer;
         $faq->searchable_text = ContentBuilder::toPlainText($title).' '.ContentBuilder::toPlainText($answer);
     }
 
@@ -30,12 +36,18 @@ class FaqObserver
 
     public function updating(Faq $faq): void
     {
-        $answer = preg_replace('/\s+/', ' ', $faq->answer);
-        $title = preg_replace('/\s+/', ' ', $faq->title ?? '');
+        $answer = $faq->answer ?? '';
+        $title = $faq->title ?? '';
+        if (! ContentBuilder::detectTipTapJson($answer)) {
+            $answer = preg_replace('/\s+/', ' ', $answer);
+            $faq->answer = $answer;
+        }
+        if (! ContentBuilder::detectTipTapJson($title)) {
+            $title = preg_replace('/\s+/', ' ', $title);
+            $faq->title = $title;
+        }
         $faq->slug = $faq->id.'-'.Str::slug($faq->category?->value ?? 'faq');
-        $faq->title = $title;
-        $faq->answer = $answer;
-        $faq->searchable_text = ContentBuilder::toPlainText($title).' '.ContentBuilder::toPlainText($answer ?? '');
+        $faq->searchable_text = ContentBuilder::toPlainText($title).' '.ContentBuilder::toPlainText($answer);
     }
 
     public function updated(Faq $faq): void

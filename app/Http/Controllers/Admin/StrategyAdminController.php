@@ -6,20 +6,13 @@ use App\Actions\Approvals\CreateApprovalAction;
 use App\Enums\MessageTypeEnum;
 use App\Enums\SuitEnum;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\FaqListResource;
-use App\Http\Resources\IndexListResource;
-use App\Http\Resources\PageListResource;
 use App\Http\Resources\SeasonListResource;
-use App\Http\Resources\SectionListResource;
 use App\Http\Resources\StrategyListResource;
 use App\Models\Batch;
-use App\Models\Faq;
-use App\Models\Index;
-use App\Models\Page;
 use App\Models\Season;
-use App\Models\Section;
 use App\Models\Strategy;
 use App\Services\ContentBuilder\ContentBuilder;
+use App\Traits\HandlesBulkActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -27,29 +20,23 @@ use Str;
 
 class StrategyAdminController extends Controller
 {
+    use HandlesBulkActions;
+
+    protected function bulkModel(): string
+    {
+        return Strategy::class;
+    }
+
+    protected function bulkLabel(): string
+    {
+        return 'strategy(ies)';
+    }
+
     public function list(Request $request)
     {
         return StrategyListResource::collection(
             Strategy::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
         )->toArray($request);
-    }
-
-    public function preview(Request $request)
-    {
-        $setup = $request->get('setup') ?? '';
-        $rules = $request->get('rules') ?? '';
-        $scoring = $request->get('scoring') ?? '';
-        $additional = $request->get('additional') ?? '';
-        $changeNotes = $request->get('change_notes') ?? null;
-
-        return [
-            'title' => $request->get('title') ?? '',
-            'setup' => (new ContentBuilder($setup))->getFullyHydratedContent(),
-            'rules' => (new ContentBuilder($rules))->getFullyHydratedContent(),
-            'scoring' => (new ContentBuilder($scoring))->getFullyHydratedContent(),
-            'additional' => (new ContentBuilder($additional))->getFullyHydratedContent(),
-            'change_notes' => $changeNotes ? (new ContentBuilder($changeNotes))->getFullyHydratedContent() : null,
-        ];
     }
 
     public function view(Request $request, Strategy $strategy)
@@ -87,18 +74,6 @@ class StrategyAdminController extends Controller
             'seasons' => SeasonListResource::collection(
                 Season::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
             )->toArray($request),
-            'indices' => IndexListResource::collection(
-                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'sections' => SectionListResource::collection(
-                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'pages' => PageListResource::collection(
-                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'faqs' => FaqListResource::collection(
-                Faq::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
         ]);
     }
 
@@ -110,18 +85,6 @@ class StrategyAdminController extends Controller
             'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
             'seasons' => SeasonListResource::collection(
                 Season::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'indices' => IndexListResource::collection(
-                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'sections' => SectionListResource::collection(
-                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'pages' => PageListResource::collection(
-                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'faqs' => FaqListResource::collection(
-                Faq::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
             )->toArray($request),
         ]);
     }
@@ -160,57 +123,6 @@ class StrategyAdminController extends Controller
         return to_route('admin.strategies.index')->withMessage($strategy->title.' has been published!');
     }
 
-    public function bulkApprove(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $items = Strategy::with('approval')->whereIn('id', $validated['ids'])->get();
-        $count = 0;
-
-        foreach ($items as $item) {
-            if ($item->approval && ! $item->approval->approved_at) {
-                $item->approval->update([
-                    'approved_at' => now(),
-                    'approved_by' => $request->user()->id,
-                ]);
-                $count++;
-            }
-        }
-
-        return redirect()->back()->withMessage("{$count} strategy(ies) approved.");
-    }
-
-    public function bulkPublish(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $items = Strategy::with('approval')->whereIn('id', $validated['ids'])->get();
-        $count = 0;
-        $errors = [];
-
-        foreach ($items as $item) {
-            try {
-                $item->publish($request->user());
-                $count++;
-            } catch (\Exception $e) {
-                $errors[] = $item->title.': '.$e->getMessage();
-            }
-        }
-
-        $message = "{$count} strategy(ies) published.";
-        if (! empty($errors)) {
-            $message .= ' Errors: '.implode('; ', $errors);
-        }
-
-        return redirect()->back()->withMessage($message);
-    }
-
-    public function bulkDelete(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $count = Strategy::whereIn('id', $validated['ids'])->whereNull('published_at')->delete();
-
-        return redirect()->back()->withMessage("{$count} strategy(ies) deleted.");
-    }
-
     private function validateAndSave(Request $request, ?Strategy $strategy = null): Strategy
     {
         $validated = $request->validate([
@@ -241,11 +153,13 @@ class StrategyAdminController extends Controller
         unset($validated['publish_directly']);
         $approveDirectly = $validated['approve_directly'];
         unset($validated['approve_directly']);
-        $changeNotes = preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
+        $changeNotes = ContentBuilder::detectTipTapJson($validated['change_notes'] ?? '')
+            ? $validated['change_notes']
+            : preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
         unset($validated['change_notes']);
 
         foreach (['setup', 'rules', 'scoring', 'additional'] as $field) {
-            if ($validated[$field]) {
+            if ($validated[$field] && ! ContentBuilder::detectTipTapJson($validated[$field])) {
                 $validated[$field] = preg_replace("/(\r|\n)/", '', nl2br($validated[$field]));
             }
         }

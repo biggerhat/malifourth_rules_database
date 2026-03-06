@@ -7,38 +7,32 @@ use App\Enums\FaqCategoryEnum;
 use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\FaqListResource;
-use App\Http\Resources\IndexListResource;
-use App\Http\Resources\PageListResource;
-use App\Http\Resources\SectionListResource;
 use App\Models\Batch;
 use App\Models\Faq;
-use App\Models\Index;
-use App\Models\Page;
-use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
+use App\Traits\HandlesBulkActions;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class FaqAdminController extends Controller
 {
+    use HandlesBulkActions;
+
+    protected function bulkModel(): string
+    {
+        return Faq::class;
+    }
+
+    protected function bulkLabel(): string
+    {
+        return 'FAQ(s)';
+    }
+
     public function list(Request $request)
     {
         return FaqListResource::collection(
             Faq::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
         )->toArray($request);
-    }
-
-    public function preview(Request $request)
-    {
-        $title = $request->get('title') ?? '';
-        $answer = $request->get('answer') ?? '';
-        $changeNotes = $request->get('change_notes') ?? null;
-
-        return [
-            'title' => (new ContentBuilder($title))->getFullyHydratedContent(),
-            'answer' => (new ContentBuilder($answer))->getFullyHydratedContent(),
-            'change_notes' => $changeNotes ? (new ContentBuilder($changeNotes))->getFullyHydratedContent() : null,
-        ];
     }
 
     public function view(Request $request, Faq $faq)
@@ -75,18 +69,6 @@ class FaqAdminController extends Controller
         return inertia('Admin/Faqs/FaqForm', [
             'faq_categories' => FaqCategoryEnum::toSelectOptions(),
             'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
-            'indices' => IndexListResource::collection(
-                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'sections' => SectionListResource::collection(
-                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'pages' => PageListResource::collection(
-                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'faqs' => FaqListResource::collection(
-                Faq::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
         ]);
     }
 
@@ -96,18 +78,6 @@ class FaqAdminController extends Controller
             'faq' => $faq->loadMissing('approval'),
             'faq_categories' => FaqCategoryEnum::toSelectOptions(),
             'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
-            'indices' => IndexListResource::collection(
-                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'sections' => SectionListResource::collection(
-                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'pages' => PageListResource::collection(
-                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'faqs' => FaqListResource::collection(
-                Faq::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
         ]);
     }
 
@@ -145,57 +115,6 @@ class FaqAdminController extends Controller
         return to_route('admin.faqs.index')->withMessage($faq->title.' has been published!');
     }
 
-    public function bulkApprove(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $items = Faq::with('approval')->whereIn('id', $validated['ids'])->get();
-        $count = 0;
-
-        foreach ($items as $item) {
-            if ($item->approval && ! $item->approval->approved_at) {
-                $item->approval->update([
-                    'approved_at' => now(),
-                    'approved_by' => $request->user()->id,
-                ]);
-                $count++;
-            }
-        }
-
-        return redirect()->back()->withMessage("{$count} FAQ(s) approved.");
-    }
-
-    public function bulkPublish(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $items = Faq::with('approval')->whereIn('id', $validated['ids'])->get();
-        $count = 0;
-        $errors = [];
-
-        foreach ($items as $item) {
-            try {
-                $item->publish($request->user());
-                $count++;
-            } catch (\Exception $e) {
-                $errors[] = $item->title.': '.$e->getMessage();
-            }
-        }
-
-        $message = "{$count} FAQ(s) published.";
-        if (! empty($errors)) {
-            $message .= ' Errors: '.implode('; ', $errors);
-        }
-
-        return redirect()->back()->withMessage($message);
-    }
-
-    public function bulkDelete(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $count = Faq::whereIn('id', $validated['ids'])->whereNull('published_at')->delete();
-
-        return redirect()->back()->withMessage("{$count} FAQ(s) deleted.");
-    }
-
     private function validateAndSave(Request $request, ?Faq $faq = null): Faq
     {
         $validated = $request->validate([
@@ -214,12 +133,16 @@ class FaqAdminController extends Controller
         unset($validated['publish_directly']);
         $approveDirectly = $validated['approve_directly'];
         unset($validated['approve_directly']);
-        $changeNotes = preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
+        $changeNotes = ContentBuilder::detectTipTapJson($validated['change_notes'] ?? '')
+            ? $validated['change_notes']
+            : preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
         unset($validated['change_notes']);
 
-        $validated['title'] = preg_replace("/(\r|\n)/", '', $validated['title']);
+        if (! ContentBuilder::detectTipTapJson($validated['title'] ?? '')) {
+            $validated['title'] = preg_replace("/(\r|\n)/", '', $validated['title']);
+        }
 
-        if ($validated['answer']) {
+        if ($validated['answer'] && ! ContentBuilder::detectTipTapJson($validated['answer'])) {
             $validated['answer'] = preg_replace("/(\r|\n)/", '', nl2br($validated['answer']));
         }
 

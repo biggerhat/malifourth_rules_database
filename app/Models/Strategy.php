@@ -26,6 +26,7 @@ class Strategy extends Model implements HasBatching, HasPublisher
 
     /** @use HasFactory<\Database\Factories\StrategyFactory> */
     use HasFactory;
+
     use LogsActivity;
     use SoftDeletes;
     use UsesVersionControl;

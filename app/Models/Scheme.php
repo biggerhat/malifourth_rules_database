@@ -25,6 +25,7 @@ class Scheme extends Model implements HasBatching, HasPublisher
 
     /** @use HasFactory<\Database\Factories\SchemeFactory> */
     use HasFactory;
+
     use LogsActivity;
     use SoftDeletes;
     use UsesVersionControl;

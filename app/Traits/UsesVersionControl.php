@@ -65,7 +65,7 @@ trait UsesVersionControl
                 ->orWhere('original', $this->original['original'])
                 ->whereNot('id', $this->id)
                 ->update(['newest' => $this->id]);
-            $previous->approval->delete();
+            $previous->approval?->delete();
             $previous->delete();
         }
 

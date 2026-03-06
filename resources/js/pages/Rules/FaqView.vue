@@ -245,7 +245,8 @@ onMounted(() => {
                             </div>
 
                             <!-- Permalink -->
-                            <div class="px-4 pb-3 sm:px-5 sm:pb-4 flex justify-end">
+                            <div class="px-4 pb-3 sm:px-5 sm:pb-4 flex items-center justify-end gap-2">
+                                <span class="text-xs text-muted-foreground/60 tabular-nums">{{ item.category_sort }}.{{ item.sort_order }}</span>
                                 <Link
                                     :href="route('rules.faq.view', item.slug)"
                                     class="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"

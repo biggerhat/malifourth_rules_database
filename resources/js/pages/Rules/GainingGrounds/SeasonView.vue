@@ -84,6 +84,13 @@ watch(seasonParam, (newSlug) => {
     }
 });
 
+const mobilePageSlug = ref('');
+watch(mobilePageSlug, (newSlug) => {
+    if (newSlug) {
+        window.location.href = route('rules.gaining-grounds.season-page', [props.season.slug, newSlug]);
+    }
+});
+
 const suitAccent = (suit: string) => {
     switch (suit) {
         case 'rams': return 'border-l-red-500 dark:border-l-red-400';
@@ -121,20 +128,39 @@ const suitSymbol = (suit: string) => {
     <div class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
         <!-- Sidebar: Season list (desktop) -->
         <div v-if="!props.viewing_old_version" class="lg:col-span-2 hidden lg:block">
-            <Card class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                <CardHeader class="pb-0">
-                    <CardTitle class="text-sm">Seasons</CardTitle>
-                </CardHeader>
-                <CardContent class="px-3">
-                    <Link
-                        v-for="s in props.seasons"
-                        :key="s.id"
-                        :href="route('rules.gaining-grounds.season', s.slug)"
-                        class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
-                        :class="s.slug === props.season.slug ? 'bg-primary text-primary-foreground' : ''"
-                    >{{ s.title }}</Link>
-                </CardContent>
-            </Card>
+            <div class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto space-y-2">
+                <Card>
+                    <CardHeader class="pb-0">
+                        <CardTitle class="text-sm">Seasons</CardTitle>
+                    </CardHeader>
+                    <CardContent class="px-3">
+                        <Link
+                            v-for="s in props.seasons"
+                            :key="s.id"
+                            :href="route('rules.gaining-grounds.season', s.slug)"
+                            class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
+                            :class="s.slug === props.season.slug ? 'bg-primary text-primary-foreground' : ''"
+                        >{{ s.title }}</Link>
+                    </CardContent>
+                </Card>
+                <Card v-if="props.seasonPages.length > 0">
+                    <CardHeader class="pb-0">
+                        <CardTitle class="text-sm">Pages</CardTitle>
+                    </CardHeader>
+                    <CardContent class="px-3">
+                        <Link
+                            :href="route('rules.gaining-grounds.season', props.season.slug)"
+                            class="p-2 block text-sm rounded-md transition-colors hover:bg-muted bg-primary text-primary-foreground"
+                        >Season Overview</Link>
+                        <Link
+                            v-for="page in props.seasonPages"
+                            :key="page.id"
+                            :href="route('rules.gaining-grounds.season-page', [props.season.slug, page.slug])"
+                            class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
+                        >{{ page.title }}</Link>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
 
         <!-- Main content -->
@@ -146,8 +172,8 @@ const suitSymbol = (suit: string) => {
                 </AlertDescription>
             </Alert>
 
-            <!-- Mobile season selector -->
-            <div v-if="!props.viewing_old_version" class="lg:hidden block mb-4 mx-2">
+            <!-- Mobile selectors -->
+            <div v-if="!props.viewing_old_version" class="lg:hidden mb-4 mx-2 space-y-2">
                 <Select v-model="seasonParam">
                     <SelectTrigger class="w-full">
                         <SelectValue placeholder="Select a Season" />
@@ -157,6 +183,19 @@ const suitSymbol = (suit: string) => {
                             <SelectLabel>Seasons</SelectLabel>
                             <SelectItem v-for="s in props.seasons" :key="s.id" :value="s.slug">
                                 {{ s.title }}
+                            </SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+                <Select v-if="props.seasonPages.length > 0" v-model="mobilePageSlug">
+                    <SelectTrigger class="w-full">
+                        <SelectValue placeholder="Select a Page" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Pages</SelectLabel>
+                            <SelectItem v-for="page in props.seasonPages" :key="page.id" :value="page.slug">
+                                {{ page.title }}
                             </SelectItem>
                         </SelectGroup>
                     </SelectContent>
@@ -179,22 +218,6 @@ const suitSymbol = (suit: string) => {
                     Last updated {{ props.season.published_at }} by {{ props.season.published_by }}
                 </CardFooter>
             </Card>
-
-            <!-- Season Pages -->
-            <div v-if="props.seasonPages.length > 1 && !props.viewing_old_version" class="mb-8">
-                <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Pages</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <Link
-                        v-for="page in props.seasonPages"
-                        :key="page.id"
-                        :href="route('rules.gaining-grounds.season-page', [props.season.slug, page.slug])"
-                        class="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
-                    >
-                        <span class="text-sm font-medium truncate">{{ page.title }}</span>
-                        <ChevronRight class="size-3.5 shrink-0 text-muted-foreground ml-auto" />
-                    </Link>
-                </div>
-            </div>
 
             <!-- Strategies -->
             <div v-if="props.strategies.length > 0" class="mb-8">

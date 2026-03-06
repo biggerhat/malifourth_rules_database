@@ -192,12 +192,14 @@ class GainingGroundsController extends Controller
 
     public function viewStrategy(Request $request, Strategy $strategy)
     {
-        $strategy->loadMissing('newestVersion', 'publishedBy', 'season');
+        $strategy->loadMissing(['newestVersion', 'publishedBy', 'season' => fn ($q) => $q->withTrashed()]);
         $strategy = $strategy->newestVersion ?? $strategy;
 
         if (! $strategy->published_at) {
             return response('', 404);
         }
+
+        $strategy->loadMissing(['season' => fn ($q) => $q->withTrashed()]);
 
         return inertia('Rules/GainingGrounds/StrategyView', [
             'strategy' => [
@@ -225,12 +227,14 @@ class GainingGroundsController extends Controller
 
     public function viewScheme(Request $request, Scheme $scheme)
     {
-        $scheme->loadMissing('newestVersion', 'publishedBy', 'season', 'nextScheme1', 'nextScheme2', 'nextScheme3');
+        $scheme->loadMissing(['newestVersion', 'publishedBy', 'nextScheme1', 'nextScheme2', 'nextScheme3', 'season' => fn ($q) => $q->withTrashed()]);
         $scheme = $scheme->newestVersion ?? $scheme;
 
         if (! $scheme->published_at) {
             return response('', 404);
         }
+
+        $scheme->loadMissing(['season' => fn ($q) => $q->withTrashed()]);
 
         $nextSchemes = collect([$scheme->nextScheme1, $scheme->nextScheme2, $scheme->nextScheme3])
             ->filter()
@@ -300,7 +304,7 @@ class GainingGroundsController extends Controller
 
     public function viewStrategyHistory(Request $request, Strategy $strategy)
     {
-        $strategy->loadMissing('newestVersion', 'publishedBy', 'season');
+        $strategy->loadMissing(['newestVersion', 'publishedBy', 'season' => fn ($q) => $q->withTrashed()]);
         $currentVersion = $strategy->newestVersion ?? $strategy;
 
         if ($currentVersion->id === $strategy->id) {
@@ -339,12 +343,15 @@ class GainingGroundsController extends Controller
 
     public function viewSeasonPage(Request $request, Season $season, SeasonPage $seasonPage)
     {
-        $seasonPage->loadMissing('newestVersion', 'publishedBy', 'season');
+        $seasonPage->loadMissing(['newestVersion', 'publishedBy', 'season' => fn ($q) => $q->withTrashed()]);
         $seasonPage = $seasonPage->newestVersion ?? $seasonPage;
 
         if (! $seasonPage->published_at) {
             return response('', 404);
         }
+
+        // Reload season for the resolved version (may differ from original)
+        $seasonPage->loadMissing(['season' => fn ($q) => $q->withTrashed()]);
 
         $seasons = Season::whereNotNull('published_at')
             ->whereNull('newest')
@@ -388,11 +395,12 @@ class GainingGroundsController extends Controller
 
     public function viewSeasonPageHistory(Request $request, Season $season, SeasonPage $seasonPage)
     {
-        $seasonPage->loadMissing('newestVersion', 'publishedBy', 'season');
+        $seasonPage->loadMissing(['newestVersion', 'publishedBy', 'season' => fn ($q) => $q->withTrashed()]);
         $currentVersion = $seasonPage->newestVersion ?? $seasonPage;
+        $currentVersion->loadMissing(['season' => fn ($q) => $q->withTrashed()]);
 
         if ($currentVersion->id === $seasonPage->id) {
-            return redirect()->route('rules.gaining-grounds.season-page', [$seasonPage->season->slug, $seasonPage->slug]);
+            return redirect()->route('rules.gaining-grounds.season-page', [$seasonPage->season?->slug ?? $season->slug, $seasonPage->slug]);
         }
 
         if (! $seasonPage->published_at) {
@@ -414,13 +422,13 @@ class GainingGroundsController extends Controller
             'seasonPages' => [],
             'references' => ContentReferencesService::getForModel($seasonPage),
             'viewing_old_version' => true,
-            'current_version_url' => route('rules.gaining-grounds.season-page', [$currentVersion->season->slug, $currentVersion->slug]),
+            'current_version_url' => route('rules.gaining-grounds.season-page', [$currentVersion->season?->slug ?? $season->slug, $currentVersion->slug]),
         ]);
     }
 
     public function viewSchemeHistory(Request $request, Scheme $scheme)
     {
-        $scheme->loadMissing('newestVersion', 'publishedBy', 'season');
+        $scheme->loadMissing(['newestVersion', 'publishedBy', 'season' => fn ($q) => $q->withTrashed()]);
         $currentVersion = $scheme->newestVersion ?? $scheme;
 
         if ($currentVersion->id === $scheme->id) {

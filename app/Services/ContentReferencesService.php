@@ -94,7 +94,7 @@ class ContentReferencesService
             ->orderByDesc('id');
 
         if ($model instanceof SeasonPage) {
-            $query->with('season');
+            $query->with(['season' => fn ($q) => $q->withTrashed()]);
         }
 
         $versions = $query->get();
@@ -138,8 +138,8 @@ class ContentReferencesService
                 ? route('rules.gaining-grounds.scheme', $currentVersion->slug)
                 : route('rules.gaining-grounds.scheme.history', $version->slug),
             $version instanceof SeasonPage => $isCurrent
-                ? route('rules.gaining-grounds.season-page', [$currentVersion->season->slug, $currentVersion->slug])
-                : route('rules.gaining-grounds.season-page.history', [$version->season->slug, $version->slug]),
+                ? route('rules.gaining-grounds.season-page', [$currentVersion->season?->slug ?? 'unknown', $currentVersion->slug])
+                : route('rules.gaining-grounds.season-page.history', [$version->season?->slug ?? 'unknown', $version->slug]),
             $version instanceof Strategy => $isCurrent
                 ? route('rules.gaining-grounds.strategy', $currentVersion->slug)
                 : route('rules.gaining-grounds.strategy.history', $version->slug),

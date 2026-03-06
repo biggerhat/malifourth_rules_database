@@ -5,37 +5,32 @@ namespace App\Http\Controllers\Admin;
 use App\Actions\Approvals\CreateApprovalAction;
 use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\IndexListResource;
-use App\Http\Resources\PageListResource;
 use App\Http\Resources\SeasonListResource;
-use App\Http\Resources\SectionListResource;
 use App\Models\Batch;
-use App\Models\Index;
-use App\Models\Page;
 use App\Models\Season;
-use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
+use App\Traits\HandlesBulkActions;
 use Illuminate\Http\Request;
 
 class SeasonAdminController extends Controller
 {
+    use HandlesBulkActions;
+
+    protected function bulkModel(): string
+    {
+        return Season::class;
+    }
+
+    protected function bulkLabel(): string
+    {
+        return 'season(s)';
+    }
+
     public function list(Request $request)
     {
         return SeasonListResource::collection(
             Season::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
         )->toArray($request);
-    }
-
-    public function preview(Request $request)
-    {
-        $content = $request->get('content') ?? '';
-        $changeNotes = $request->get('change_notes') ?? null;
-
-        return [
-            'title' => $request->get('title') ?? '',
-            'content' => (new ContentBuilder($content))->getFullyHydratedContent(),
-            'change_notes' => $changeNotes ? (new ContentBuilder($changeNotes))->getFullyHydratedContent() : null,
-        ];
     }
 
     public function view(Request $request, Season $season)
@@ -66,15 +61,6 @@ class SeasonAdminController extends Controller
     {
         return inertia('Admin/Seasons/SeasonForm', [
             'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
-            'indices' => IndexListResource::collection(
-                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'sections' => SectionListResource::collection(
-                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'pages' => PageListResource::collection(
-                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
         ]);
     }
 
@@ -83,15 +69,6 @@ class SeasonAdminController extends Controller
         return inertia('Admin/Seasons/SeasonForm', [
             'season' => $season->loadMissing('approval'),
             'batches' => Batch::unpublished()->orderBy('id', 'desc')->get(),
-            'indices' => IndexListResource::collection(
-                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'sections' => SectionListResource::collection(
-                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'pages' => PageListResource::collection(
-                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
         ]);
     }
 
@@ -129,57 +106,6 @@ class SeasonAdminController extends Controller
         return to_route('admin.seasons.index')->withMessage($season->title.' has been published!');
     }
 
-    public function bulkApprove(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $items = Season::with('approval')->whereIn('id', $validated['ids'])->get();
-        $count = 0;
-
-        foreach ($items as $item) {
-            if ($item->approval && ! $item->approval->approved_at) {
-                $item->approval->update([
-                    'approved_at' => now(),
-                    'approved_by' => $request->user()->id,
-                ]);
-                $count++;
-            }
-        }
-
-        return redirect()->back()->withMessage("{$count} season(s) approved.");
-    }
-
-    public function bulkPublish(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $items = Season::with('approval')->whereIn('id', $validated['ids'])->get();
-        $count = 0;
-        $errors = [];
-
-        foreach ($items as $item) {
-            try {
-                $item->publish($request->user());
-                $count++;
-            } catch (\Exception $e) {
-                $errors[] = $item->title.': '.$e->getMessage();
-            }
-        }
-
-        $message = "{$count} season(s) published.";
-        if (! empty($errors)) {
-            $message .= ' Errors: '.implode('; ', $errors);
-        }
-
-        return redirect()->back()->withMessage($message);
-    }
-
-    public function bulkDelete(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $count = Season::whereIn('id', $validated['ids'])->whereNull('published_at')->delete();
-
-        return redirect()->back()->withMessage("{$count} season(s) deleted.");
-    }
-
     private function validateAndSave(Request $request, ?Season $season = null): Season
     {
         $validated = $request->validate([
@@ -197,10 +123,12 @@ class SeasonAdminController extends Controller
         unset($validated['publish_directly']);
         $approveDirectly = $validated['approve_directly'];
         unset($validated['approve_directly']);
-        $changeNotes = preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
+        $changeNotes = ContentBuilder::detectTipTapJson($validated['change_notes'] ?? '')
+            ? $validated['change_notes']
+            : preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes']));
         unset($validated['change_notes']);
 
-        if ($validated['content']) {
+        if ($validated['content'] && ! ContentBuilder::detectTipTapJson($validated['content'])) {
             $validated['content'] = preg_replace("/(\r|\n)/", '', nl2br($validated['content']));
         }
 

@@ -11,9 +11,12 @@ class SeasonPageObserver
 {
     public function creating(SeasonPage $seasonPage): void
     {
-        $content = preg_replace('/\s+/', ' ', $seasonPage->content ?? '');
+        $content = $seasonPage->content ?? '';
+        if (! ContentBuilder::detectTipTapJson($content)) {
+            $content = preg_replace('/\s+/', ' ', $content);
+            $seasonPage->content = $content;
+        }
         $seasonPage->slug = Str::slug($seasonPage->title);
-        $seasonPage->content = $content;
         $seasonPage->searchable_text = $this->buildSearchableText($seasonPage);
     }
 
@@ -28,9 +31,12 @@ class SeasonPageObserver
 
     public function updating(SeasonPage $seasonPage): void
     {
-        $content = preg_replace('/\s+/', ' ', $seasonPage->content ?? '');
+        $content = $seasonPage->content ?? '';
+        if (! ContentBuilder::detectTipTapJson($content)) {
+            $content = preg_replace('/\s+/', ' ', $content);
+            $seasonPage->content = $content;
+        }
         $seasonPage->slug = $seasonPage->id.'-'.Str::slug($seasonPage->title);
-        $seasonPage->content = $content;
         $seasonPage->searchable_text = $this->buildSearchableText($seasonPage);
     }
 

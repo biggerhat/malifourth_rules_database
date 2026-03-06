@@ -54,7 +54,7 @@ class ContentBuilder
 
     public string $jsonContent;
 
-    /** @var array<string, string> */
+    /** @var array<string, array<string>> */
     public array $pluckedTagResults = [];
 
     public array $slugModelMap = [
@@ -70,14 +70,41 @@ class ContentBuilder
         'section',
     ];
 
+    public bool $isTipTapJson = false;
+
+    private ?array $decodedDoc = null;
+
     public function __construct(public string $stringContent)
     {
-        $this->parsedContent = $this->parseTaggedTextRecursive();
+        $this->isTipTapJson = self::detectTipTapJson($stringContent);
+
+        if ($this->isTipTapJson) {
+            $this->decodedDoc = json_decode($stringContent, true);
+            $this->parsedContent = is_array($this->decodedDoc) ? TipTapContentBuilder::parse($this->decodedDoc) : [];
+        } else {
+            $this->parsedContent = $this->parseTaggedTextRecursive();
+        }
         $this->jsonContent = json_encode($this->parsedContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    public static function detectTipTapJson(string $content): bool
+    {
+        $trimmed = trim($content);
+        if (! str_starts_with($trimmed, '{')) {
+            return false;
+        }
+
+        $decoded = json_decode($trimmed, true);
+
+        return is_array($decoded) && ($decoded['type'] ?? null) === 'doc' && isset($decoded['content']);
     }
 
     public static function toSearchable(string $content): string
     {
+        if (self::detectTipTapJson($content)) {
+            return TipTapContentBuilder::toSearchable(json_decode($content, true));
+        }
+
         $text = self::removeInlineTags($content);
         $text = preg_replace('/\{\{.*?\}\}/', '', $text);
         $text = strip_tags($text);
@@ -89,6 +116,10 @@ class ContentBuilder
 
     public static function toPlainText(string $content): string
     {
+        if (self::detectTipTapJson($content)) {
+            return TipTapContentBuilder::toSearchable(json_decode($content, true));
+        }
+
         $text = preg_replace('/\{\{.*?\}\}/', '', $content);
         $text = str_replace('<br />', ' ', $text);
         $text = preg_replace('/\s+/', ' ', $text);
@@ -98,6 +129,10 @@ class ContentBuilder
 
     public static function parseTitleTags(string $title): string
     {
+        if (self::detectTipTapJson($title)) {
+            return TipTapContentBuilder::parseTitleTags(json_decode($title, true));
+        }
+
         $search = [];
         $replace = [];
 
@@ -172,6 +207,10 @@ class ContentBuilder
 
     public function getTagSlugs(): array
     {
+        if ($this->isTipTapJson) {
+            return TipTapContentBuilder::getTagSlugs($this->decodedDoc);
+        }
+
         $this->pluckTagSlugs($this->parsedContent);
 
         return $this->pluckedTagResults;

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ApprovalAdminController;
 use App\Http\Controllers\Admin\BatchAdminController;
+use App\Http\Controllers\Admin\EntitySearchController;
 use App\Http\Controllers\Admin\ErrataAdminController;
 use App\Http\Controllers\Admin\FaqAdminController;
 use App\Http\Controllers\Admin\IndexAdminController;
@@ -17,6 +18,8 @@ use App\Http\Controllers\Admin\StrategyAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 
 Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(function () {
+    Route::get('/entity-search', [EntitySearchController::class, 'search'])->name('entity-search');
+
     Route::controller(UserAdminController::class)->prefix('users')->name('users.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_user']);
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_user']);
@@ -38,7 +41,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(BatchAdminController::class)->prefix('batches')->name('batches.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_batch']);
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_batch']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_batch']);
         Route::get('/edit/{batch}', 'edit')->name('edit')->middleware(['permission:edit_batch']);
         Route::post('/store', 'store')->name('store')->middleware(['permission:add_batch']);
         Route::post('/update/{batch}', 'update')->name('update')->middleware(['permission:edit_batch']);
@@ -49,7 +51,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(IndexAdminController::class)->prefix('indices')->name('indices.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_index']);
         Route::get('/view/{index}', 'view')->name('view')->middleware(['permission:view_index']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_index']);
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_index']);
         Route::get('/list', 'list')->name('list');
         Route::get('/edit/{index}', 'edit')->name('edit')->middleware(['permission:edit_index']);
@@ -65,7 +66,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(SectionAdminController::class)->prefix('sections')->name('sections.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_section']);
         Route::get('/view/{section}', 'view')->name('view')->middleware(['permission:view_section']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_section']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_section']);
         Route::get('/edit/{section}', 'edit')->name('edit')->middleware(['permission:edit_section']);
@@ -81,7 +81,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(PageAdminController::class)->prefix('pages')->name('pages.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_page']);
         Route::get('/view/{page}', 'view')->name('view')->middleware(['permission:view_page']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_page']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_page']);
         Route::get('/edit/{page}', 'edit')->name('edit')->middleware(['permission:edit_page']);
@@ -101,7 +100,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(SeasonAdminController::class)->prefix('seasons')->name('seasons.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_season']);
         Route::get('/view/{season}', 'view')->name('view')->middleware(['permission:view_season']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_season']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_season']);
         Route::get('/edit/{season}', 'edit')->name('edit')->middleware(['permission:edit_season']);
@@ -117,7 +115,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(SchemeAdminController::class)->prefix('schemes')->name('schemes.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_scheme']);
         Route::get('/view/{scheme}', 'view')->name('view')->middleware(['permission:view_scheme']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_scheme']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_scheme']);
         Route::get('/edit/{scheme}', 'edit')->name('edit')->middleware(['permission:edit_scheme']);
@@ -133,7 +130,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(SeasonPageAdminController::class)->prefix('season-pages')->name('season-pages.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_season_page']);
         Route::get('/view/{seasonPage}', 'view')->name('view')->middleware(['permission:view_season_page']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_season_page']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_season_page']);
         Route::get('/edit/{seasonPage}', 'edit')->name('edit')->middleware(['permission:edit_season_page']);
@@ -149,7 +145,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(StrategyAdminController::class)->prefix('strategies')->name('strategies.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_strategy']);
         Route::get('/view/{strategy}', 'view')->name('view')->middleware(['permission:view_strategy']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_strategy']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_strategy']);
         Route::get('/edit/{strategy}', 'edit')->name('edit')->middleware(['permission:edit_strategy']);
@@ -165,7 +160,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(FaqAdminController::class)->prefix('faqs')->name('faqs.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_faq']);
         Route::get('/view/{faq}', 'view')->name('view')->middleware(['permission:view_faq']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_faq']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_faq']);
         Route::get('/edit/{faq}', 'edit')->name('edit')->middleware(['permission:edit_faq']);
@@ -181,7 +175,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(ErrataAdminController::class)->prefix('errata')->name('errata.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_errata']);
         Route::get('/view/{errata}', 'view')->name('view')->middleware(['permission:view_errata']);
-        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_errata']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_errata']);
         Route::get('/edit/{errata}', 'edit')->name('edit')->middleware(['permission:edit_errata']);

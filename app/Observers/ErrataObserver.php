@@ -11,9 +11,12 @@ class ErrataObserver
 {
     public function creating(Errata $errata): void
     {
-        $content = preg_replace('/\s+/', ' ', $errata->content ?? '');
+        $content = $errata->content ?? '';
+        if (! ContentBuilder::detectTipTapJson($content)) {
+            $content = preg_replace('/\s+/', ' ', $content);
+            $errata->content = $content;
+        }
         $errata->slug = Str::slug($errata->title);
-        $errata->content = $content;
         $errata->searchable_text = $this->buildSearchableText($errata);
     }
 
@@ -28,9 +31,12 @@ class ErrataObserver
 
     public function updating(Errata $errata): void
     {
-        $content = preg_replace('/\s+/', ' ', $errata->content ?? '');
+        $content = $errata->content ?? '';
+        if (! ContentBuilder::detectTipTapJson($content)) {
+            $content = preg_replace('/\s+/', ' ', $content);
+            $errata->content = $content;
+        }
         $errata->slug = $errata->id.'-'.Str::slug($errata->title);
-        $errata->content = $content;
         $errata->searchable_text = $this->buildSearchableText($errata);
     }
 

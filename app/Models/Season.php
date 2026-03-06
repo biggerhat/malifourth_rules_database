@@ -25,6 +25,7 @@ class Season extends Model implements HasBatching, HasPublisher
 
     /** @use HasFactory<\Database\Factories\SeasonFactory> */
     use HasFactory;
+
     use LogsActivity;
     use SoftDeletes;
     use UsesVersionControl;

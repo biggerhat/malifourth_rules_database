@@ -11,10 +11,16 @@ class SectionObserver
 {
     public function creating(Section $section): void
     {
-        $leftColumn = preg_replace('/\s+/', ' ', $section->left_column ?? '');
-        $rightColumn = preg_replace('/\s+/', ' ', $section->right_column ?? '');
-        $section->left_column = $leftColumn;
-        $section->right_column = $rightColumn;
+        $leftColumn = $section->left_column ?? '';
+        $rightColumn = $section->right_column ?? '';
+        if (! ContentBuilder::detectTipTapJson($leftColumn)) {
+            $leftColumn = preg_replace('/\s+/', ' ', $leftColumn);
+            $section->left_column = $leftColumn;
+        }
+        if (! ContentBuilder::detectTipTapJson($rightColumn)) {
+            $rightColumn = preg_replace('/\s+/', ' ', $rightColumn);
+            $section->right_column = $rightColumn;
+        }
         $section->slug = Str::slug($section->title);
         $section->searchable_text = ContentBuilder::toSearchable($leftColumn);
         $section->searchable_text .= ' ';
@@ -37,10 +43,16 @@ class SectionObserver
 
     public function updating(Section $section): void
     {
-        $leftColumn = preg_replace('/\s+/', ' ', $section->left_column ?? '');
-        $rightColumn = preg_replace('/\s+/', ' ', $section->right_column ?? '');
-        $section->left_column = $leftColumn;
-        $section->right_column = $rightColumn;
+        $leftColumn = $section->left_column ?? '';
+        $rightColumn = $section->right_column ?? '';
+        if (! ContentBuilder::detectTipTapJson($leftColumn)) {
+            $leftColumn = preg_replace('/\s+/', ' ', $leftColumn);
+            $section->left_column = $leftColumn;
+        }
+        if (! ContentBuilder::detectTipTapJson($rightColumn)) {
+            $rightColumn = preg_replace('/\s+/', ' ', $rightColumn);
+            $section->right_column = $rightColumn;
+        }
         $section->slug = $section->id.'-'.Str::slug($section->title);
         $section->searchable_text = ContentBuilder::toSearchable($leftColumn);
         $section->searchable_text .= ' ';
@@ -50,6 +62,6 @@ class SectionObserver
     public function deleted(Section $section): void
     {
         $section->loadMissing('approval');
-        $section->approval->delete();
+        $section->approval?->delete();
     }
 }

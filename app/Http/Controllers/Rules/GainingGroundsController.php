@@ -346,6 +346,16 @@ class GainingGroundsController extends Controller
             return response('', 404);
         }
 
+        $seasons = Season::whereNotNull('published_at')
+            ->whereNull('newest')
+            ->orderByDesc('published_at')
+            ->get()
+            ->map(fn (Season $s) => [
+                'id' => $s->id,
+                'title' => $s->title,
+                'slug' => $s->slug,
+            ]);
+
         $seasonPages = SeasonPage::where('season_id', $seasonPage->season_id)
             ->whereNotNull('published_at')
             ->whereNull('newest')
@@ -370,6 +380,7 @@ class GainingGroundsController extends Controller
                 'title' => $seasonPage->season?->title,
                 'slug' => $seasonPage->season?->slug,
             ],
+            'seasons' => $seasons,
             'seasonPages' => $seasonPages,
             'references' => ContentReferencesService::getForModel($seasonPage),
         ]);

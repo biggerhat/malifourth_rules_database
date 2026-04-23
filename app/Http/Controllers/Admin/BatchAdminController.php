@@ -7,13 +7,7 @@ use App\Enums\MessageTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BatchableListResource;
 use App\Http\Resources\BatchListResource;
-use App\Http\Resources\IndexListResource;
-use App\Http\Resources\PageListResource;
-use App\Http\Resources\SectionListResource;
 use App\Models\Batch;
-use App\Models\Index;
-use App\Models\Page;
-use App\Models\Section;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
 
@@ -26,29 +20,9 @@ class BatchAdminController extends Controller
         ]);
     }
 
-    public function preview(Request $request)
-    {
-        $releaseNotes = $request->get('release_notes') ?? null;
-
-        return [
-            'title' => $request->get('title') ?? '',
-            'release_notes' => $releaseNotes ? (new ContentBuilder($releaseNotes))->getFullyHydratedContent() : null,
-        ];
-    }
-
     public function create(Request $request): \Inertia\Response|\Inertia\ResponseFactory
     {
-        return inertia('Admin/Batches/BatchForm', [
-            'indices' => IndexListResource::collection(
-                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'sections' => SectionListResource::collection(
-                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'pages' => PageListResource::collection(
-                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-        ]);
+        return inertia('Admin/Batches/BatchForm', []);
     }
 
     public function edit(Request $request, Batch $batch)
@@ -56,15 +30,6 @@ class BatchAdminController extends Controller
         return inertia('Admin/Batches/BatchForm', [
             'batch' => $batch,
             'batchables' => BatchableListResource::collection($batch->flattenBatchables())->toArray($request),
-            'indices' => IndexListResource::collection(
-                Index::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'sections' => SectionListResource::collection(
-                Section::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
-            'pages' => PageListResource::collection(
-                Page::orderBy('title', 'ASC')->orderBy('id', 'DESC')->get()
-            )->toArray($request),
         ]);
     }
 
@@ -133,7 +98,7 @@ class BatchAdminController extends Controller
 
         $validated['created_by'] = $request->user()->id;
 
-        if ($validated['release_notes']) {
+        if ($validated['release_notes'] && ! ContentBuilder::detectTipTapJson($validated['release_notes'])) {
             $validated['release_notes'] = preg_replace("/(\r|\n)/", '', nl2br($validated['release_notes']));
         }
 

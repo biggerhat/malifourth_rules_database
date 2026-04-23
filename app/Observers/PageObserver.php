@@ -11,9 +11,12 @@ class PageObserver
 {
     public function creating(Page $page): void
     {
-        $content = preg_replace('/\s+/', ' ', $page->content ?? '');
+        $content = $page->content ?? '';
+        if (! ContentBuilder::detectTipTapJson($content)) {
+            $content = preg_replace('/\s+/', ' ', $content);
+            $page->content = $content;
+        }
         $page->slug = Str::slug($page->title);
-        $page->content = $content;
         $page->searchable_text = ContentBuilder::toSearchable($content);
     }
 
@@ -33,15 +36,18 @@ class PageObserver
 
     public function updating(Page $page): void
     {
-        $content = preg_replace('/\s+/', ' ', $page->content ?? '');
+        $content = $page->content ?? '';
+        if (! ContentBuilder::detectTipTapJson($content)) {
+            $content = preg_replace('/\s+/', ' ', $content);
+            $page->content = $content;
+        }
         $page->slug = $page->id.'-'.Str::slug($page->title);
-        $page->content = $content;
         $page->searchable_text = ContentBuilder::toSearchable($content);
     }
 
     public function deleted(Page $page): void
     {
         $page->loadMissing('approval');
-        $page->approval->delete();
+        $page->approval?->delete();
     }
 }

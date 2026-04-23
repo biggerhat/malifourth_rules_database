@@ -11,9 +11,12 @@ class SeasonObserver
 {
     public function creating(Season $season): void
     {
-        $content = preg_replace('/\s+/', ' ', $season->content ?? '');
+        $content = $season->content ?? '';
+        if (! ContentBuilder::detectTipTapJson($content)) {
+            $content = preg_replace('/\s+/', ' ', $content);
+            $season->content = $content;
+        }
         $season->slug = Str::slug($season->title);
-        $season->content = $content;
         $season->searchable_text = ContentBuilder::toSearchable($content);
     }
 
@@ -28,9 +31,12 @@ class SeasonObserver
 
     public function updating(Season $season): void
     {
-        $content = preg_replace('/\s+/', ' ', $season->content ?? '');
+        $content = $season->content ?? '';
+        if (! ContentBuilder::detectTipTapJson($content)) {
+            $content = preg_replace('/\s+/', ' ', $content);
+            $season->content = $content;
+        }
         $season->slug = $season->id.'-'.Str::slug($season->title);
-        $season->content = $content;
         $season->searchable_text = ContentBuilder::toSearchable($content);
     }
 

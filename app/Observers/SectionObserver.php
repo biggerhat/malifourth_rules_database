@@ -50,6 +50,6 @@ class SectionObserver
     public function deleted(Section $section): void
     {
         $section->loadMissing('approval');
-        $section->approval->delete();
+        $section->approval?->delete();
     }
 }

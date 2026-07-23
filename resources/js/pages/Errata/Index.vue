@@ -30,6 +30,21 @@ const props = defineProps({
             <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
         </div>
 
+        <!-- Card Errata Section -->
+        <div class="mb-8">
+            <h2 class="font-semibold text-lg mb-4 pb-2 border-b">Card Errata</h2>
+            <Link
+                :href="route('errata.cards.index')"
+                class="flex items-center justify-between rounded-lg border bg-card px-4 py-3 sm:px-5 sm:py-4 hover:bg-muted/50 transition-colors"
+            >
+                <div class="min-w-0">
+                    <div class="text-sm sm:text-base font-medium">Browse Card Errata</div>
+                    <div class="text-xs text-muted-foreground mt-0.5">Errata organized by faction and card</div>
+                </div>
+                <ChevronRight class="size-4 shrink-0 text-muted-foreground ml-3" />
+            </Link>
+        </div>
+
         <!-- Rules Errata Section -->
         <div v-if="props.rulesErrata.length" class="mb-8">
             <h2 class="font-semibold text-lg mb-4 pb-2 border-b">Rules Errata</h2>

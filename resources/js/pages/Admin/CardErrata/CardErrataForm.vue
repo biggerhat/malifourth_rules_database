@@ -1,0 +1,290 @@
+<script setup lang='ts'>
+import { onMounted } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from '@/components/ui/drawer';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import InputError from '@/components/InputError.vue';
+import { CircleX, Plus, Trash2 } from 'lucide-vue-next';
+import { Textarea } from '@/components/ui/textarea'
+import { hasPermission } from '@/composables/hasPermission';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+
+const props = defineProps({
+    cardErrata: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return null;
+        }
+    },
+    batches: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return {};
+        }
+    },
+    faction_options: {
+        type: Array,
+        required: false,
+        default() {
+            return [];
+        }
+    }
+});
+
+function makeEmptyEntry() {
+    return {
+        what_changed: '',
+        what_it_was: '',
+        what_it_is_now: '',
+        front_image: null,
+        back_image: null,
+        existing_front_image: null,
+        existing_back_image: null,
+    };
+}
+
+const form = useForm({
+    faction: '',
+    card_name: '',
+    internal_notes: '',
+    change_notes: '',
+    batch_id: null,
+    publish_directly: false,
+    approve_directly: false,
+    entries: [makeEmptyEntry()],
+});
+
+const back = () => {
+    history.back();
+};
+
+onMounted(() => {
+    form.faction = props.cardErrata?.faction ?? '';
+    form.card_name = props.cardErrata?.card_name ?? '';
+    form.internal_notes = props.cardErrata?.internal_notes ?? '';
+    form.change_notes = props.cardErrata?.published_at ? '' : props.cardErrata?.approval?.change_notes ?? '';
+    form.batch_id = props.cardErrata?.published_at ? null : props.cardErrata?.batch_id ?? null;
+
+    if (props.cardErrata?.entries?.length) {
+        form.entries = props.cardErrata.entries.map(entry => ({
+            what_changed: entry.what_changed ?? '',
+            what_it_was: entry.what_it_was ?? '',
+            what_it_is_now: entry.what_it_is_now ?? '',
+            front_image: null,
+            back_image: null,
+            existing_front_image: entry.front_image ?? null,
+            existing_back_image: entry.back_image ?? null,
+        }));
+    }
+});
+
+const addEntry = () => {
+    form.entries.push(makeEmptyEntry());
+};
+
+const removeEntry = (index) => {
+    form.entries.splice(index, 1);
+};
+
+const submitCardErrata = () => {
+    if (props.cardErrata) {
+        form.post(route('admin.card-errata.update', { cardErrata: props.cardErrata.slug }));
+    } else {
+        form.post(route('admin.card-errata.store'));
+    }
+};
+</script>
+
+<template>
+    <Head title="Card Errata Information" />
+
+    <Card>
+        <CardHeader>
+            <CardTitle>Card Errata Form</CardTitle>
+            <CardDescription>
+                Create and Edit Card Errata Information
+                <span class="text-destructive" v-if="!props.cardErrata"><br />Make sure you want an entirely NEW card. <br />
+                    If you just want to add more errata to an existing card, you need to edit it.</span>
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <form @submit.prevent>
+                <Tabs default-value="details">
+                    <TabsList>
+                        <TabsTrigger value="details">Details</TabsTrigger>
+                        <TabsTrigger value="entries">Errata</TabsTrigger>
+                        <TabsTrigger value="notes">Notes</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="details" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="faction">Faction</Label>
+                                <div class="flex">
+                                    <Select id="faction" v-model="form.faction">
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue placeholder="Select Faction" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem v-for="faction in props.faction_options" :value="faction.value" :key="faction.value">
+                                                {{ faction.name }}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <CircleX class="text-destructive my-auto ml-2" v-if="form.faction" @click="form.faction = null" />
+                                </div>
+                                <InputError :message="form.errors.faction" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="card_name">Card Effected</Label>
+                                <Input id="card_name" type="text" required autofocus :tabindex="1" autocomplete="off" v-model="form.card_name" placeholder="Card Name" />
+                                <InputError :message="form.errors.card_name" />
+                            </div>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="entries" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <Card v-for="(entry, index) in form.entries" :key="index" class="border-2">
+                                <CardHeader class="flex flex-row items-center justify-between">
+                                    <CardTitle class="text-base">Errata {{ index + 1 }}</CardTitle>
+                                    <Button variant="destructive" size="sm" type="button" @click="removeEntry(index)" v-if="form.entries.length > 1">
+                                        <Trash2 class="h-4 w-4" />
+                                    </Button>
+                                </CardHeader>
+                                <CardContent>
+                                    <div class="grid items-center w-full gap-4">
+                                        <div class="flex flex-col space-y-1.5">
+                                            <Label :for="`what_changed_${index}`">What Was Changed</Label>
+                                            <Textarea :id="`what_changed_${index}`" class="min-h-24" v-model="entry.what_changed" placeholder="What was changed" />
+                                            <InputError :message="form.errors[`entries.${index}.what_changed`]" />
+                                        </div>
+                                        <div class="flex flex-col space-y-1.5">
+                                            <Label :for="`what_it_was_${index}`">What It Was</Label>
+                                            <Textarea :id="`what_it_was_${index}`" class="min-h-24" v-model="entry.what_it_was" placeholder="What it was" />
+                                            <InputError :message="form.errors[`entries.${index}.what_it_was`]" />
+                                        </div>
+                                        <div class="flex flex-col space-y-1.5">
+                                            <Label :for="`what_it_is_now_${index}`">What It Is Now</Label>
+                                            <Textarea :id="`what_it_is_now_${index}`" class="min-h-24" v-model="entry.what_it_is_now" placeholder="What it is now" />
+                                            <InputError :message="form.errors[`entries.${index}.what_it_is_now`]" />
+                                        </div>
+                                        <div class="flex flex-col space-y-1.5" v-if="entry.existing_front_image">
+                                            <Label>Current Front Image</Label>
+                                            <img :src="entry.existing_front_image" :alt="form.card_name" class="w-75" />
+                                        </div>
+                                        <div class="flex flex-col space-y-1.5">
+                                            <Label :for="`front_image_${index}`">{{ entry.existing_front_image ? 'New ' : '' }}Front Image</Label>
+                                            <Input :id="`front_image_${index}`" type="file" accept=".jpeg,.jpg,.png,.webp" @input="entry.front_image = $event.target.files[0]" />
+                                            <InputError :message="form.errors[`entries.${index}.front_image`]" />
+                                        </div>
+                                        <div class="flex flex-col space-y-1.5" v-if="entry.existing_back_image">
+                                            <Label>Current Back Image</Label>
+                                            <img :src="entry.existing_back_image" :alt="form.card_name" class="w-75" />
+                                        </div>
+                                        <div class="flex flex-col space-y-1.5">
+                                            <Label :for="`back_image_${index}`">{{ entry.existing_back_image ? 'New ' : '' }}Back Image</Label>
+                                            <Input :id="`back_image_${index}`" type="file" accept=".jpeg,.jpg,.png,.webp" @input="entry.back_image = $event.target.files[0]" />
+                                            <InputError :message="form.errors[`entries.${index}.back_image`]" />
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Button type="button" variant="outline" @click="addEntry">
+                                <Plus class="h-4 w-4 mr-1" /> Add Another Errata
+                            </Button>
+                            <InputError :message="form.errors.entries" />
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="notes" force-mount class="data-[state=inactive]:hidden">
+                        <div class="grid items-center w-full gap-4 pt-4">
+                            <div class="flex flex-col space-y-1.5" v-if="(props.cardErrata && props.cardErrata?.published_at) || props.cardErrata?.approval?.change_notes">
+                                <Label for="change_notes">Change Notes</Label>
+                                <Textarea class="min-h-24" id="change_notes" v-model="form.change_notes" placeholder="What changed in this update" />
+                                <InputError :message="form.errors.change_notes" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="internal_notes">Internal Notes</Label>
+                                <Textarea class="min-h-48" id="internal_notes" v-model="form.internal_notes" placeholder="Add Internal Notes" />
+                                <InputError :message="form.errors.internal_notes" />
+                            </div>
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            </form>
+        </CardContent>
+        <CardFooter>
+            <div class="flex ml-auto my-auto">
+                <Drawer>
+                    <DrawerTrigger>
+                        <Button class="bg-green-500">{{ props.cardErrata ? 'Update' : 'Create' }} Card Errata</Button>
+                    </DrawerTrigger>
+                    <DrawerContent class="max-w-lg mx-auto">
+                        <DrawerHeader>
+                            <DrawerTitle>{{ props.cardErrata ? 'Update' : 'Create' }} Card Errata</DrawerTitle>
+                            <DrawerDescription>
+                                <div class="mx-auto max-w-lg mt-2 container overflow-y-auto">
+                                    <div class="flex mb-4">
+                                        <Select id="batch" v-model="form.batch_id">
+                                            <SelectTrigger class="w-full">
+                                                <SelectValue placeholder="Select Batch" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem v-for="batch in props.batches" :value="batch.id" :key="batch.id">
+                                                    {{ batch.title }}
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <CircleX class="text-destructive my-auto ml-2" v-if="form.batch_id" @click="form.batch_id = null" />
+                                    </div>
+                                    <div class="flex items-center mb-4 space-x-2" v-if="hasPermission('approve_card_errata')">
+                                        <Switch id="approve-directly" v-model="form.approve_directly" />
+                                        <Label for="approve-directly">Approve Directly</Label>
+                                    </div>
+                                    <div class="flex items-center mb-4 space-x-2" v-if="hasPermission('publish_card_errata')">
+                                        <Switch id="publish-directly" v-model="form.publish_directly" />
+                                        <Label for="publish-directly">Publish Directly</Label>
+                                    </div>
+                                </div>
+                            </DrawerDescription>
+                        </DrawerHeader>
+                        <DrawerFooter class="container grid grid-cols-2">
+                            <Button @click="submitCardErrata">Submit</Button>
+                            <DrawerClose>
+                                <Button variant="destructive" class="w-full">
+                                    Cancel
+                                </Button>
+                            </DrawerClose>
+                        </DrawerFooter>
+                    </DrawerContent>
+                </Drawer>
+                <div class="ml-2">
+                    <Button @click="back()" class="bg-destructive my-auto">
+                        Cancel
+                    </Button>
+                </div>
+            </div>
+        </CardFooter>
+    </Card>
+</template>

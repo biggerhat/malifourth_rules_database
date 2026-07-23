@@ -42,6 +42,7 @@ class Batch extends Model implements HasPublisher
 
     public array $batchables = [
         'errata',
+        'cardErratas',
         'faqs',
         'indices',
         'pages',
@@ -75,6 +76,11 @@ class Batch extends Model implements HasPublisher
     public function errata(): HasMany
     {
         return $this->hasMany(Errata::class, 'batch_id', 'id');
+    }
+
+    public function cardErratas(): HasMany
+    {
+        return $this->hasMany(CardErrata::class, 'batch_id', 'id');
     }
 
     public function faqs(): HasMany

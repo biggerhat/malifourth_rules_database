@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ApprovalAdminController;
 use App\Http\Controllers\Admin\BatchAdminController;
+use App\Http\Controllers\Admin\CardErrataAdminController;
 use App\Http\Controllers\Admin\ErrataAdminController;
 use App\Http\Controllers\Admin\FaqAdminController;
 use App\Http\Controllers\Admin\IndexAdminController;
@@ -192,6 +193,21 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_errata']);
         Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_errata']);
         Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_errata']);
+    });
+
+    Route::controller(CardErrataAdminController::class)->prefix('card-errata')->name('card-errata.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware(['permission:view_card_errata']);
+        Route::get('/view/{cardErrata}', 'view')->name('view')->middleware(['permission:view_card_errata']);
+        Route::get('/list', 'list')->name('list');
+        Route::get('/create', 'create')->name('create')->middleware(['permission:add_card_errata']);
+        Route::get('/edit/{cardErrata}', 'edit')->name('edit')->middleware(['permission:edit_card_errata']);
+        Route::post('/store', 'store')->name('store')->middleware(['permission:add_card_errata']);
+        Route::post('/update/{cardErrata}', 'update')->name('update')->middleware(['permission:edit_card_errata']);
+        Route::post('/delete/{cardErrata}', 'delete')->name('delete')->middleware(['permission:delete_card_errata']);
+        Route::post('/publish/{cardErrata}', 'publish')->name('publish')->middleware(['permission:publish_card_errata']);
+        Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_card_errata']);
+        Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_card_errata']);
+        Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_card_errata']);
     });
 
     Route::controller(NavigationItemAdminController::class)

@@ -42,6 +42,6 @@ class PageObserver
     public function deleted(Page $page): void
     {
         $page->loadMissing('approval');
-        $page->approval->delete();
+        $page->approval?->delete();
     }
 }

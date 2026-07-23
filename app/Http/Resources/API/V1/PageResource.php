@@ -22,8 +22,8 @@ class PageResource extends JsonResource
             'title_text' => ContentBuilder::toPlainText($this->title),
             'page_number' => $this->page_number,
             'book_page_numbers' => $this->book_page_numbers,
-            'left_column' => $this->left_column,
-            'right_column' => $this->right_column,
+            'content' => $this->content,
+            'content_text' => ContentBuilder::toSearchable($this->content ?? ''),
             'published_at' => $this->published_at?->toIso8601String(),
         ];
     }

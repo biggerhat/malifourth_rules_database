@@ -2,6 +2,7 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import {
     Card,
     CardContent,
@@ -119,7 +120,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <Head :title="props.faq ? props.faq.title_text : 'FAQ'" />
+    <SeoHead :title="props.faq ? props.faq.title_text : 'FAQ'" :description="props.faq ? props.faq.meta_description : null" />
 
     <div
         class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md"

@@ -12,21 +12,33 @@ trait UsesVersionControl
 
     public const NO_APPROVAL = 'Item must be approved before it can be published.';
 
+    /**
+     * @return BelongsTo<self, $this>
+     */
     public function previousVersion(): BelongsTo
     {
         return $this->belongsTo(self::class, 'previous', 'id');
     }
 
+    /**
+     * @return BelongsTo<self, $this>
+     */
     public function originalVersion(): BelongsTo
     {
         return $this->belongsTo(self::class, 'original', 'id');
     }
 
+    /**
+     * @return BelongsTo<self, $this>
+     */
     public function newestVersion(): BelongsTo
     {
         return $this->belongsTo(self::class, 'newest', 'id');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function publishedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'published_by', 'id');

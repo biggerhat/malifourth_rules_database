@@ -15,41 +15,65 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasContentReferences
 {
+    /**
+     * @return MorphToMany<Faq, $this>
+     */
     public function referencedFaqs(): MorphToMany
     {
         return $this->morphToMany(Faq::class, 'faqable');
     }
 
+    /**
+     * @return MorphToMany<Index, $this>
+     */
     public function referencedIndices(): MorphToMany
     {
         return $this->morphToMany(Index::class, 'indexable');
     }
 
+    /**
+     * @return MorphToMany<Section, $this>
+     */
     public function referencedSections(): MorphToMany
     {
         return $this->morphToMany(Section::class, 'sectionable');
     }
 
+    /**
+     * @return MorphToMany<Page, $this>
+     */
     public function referencedPages(): MorphToMany
     {
         return $this->morphToMany(Page::class, 'pageable');
     }
 
+    /**
+     * @return MorphToMany<Faq, $this>
+     */
     public function referencedByFaqs(): MorphToMany
     {
         return $this->morphedByMany(Faq::class, $this->getReferenceMorphName());
     }
 
+    /**
+     * @return MorphToMany<Index, $this>
+     */
     public function referencedByIndices(): MorphToMany
     {
         return $this->morphedByMany(Index::class, $this->getReferenceMorphName());
     }
 
+    /**
+     * @return MorphToMany<Section, $this>
+     */
     public function referencedBySections(): MorphToMany
     {
         return $this->morphedByMany(Section::class, $this->getReferenceMorphName());
     }
 
+    /**
+     * @return MorphToMany<Page, $this>
+     */
     public function referencedByPages(): MorphToMany
     {
         return $this->morphedByMany(Page::class, $this->getReferenceMorphName());

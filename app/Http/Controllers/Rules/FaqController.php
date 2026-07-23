@@ -8,6 +8,7 @@ use App\Models\Faq;
 use App\Services\ContentBuilder\ContentBuilder;
 use App\Services\ContentReferencesService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class FaqController extends Controller
 {
@@ -96,6 +97,7 @@ class FaqController extends Controller
         return [
             'title' => (new ContentBuilder($faq->title))->getFullyHydratedContent(),
             'title_text' => ContentBuilder::toPlainText($faq->title),
+            'meta_description' => Str::limit(ContentBuilder::toSearchable($faq->answer ?? ''), 155),
             'slug' => $faq->slug,
             'category' => $faq->category->value,
             'category_label' => $faq->category->label(),

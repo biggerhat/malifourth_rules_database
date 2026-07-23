@@ -7,6 +7,7 @@ use App\Models\Page;
 use App\Services\ContentBuilder\ContentBuilder;
 use App\Services\ContentReferencesService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
@@ -20,28 +21,7 @@ class PageController extends Controller
             return response('', 404);
         }
 
-        $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
-
-        return inertia('Rules/PageView', [
-            'pages' => Page::orderBy('page_number', 'ASC')->published()->get()->map(function (Page $page) {
-                return [
-                    'slug' => $page->slug,
-                    'title' => ContentBuilder::parseTitleTags($page->title),
-                    'page_number' => $page->page_number,
-                ];
-            }),
-            'title' => ContentBuilder::parseTitleTags($page->title),
-            'title_text' => ContentBuilder::toPlainText($page->title),
-            'slug' => $page->slug,
-            'content' => $content,
-            'page_number' => $page->page_number,
-            'book_page_numbers' => $page->book_page_numbers,
-            'published_at' => $page->published_at->format('m-d-Y'),
-            'published_by' => $page->publishedBy->name,
-            'previous_page' => $page->previousPage()?->slug,
-            'next_page' => $page->nextPage()?->slug,
-            'references' => ContentReferencesService::getForModel($page),
-        ]);
+        return $this->renderPage($page);
     }
 
     public function view(Request $request, Page $page)
@@ -53,28 +33,7 @@ class PageController extends Controller
             return response('', 404);
         }
 
-        $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
-
-        return inertia('Rules/PageView', [
-            'pages' => Page::orderBy('page_number', 'ASC')->published()->get()->map(function (Page $page) {
-                return [
-                    'slug' => $page->slug,
-                    'title' => ContentBuilder::parseTitleTags($page->title),
-                    'page_number' => $page->page_number,
-                ];
-            }),
-            'title' => ContentBuilder::parseTitleTags($page->title),
-            'title_text' => ContentBuilder::toPlainText($page->title),
-            'slug' => $page->slug,
-            'content' => $content,
-            'page_number' => $page->page_number,
-            'book_page_numbers' => $page->book_page_numbers,
-            'published_at' => $page->published_at->format('m-d-Y'),
-            'published_by' => $page->publishedBy->name,
-            'previous_page' => $page->previousPage()?->slug,
-            'next_page' => $page->nextPage()?->slug,
-            'references' => ContentReferencesService::getForModel($page),
-        ]);
+        return $this->renderPage($page);
     }
 
     public function viewHistory(Request $request, Page $page)
@@ -91,20 +50,36 @@ class PageController extends Controller
             return response('', 404);
         }
 
+        return $this->renderPage($page, [
+            'viewing_old_version' => true,
+            'current_version_url' => route('rules.page.view', $currentVersion->slug),
+        ]);
+    }
+
+    private function renderPage(Page $page, array $extra = [])
+    {
         $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
 
-        return inertia('Rules/PageView', [
+        return inertia('Rules/PageView', array_merge([
+            'pages' => Page::orderBy('page_number', 'ASC')->published()->get()->map(function (Page $p) {
+                return [
+                    'slug' => $p->slug,
+                    'title' => ContentBuilder::parseTitleTags($p->title),
+                    'page_number' => $p->page_number,
+                ];
+            }),
             'title' => ContentBuilder::parseTitleTags($page->title),
             'title_text' => ContentBuilder::toPlainText($page->title),
+            'meta_description' => Str::limit(ContentBuilder::toSearchable($page->content ?? ''), 155),
             'slug' => $page->slug,
             'content' => $content,
             'page_number' => $page->page_number,
             'book_page_numbers' => $page->book_page_numbers,
             'published_at' => $page->published_at->format('m-d-Y'),
             'published_by' => $page->publishedBy->name,
+            'previous_page' => $page->previousPage()?->slug,
+            'next_page' => $page->nextPage()?->slug,
             'references' => ContentReferencesService::getForModel($page),
-            'viewing_old_version' => true,
-            'current_version_url' => route('rules.page.view', $currentVersion->slug),
-        ]);
+        ], $extra));
     }
 }

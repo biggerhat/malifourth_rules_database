@@ -2,6 +2,7 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import {
     Card,
     CardContent,
@@ -40,7 +41,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <Head :title="props.errata.title" />
+    <SeoHead :title="props.errata.title" :description="props.errata.meta_description" />
 
     <div class="max-w-4xl mx-auto px-2 sm:px-4 text-primary leading-6 text-md">
         <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">

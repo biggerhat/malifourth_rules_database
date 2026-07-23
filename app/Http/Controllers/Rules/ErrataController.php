@@ -8,6 +8,7 @@ use App\Models\Errata;
 use App\Services\ContentBuilder\ContentBuilder;
 use App\Services\ContentReferencesService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ErrataController extends Controller
 {
@@ -89,16 +90,7 @@ class ErrataController extends Controller
             return response('', 404);
         }
 
-        return inertia('Errata/ErrataView', [
-            'errata' => [
-                'title' => $errata->title,
-                'slug' => $errata->slug,
-                'content' => (new ContentBuilder($errata->content ?? ''))->getFullyHydratedContent(),
-                'published_at' => $errata->published_at->format('m-d-Y'),
-                'published_by' => $errata->publishedBy?->name,
-            ],
-            'references' => ContentReferencesService::getForModel($errata),
-        ]);
+        return $this->renderErrata($errata);
     }
 
     public function viewHistory(Request $request, Errata $errata)
@@ -114,17 +106,24 @@ class ErrataController extends Controller
             return response('', 404);
         }
 
-        return inertia('Errata/ErrataView', [
+        return $this->renderErrata($errata, [
+            'viewing_old_version' => true,
+            'current_version_url' => route('errata.view', $currentVersion->slug),
+        ]);
+    }
+
+    private function renderErrata(Errata $errata, array $extra = [])
+    {
+        return inertia('Errata/ErrataView', array_merge([
             'errata' => [
                 'title' => $errata->title,
                 'slug' => $errata->slug,
+                'meta_description' => Str::limit(ContentBuilder::toSearchable($errata->content ?? ''), 155),
                 'content' => (new ContentBuilder($errata->content ?? ''))->getFullyHydratedContent(),
                 'published_at' => $errata->published_at->format('m-d-Y'),
                 'published_by' => $errata->publishedBy?->name,
             ],
             'references' => ContentReferencesService::getForModel($errata),
-            'viewing_old_version' => true,
-            'current_version_url' => route('errata.view', $currentVersion->slug),
-        ]);
+        ], $extra));
     }
 }

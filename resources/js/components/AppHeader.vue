@@ -344,31 +344,31 @@ const rightNavItems: NavItem[] = [];
                 <CommandSeparator />
                 <CommandGroup heading="FAQs">
                     <CommandItem v-for="faq in commandSearch.faqs" v-bind:key="faq.slug" @select="commandRoute(faq.route)" value="faq.slug">
-                        <span v-html="faq.title"></span>
+                        <span>{{ faq.title }}</span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Gaining Grounds">
                     <CommandItem v-for="season in commandSearch.seasons" v-bind:key="season.slug" @select="commandRoute(season.route)" value="season.slug">
-                        <span v-html="season.title"></span>
+                        <span>{{ season.title }}</span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Strategies">
                     <CommandItem v-for="strategy in commandSearch.strategies" v-bind:key="strategy.slug" @select="commandRoute(strategy.route)" value="strategy.slug">
-                        <span v-html="strategy.title"></span>
+                        <span>{{ strategy.title }}</span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Schemes">
                     <CommandItem v-for="scheme in commandSearch.schemes" v-bind:key="scheme.slug" @select="commandRoute(scheme.route)" value="scheme.slug">
-                        <span v-html="scheme.title"></span>
+                        <span>{{ scheme.title }}</span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Errata">
                     <CommandItem v-for="errata in commandSearch.errata" v-bind:key="errata.slug" @select="commandRoute(errata.route)" value="errata.slug">
-                        <span v-html="errata.title"></span>
+                        <span>{{ errata.title }}</span>
                     </CommandItem>
                 </CommandGroup>
             </CommandList>

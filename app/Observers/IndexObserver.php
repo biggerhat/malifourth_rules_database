@@ -42,6 +42,6 @@ class IndexObserver
     public function deleted(Index $index): void
     {
         $index->loadMissing('approval');
-        $index->approval->delete();
+        $index->approval?->delete();
     }
 }

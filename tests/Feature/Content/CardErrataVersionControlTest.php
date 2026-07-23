@@ -4,6 +4,8 @@ use App\Models\CardErrata;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -130,6 +132,19 @@ it('retires the previous version and preserves its entries for history when a dr
     expect($original->entries)->toHaveCount(1);
 });
 
+it('exposes a flat json shape from the admin view endpoint for the in-form preview', function () {
+    $this->actingAs($this->editor)->post(route('admin.card-errata.store'), $this->cardAttributes);
+    $card = CardErrata::latest('id')->firstOrFail();
+
+    $response = $this->actingAs($this->editor)->get(route('admin.card-errata.view', $card));
+
+    $response->assertOk();
+    $response->assertJsonPath('faction', 'guild');
+    $response->assertJsonPath('faction_label', 'Guild');
+    $response->assertJsonPath('card_name', 'Lucius Mattheson');
+    $response->assertJsonPath('entries.0.what_changed.0.text', 'Reduced defense');
+});
+
 it('throws when publishing a card errata that was never submitted for approval', function () {
     $card = CardErrata::factory()->create();
 
@@ -137,4 +152,72 @@ it('throws when publishing a card errata that was never submitted for approval',
     $this->expectExceptionMessage(CardErrata::NO_APPROVAL);
 
     $card->publish($this->editor);
+});
+
+it('uploads a single card-level image and stores it on the card, not the entries', function () {
+    Storage::fake('public');
+
+    $attributes = $this->cardAttributes;
+    $attributes['image'] = UploadedFile::fake()->image('lucius.png');
+
+    $this->actingAs($this->editor)->post(route('admin.card-errata.store'), $attributes)->assertRedirect();
+    $card = CardErrata::with('entries')->latest('id')->firstOrFail();
+
+    expect($card->image)->not->toBeNull();
+    Storage::disk('public')->assertExists(str_replace('/storage/', '', $card->image));
+    expect($card->entries->first()->getAttributes())->not->toHaveKeys(['front_image', 'back_image']);
+});
+
+it('preserves the existing card image when a new version is created without a new upload', function () {
+    Storage::fake('public');
+
+    $attributes = $this->cardAttributes;
+    $attributes['image'] = UploadedFile::fake()->image('lucius.png');
+    $this->actingAs($this->editor)->post(route('admin.card-errata.store'), $attributes);
+    $card = CardErrata::latest('id')->firstOrFail();
+    $card->approval->update(['approved_at' => now(), 'approved_by' => $this->editor->id]);
+    $this->actingAs($this->editor)->post(route('admin.card-errata.publish', $card));
+    $card->refresh();
+
+    $updatedAttributes = $this->cardAttributes;
+    $updatedAttributes['existing_image'] = $card->image;
+
+    $this->actingAs($this->editor)->post(route('admin.card-errata.update', $card), $updatedAttributes);
+
+    $draft = CardErrata::where('id', '!=', $card->id)->latest('id')->firstOrFail();
+    expect($draft->image)->toBe($card->image);
+});
+
+it('renders bold and italic markup from entry text as real html, not raw markup or escaped text', function () {
+    $attributes = $this->cardAttributes;
+    $attributes['entries'] = [
+        ['what_changed' => '{{b}}Bold{{/b}} and {{i}}italic{{/i}} text', 'what_it_was' => '', 'what_it_is_now' => ''],
+    ];
+
+    $this->actingAs($this->editor)->post(route('admin.card-errata.store'), $attributes);
+    $card = CardErrata::latest('id')->firstOrFail();
+    $card->approval->update(['approved_at' => now(), 'approved_by' => $this->editor->id]);
+    $this->actingAs($this->editor)->post(route('admin.card-errata.publish', $card));
+
+    $response = $this->get(route('errata.cards.view', $card->fresh()));
+
+    $response->assertInertia(fn ($page) => $page
+        ->where('entries.0.what_changed.0.text', '<strong>Bold</strong> and <i>italic</i> text')
+    );
+});
+
+it('hydrates entry text via the admin preview endpoint without persisting anything', function () {
+    $response = $this->actingAs($this->editor)->post(route('admin.card-errata.preview'), [
+        'card_name' => 'Lucius Mattheson',
+        'faction' => 'guild',
+        'entries' => [
+            ['what_changed' => '{{b}}Bold{{/b}}', 'what_it_was' => 'was', 'what_it_is_now' => 'now'],
+        ],
+    ]);
+
+    $response->assertOk();
+    $response->assertJsonPath('card_name', 'Lucius Mattheson');
+    $response->assertJsonPath('faction_label', 'Guild');
+    $response->assertJsonPath('entries.0.what_changed.0.text', '<strong>Bold</strong>');
+    expect(CardErrata::count())->toBe(0);
 });

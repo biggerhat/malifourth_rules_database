@@ -1,6 +1,7 @@
 <script setup lang='ts'>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -25,10 +26,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import InputError from '@/components/InputError.vue';
-import { CircleX, Plus, Trash2 } from 'lucide-vue-next';
+import { CircleX, Eye, Plus, Trash2 } from 'lucide-vue-next';
 import { Textarea } from '@/components/ui/textarea'
+import SimpleRichTextarea from '@/components/SimpleRichTextarea.vue';
 import { hasPermission } from '@/composables/hasPermission';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import CardErrataView from '@/pages/Errata/CardErrata/CardErrataView.vue';
 
 const props = defineProps({
     cardErrata: {
@@ -59,16 +62,14 @@ function makeEmptyEntry() {
         what_changed: '',
         what_it_was: '',
         what_it_is_now: '',
-        front_image: null,
-        back_image: null,
-        existing_front_image: null,
-        existing_back_image: null,
     };
 }
 
 const form = useForm({
     faction: '',
     card_name: '',
+    image: null,
+    existing_image: null,
     internal_notes: '',
     change_notes: '',
     batch_id: null,
@@ -84,6 +85,7 @@ const back = () => {
 onMounted(() => {
     form.faction = props.cardErrata?.faction ?? '';
     form.card_name = props.cardErrata?.card_name ?? '';
+    form.existing_image = props.cardErrata?.image ?? null;
     form.internal_notes = props.cardErrata?.internal_notes ?? '';
     form.change_notes = props.cardErrata?.published_at ? '' : props.cardErrata?.approval?.change_notes ?? '';
     form.batch_id = props.cardErrata?.published_at ? null : props.cardErrata?.batch_id ?? null;
@@ -93,10 +95,6 @@ onMounted(() => {
             what_changed: entry.what_changed ?? '',
             what_it_was: entry.what_it_was ?? '',
             what_it_is_now: entry.what_it_is_now ?? '',
-            front_image: null,
-            back_image: null,
-            existing_front_image: entry.front_image ?? null,
-            existing_back_image: entry.back_image ?? null,
         }));
     }
 });
@@ -107,6 +105,29 @@ const addEntry = () => {
 
 const removeEntry = (index) => {
     form.entries.splice(index, 1);
+};
+
+const previewData = ref(null);
+
+const fetchPreviewData = () => {
+    axios.post(route('admin.card-errata.preview'), {
+        card_name: form.card_name,
+        faction: form.faction,
+        entries: form.entries.map((entry) => ({
+            what_changed: entry.what_changed,
+            what_it_was: entry.what_it_was,
+            what_it_is_now: entry.what_it_is_now,
+        })),
+    }).then((response) => {
+        previewData.value = {
+            ...JSON.parse(JSON.stringify(response.data)),
+            faction: form.faction,
+            slug: props.cardErrata?.slug ?? '',
+            image: form.image ? URL.createObjectURL(form.image) : form.existing_image,
+            published_at: props.cardErrata?.published_at ?? null,
+            published_by: props.cardErrata?.published_by ?? null,
+        };
+    });
 };
 
 const submitCardErrata = () => {
@@ -162,6 +183,15 @@ const submitCardErrata = () => {
                                 <Input id="card_name" type="text" required autofocus :tabindex="1" autocomplete="off" v-model="form.card_name" placeholder="Card Name" />
                                 <InputError :message="form.errors.card_name" />
                             </div>
+                            <div class="flex flex-col space-y-1.5" v-if="form.existing_image">
+                                <Label>Current Card Image</Label>
+                                <img :src="form.existing_image" :alt="form.card_name" class="w-75" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="image">{{ form.existing_image ? 'New ' : '' }}Card Image</Label>
+                                <Input id="image" type="file" accept=".jpeg,.jpg,.png,.webp" @input="form.image = $event.target.files[0]" />
+                                <InputError :message="form.errors.image" />
+                            </div>
                         </div>
                     </TabsContent>
                     <TabsContent value="entries" force-mount class="data-[state=inactive]:hidden">
@@ -177,36 +207,18 @@ const submitCardErrata = () => {
                                     <div class="grid items-center w-full gap-4">
                                         <div class="flex flex-col space-y-1.5">
                                             <Label :for="`what_changed_${index}`">What Was Changed</Label>
-                                            <Textarea :id="`what_changed_${index}`" class="min-h-24" v-model="entry.what_changed" placeholder="What was changed" />
+                                            <SimpleRichTextarea :id="`what_changed_${index}`" v-model="entry.what_changed" placeholder="What was changed" />
                                             <InputError :message="form.errors[`entries.${index}.what_changed`]" />
                                         </div>
                                         <div class="flex flex-col space-y-1.5">
                                             <Label :for="`what_it_was_${index}`">What It Was</Label>
-                                            <Textarea :id="`what_it_was_${index}`" class="min-h-24" v-model="entry.what_it_was" placeholder="What it was" />
+                                            <SimpleRichTextarea :id="`what_it_was_${index}`" v-model="entry.what_it_was" placeholder="What it was" />
                                             <InputError :message="form.errors[`entries.${index}.what_it_was`]" />
                                         </div>
                                         <div class="flex flex-col space-y-1.5">
                                             <Label :for="`what_it_is_now_${index}`">What It Is Now</Label>
-                                            <Textarea :id="`what_it_is_now_${index}`" class="min-h-24" v-model="entry.what_it_is_now" placeholder="What it is now" />
+                                            <SimpleRichTextarea :id="`what_it_is_now_${index}`" v-model="entry.what_it_is_now" placeholder="What it is now" />
                                             <InputError :message="form.errors[`entries.${index}.what_it_is_now`]" />
-                                        </div>
-                                        <div class="flex flex-col space-y-1.5" v-if="entry.existing_front_image">
-                                            <Label>Current Front Image</Label>
-                                            <img :src="entry.existing_front_image" :alt="form.card_name" class="w-75" />
-                                        </div>
-                                        <div class="flex flex-col space-y-1.5">
-                                            <Label :for="`front_image_${index}`">{{ entry.existing_front_image ? 'New ' : '' }}Front Image</Label>
-                                            <Input :id="`front_image_${index}`" type="file" accept=".jpeg,.jpg,.png,.webp" @input="entry.front_image = $event.target.files[0]" />
-                                            <InputError :message="form.errors[`entries.${index}.front_image`]" />
-                                        </div>
-                                        <div class="flex flex-col space-y-1.5" v-if="entry.existing_back_image">
-                                            <Label>Current Back Image</Label>
-                                            <img :src="entry.existing_back_image" :alt="form.card_name" class="w-75" />
-                                        </div>
-                                        <div class="flex flex-col space-y-1.5">
-                                            <Label :for="`back_image_${index}`">{{ entry.existing_back_image ? 'New ' : '' }}Back Image</Label>
-                                            <Input :id="`back_image_${index}`" type="file" accept=".jpeg,.jpg,.png,.webp" @input="entry.back_image = $event.target.files[0]" />
-                                            <InputError :message="form.errors[`entries.${index}.back_image`]" />
                                         </div>
                                     </div>
                                 </CardContent>
@@ -236,6 +248,27 @@ const submitCardErrata = () => {
         </CardContent>
         <CardFooter>
             <div class="flex ml-auto my-auto">
+                <Drawer v-if="hasPermission('view_card_errata')">
+                    <DrawerTrigger as-child>
+                        <Button class="bg-purple-500 mx-2" @click="fetchPreviewData()">
+                            <Eye class="h-4 w-4" /> Preview
+                        </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                        <div class="mx-auto w-full mt-2 container overflow-y-auto">
+                            <DrawerDescription>
+                                <CardErrataView v-if="previewData" v-bind="previewData" />
+                            </DrawerDescription>
+                            <DrawerFooter>
+                                <DrawerClose as-child>
+                                    <Button type="button" class="mx-auto w-25" variant="destructive">
+                                        Close
+                                    </Button>
+                                </DrawerClose>
+                            </DrawerFooter>
+                        </div>
+                    </DrawerContent>
+                </Drawer>
                 <Drawer>
                     <DrawerTrigger>
                         <Button class="bg-green-500">{{ props.cardErrata ? 'Update' : 'Create' }} Card Errata</Button>

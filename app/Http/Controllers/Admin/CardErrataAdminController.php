@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CardErrataListResource;
 use App\Models\Batch;
 use App\Models\CardErrata;
+use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -31,10 +32,33 @@ class CardErrataAdminController extends Controller
 
         return [
             'faction' => $cardErrata->faction,
+            'faction_label' => FactionEnum::from($cardErrata->faction)->label(),
             'card_name' => $cardErrata->card_name,
-            'entries' => $cardErrata->entries,
+            'slug' => $cardErrata->slug,
+            'image' => $cardErrata->image,
+            'entries' => $cardErrata->entries->map(fn ($entry) => [
+                'id' => $entry->id,
+                'what_changed' => (new ContentBuilder($entry->what_changed ?? ''))->getFullyHydratedContent(),
+                'what_it_was' => (new ContentBuilder($entry->what_it_was ?? ''))->getFullyHydratedContent(),
+                'what_it_is_now' => (new ContentBuilder($entry->what_it_is_now ?? ''))->getFullyHydratedContent(),
+            ]),
             'published_at' => $cardErrata->published_at?->format('m-d-Y'),
             'published_by' => $cardErrata->publishedBy?->name,
+        ];
+    }
+
+    public function preview(Request $request)
+    {
+        $entries = $request->input('entries', []);
+
+        return [
+            'card_name' => $request->get('card_name') ?? '',
+            'faction_label' => $request->get('faction') ? FactionEnum::tryFrom($request->get('faction'))?->label() : '',
+            'entries' => collect($entries)->map(fn ($entry) => [
+                'what_changed' => (new ContentBuilder($entry['what_changed'] ?? ''))->getFullyHydratedContent(),
+                'what_it_was' => (new ContentBuilder($entry['what_it_was'] ?? ''))->getFullyHydratedContent(),
+                'what_it_is_now' => (new ContentBuilder($entry['what_it_is_now'] ?? ''))->getFullyHydratedContent(),
+            ])->values(),
         ];
     }
 
@@ -160,24 +184,28 @@ class CardErrataAdminController extends Controller
             'batch_id' => ['nullable', 'int', 'exists:batches,id'],
             'publish_directly' => ['required', 'boolean'],
             'approve_directly' => ['required', 'boolean'],
+            'image' => self::IMAGE_RULES,
+            'existing_image' => ['nullable', 'string'],
             'entries' => ['required', 'array', 'min:1'],
             'entries.*.what_changed' => ['nullable', 'string'],
             'entries.*.what_it_was' => ['nullable', 'string'],
             'entries.*.what_it_is_now' => ['nullable', 'string'],
-            'entries.*.front_image' => self::IMAGE_RULES,
-            'entries.*.back_image' => self::IMAGE_RULES,
-            'entries.*.existing_front_image' => ['nullable', 'string'],
-            'entries.*.existing_back_image' => ['nullable', 'string'],
         ]);
+
+        $existingImage = $cardErrata?->image;
 
         $publishDirectly = $validated['publish_directly'];
         $approveDirectly = $validated['approve_directly'];
         $changeNotes = $validated['change_notes'] ? preg_replace("/(\r|\n)/", '', nl2br($validated['change_notes'])) : null;
         $entries = $validated['entries'];
 
+        $nameSlug = Str::slug($validated['card_name']);
+        $image = $this->resolveImage($validated['image'] ?? null, $validated['existing_image'] ?? null, $nameSlug);
+
         $cardAttributes = [
             'faction' => $validated['faction'],
             'card_name' => $validated['card_name'],
+            'image' => $image,
             'internal_notes' => $validated['internal_notes'] ?? null,
             'batch_id' => $validated['batch_id'] ?? null,
         ];
@@ -194,22 +222,16 @@ class CardErrataAdminController extends Controller
             } else {
                 $cardAttributes['previous'] = $cardErrata->id;
                 $cardAttributes['original'] = $cardErrata->original ?? $cardErrata->id;
+                $cardAttributes['image'] = $cardAttributes['image'] ?? $existingImage;
                 $cardErrata = CardErrata::create($cardAttributes);
             }
         }
 
-        $nameSlug = Str::slug($cardAttributes['card_name']);
-
         foreach ($entries as $index => $entry) {
-            $frontImage = $this->resolveEntryImage($entry, 'front_image', 'existing_front_image', $nameSlug);
-            $backImage = $this->resolveEntryImage($entry, 'back_image', 'existing_back_image', $nameSlug);
-
             $cardErrata->entries()->create([
                 'what_changed' => $entry['what_changed'] ?? null,
                 'what_it_was' => $entry['what_it_was'] ?? null,
                 'what_it_is_now' => $entry['what_it_is_now'] ?? null,
-                'front_image' => $frontImage,
-                'back_image' => $backImage,
                 'sort_order' => $index,
             ]);
         }
@@ -232,10 +254,8 @@ class CardErrataAdminController extends Controller
         return $cardErrata;
     }
 
-    private function resolveEntryImage(array $entry, string $fileKey, string $existingKey, string $nameSlug): ?string
+    private function resolveImage(mixed $file, ?string $existing, string $nameSlug): ?string
     {
-        $file = $entry[$fileKey] ?? null;
-
         if ($file) {
             $extension = $file->extension();
             $uuid = Str::uuid();
@@ -246,15 +266,15 @@ class CardErrataAdminController extends Controller
             return '/storage/'.$filePath;
         }
 
-        return $entry[$existingKey] ?? null;
+        return $existing;
     }
 
     private function buildSearchableText(CardErrata $cardErrata): string
     {
         $entryText = $cardErrata->entries()->get()->flatMap(fn ($entry) => [
-            $entry->what_changed,
-            $entry->what_it_was,
-            $entry->what_it_is_now,
+            ContentBuilder::toSearchable($entry->what_changed ?? ''),
+            ContentBuilder::toSearchable($entry->what_it_was ?? ''),
+            ContentBuilder::toSearchable($entry->what_it_is_now ?? ''),
         ]);
 
         return collect([$cardErrata->card_name, $cardErrata->faction])

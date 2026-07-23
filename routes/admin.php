@@ -198,6 +198,7 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     Route::controller(CardErrataAdminController::class)->prefix('card-errata')->name('card-errata.')->group(function () {
         Route::get('/', 'index')->name('index')->middleware(['permission:view_card_errata']);
         Route::get('/view/{cardErrata}', 'view')->name('view')->middleware(['permission:view_card_errata']);
+        Route::post('/preview', 'preview')->name('preview')->middleware(['permission:view_card_errata']);
         Route::get('/list', 'list')->name('list');
         Route::get('/create', 'create')->name('create')->middleware(['permission:add_card_errata']);
         Route::get('/edit/{cardErrata}', 'edit')->name('edit')->middleware(['permission:edit_card_errata']);

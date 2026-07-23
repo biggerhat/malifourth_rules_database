@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,12 +25,13 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import InputError from "@/components/InputError.vue";
-import {CircleX} from "lucide-vue-next";
+import {CircleX, Eye} from "lucide-vue-next";
 import { Textarea } from '@/components/ui/textarea'
 import {hasPermission} from "@/composables/hasPermission";
 import axios from "axios";
 import DraggableContent from "@/components/DraggableContent.vue";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import ErrataView from "@/pages/Errata/ErrataView.vue";
 
 const props = defineProps({
     errata: {
@@ -124,6 +125,17 @@ const contentUpdate = (newOrder) => { form.content = newOrder; };
 const contentNewContent = (content) => { form.content = content; fetchViewData(); };
 const changeNotesUpdate = (newOrder) => { form.change_notes = newOrder; };
 const changeNotesNewContent = (content) => { form.change_notes = content; fetchViewData(); };
+
+const previewData = computed(() => ({
+    errata: {
+        title: viewData.value?.title ?? form.title,
+        slug: props.errata?.slug ?? '',
+        content: viewData.value?.content ?? [],
+        published_at: props.errata?.published_at ?? null,
+        published_by: props.errata?.published_by ?? null,
+    },
+    references: null,
+}));
 </script>
 
 <template>
@@ -201,6 +213,27 @@ const changeNotesNewContent = (content) => { form.change_notes = content; fetchV
         </CardContent>
         <CardFooter>
             <div class="flex ml-auto my-auto">
+                <Drawer v-if="hasPermission('view_errata')">
+                    <DrawerTrigger as-child>
+                        <Button class="bg-purple-500 mx-2" @click="fetchViewData()">
+                            <Eye class="h-4 w-4" /> Preview
+                        </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                        <div class="mx-auto w-full mt-2 container overflow-y-auto">
+                            <DrawerDescription>
+                                <ErrataView v-bind="previewData" />
+                            </DrawerDescription>
+                            <DrawerFooter>
+                                <DrawerClose as-child>
+                                    <Button type="button" class="mx-auto w-25" variant="destructive">
+                                        Close
+                                    </Button>
+                                </DrawerClose>
+                            </DrawerFooter>
+                        </div>
+                    </DrawerContent>
+                </Drawer>
                 <Drawer>
                     <DrawerTrigger>
                         <Button class="bg-green-500">{{ props.errata ? 'Update' : 'Create' }} Errata</Button>

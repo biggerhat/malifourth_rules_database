@@ -39,8 +39,8 @@ it('renders a single published card with its entries', function () {
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
-        ->where('card.card_name', 'Lucius Mattheson')
-        ->where('card.entries.0.what_changed', 'Reduced defense')
+        ->where('card_name', 'Lucius Mattheson')
+        ->where('entries.0.what_changed.0.text', 'Reduced defense')
     );
 });
 

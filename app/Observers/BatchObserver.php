@@ -36,6 +36,6 @@ class BatchObserver
     public function deleted(Batch $batch): void
     {
         $batch->loadMissing('approval');
-        $batch->approval->delete();
+        $batch->approval?->delete();
     }
 }

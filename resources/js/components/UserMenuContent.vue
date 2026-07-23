@@ -91,6 +91,12 @@ defineProps<Props>();
                 Errata
             </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true" v-if="hasPermission('view_card_errata')">
+            <Link class="block w-full" :href="route('admin.card-errata.index')" prefetch as="button">
+                <PencilRuler class="mr-2 h-4 w-4" />
+                Card Errata
+            </Link>
+        </DropdownMenuItem>
     </DropdownMenuGroup>
     <DropdownMenuSeparator />
     <DropdownMenuGroup>

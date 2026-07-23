@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use App\Models\Batch;
+use App\Models\CardErrata;
 use App\Models\Errata;
 use App\Models\Faq;
 use App\Models\Index;
@@ -30,12 +31,14 @@ enum ApprovablesEnum: string
     case SeasonPage = 'season_page';
     case Faq = 'faq';
     case Errata = 'errata';
+    case CardErrata = 'card_errata';
 
     public static function fromClass(string $className): ?self
     {
         return match ($className) {
             Batch::class => self::Batch,
             Errata::class => self::Errata,
+            CardErrata::class => self::CardErrata,
             Faq::class => self::Faq,
             Index::class => self::Index,
             Page::class => self::Page,
@@ -61,6 +64,7 @@ enum ApprovablesEnum: string
             self::SeasonPage => 'admin.season-pages',
             self::Strategy => 'admin.strategies',
             self::Errata => 'admin.errata',
+            self::CardErrata => 'admin.card-errata',
         };
     }
 

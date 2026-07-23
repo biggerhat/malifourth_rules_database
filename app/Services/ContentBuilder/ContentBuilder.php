@@ -98,6 +98,8 @@ class ContentBuilder
 
     public static function parseTitleTags(string $title): string
     {
+        $escaped = htmlspecialchars($title, ENT_NOQUOTES, 'UTF-8');
+
         $search = [];
         $replace = [];
 
@@ -106,7 +108,7 @@ class ContentBuilder
             $replace[] = '<span class="font-[symbolFont] text-2xl">'.$char.'</span>';
         }
 
-        return str_replace($search, $replace, $title);
+        return str_replace($search, $replace, $escaped);
     }
 
     public static function removeInlineTags(string $content): string
@@ -219,7 +221,8 @@ class ContentBuilder
 
     private function parseBasicElements(): string
     {
-        $nl2br = nl2br($this->stringContent);
+        $escaped = htmlspecialchars($this->stringContent, ENT_NOQUOTES, 'UTF-8');
+        $nl2br = nl2br($escaped);
 
         return str_replace([
             '{{b}}',

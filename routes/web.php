@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CommandController;
 use App\Http\Controllers\IndexController as IndexPageController;
+use App\Http\Controllers\Rules\CardErrataController;
 use App\Http\Controllers\Rules\ErrataController;
 use App\Http\Controllers\Rules\FaqController;
 use App\Http\Controllers\Rules\GainingGroundsController;
@@ -9,9 +10,17 @@ use App\Http\Controllers\Rules\IndexController;
 use App\Http\Controllers\Rules\PageController;
 use App\Http\Controllers\Rules\SearchController;
 use App\Http\Controllers\Rules\SectionController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/command', CommandController::class)->name('command');
+
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+
+Route::get('/robots.txt', function () {
+    return response("User-agent: *\nDisallow:\nSitemap: ".route('sitemap')."\n")
+        ->header('Content-Type', 'text/plain');
+})->name('robots');
 
 Route::get('/', IndexPageController::class)->name('index');
 
@@ -49,6 +58,13 @@ Route::get('/search', [SearchController::class, 'view'])->name('search');
 
 Route::get('/errata', [ErrataController::class, 'index'])->name('errata.index');
 Route::get('/errata/batch/{batch}', [ErrataController::class, 'viewBatch'])->name('errata.batch');
+
+Route::prefix('errata/cards')->name('errata.cards.')->group(function () {
+    Route::get('/', [CardErrataController::class, 'index'])->name('index');
+    Route::get('/{cardErrata}', [CardErrataController::class, 'view'])->name('view')->withTrashed();
+    Route::get('/{cardErrata}/history', [CardErrataController::class, 'viewHistory'])->name('history')->withTrashed();
+});
+
 Route::get('/errata/{errata}', [ErrataController::class, 'view'])->name('errata.view')->withTrashed();
 Route::get('/errata/{errata}/history', [ErrataController::class, 'viewHistory'])->name('errata.history')->withTrashed();
 

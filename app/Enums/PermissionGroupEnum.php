@@ -22,5 +22,6 @@ enum PermissionGroupEnum: string
     case SeasonPage = 'season_page';
     case Faq = 'faq';
     case Errata = 'errata';
+    case CardErrata = 'card_errata';
     case NavigationItem = 'navigation_item';
 }

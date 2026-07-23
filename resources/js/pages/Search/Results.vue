@@ -111,7 +111,7 @@ const groups = computed<ResultGroup[]>(() => {
                 id: f.id,
                 type: 'FAQ',
                 title: f.title,
-                htmlTitle: true,
+                htmlTitle: false,
                 snippet: f.snippet,
                 href: route('rules.faq.view', f.slug),
             })),

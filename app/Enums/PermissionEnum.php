@@ -160,6 +160,19 @@ enum PermissionEnum: string
     #[PermissionGroup(PermissionGroupEnum::Errata)]
     case PublishErrata = 'publish_errata';
 
+    #[PermissionGroup(PermissionGroupEnum::CardErrata)]
+    case ViewCardErrata = 'view_card_errata';
+    #[PermissionGroup(PermissionGroupEnum::CardErrata)]
+    case AddCardErrata = 'add_card_errata';
+    #[PermissionGroup(PermissionGroupEnum::CardErrata)]
+    case EditCardErrata = 'edit_card_errata';
+    #[PermissionGroup(PermissionGroupEnum::CardErrata)]
+    case DeleteCardErrata = 'delete_card_errata';
+    #[PermissionGroup(PermissionGroupEnum::CardErrata)]
+    case ApproveCardErrata = 'approve_card_errata';
+    #[PermissionGroup(PermissionGroupEnum::CardErrata)]
+    case PublishCardErrata = 'publish_card_errata';
+
     #[PermissionGroup(PermissionGroupEnum::NavigationItem)]
     case ViewNavigationItem = 'view_navigation_item';
     #[PermissionGroup(PermissionGroupEnum::NavigationItem)]

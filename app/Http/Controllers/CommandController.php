@@ -13,10 +13,18 @@ use App\Models\Strategy;
 use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CommandController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
+    {
+        $data = Cache::remember('command-search-index', 300, fn () => $this->buildIndex());
+
+        return response()->json($data);
+    }
+
+    private function buildIndex(): array
     {
         $pages = Page::published()->orderBy('title', 'ASC')->get()->map(function (Page $page) {
             return [
@@ -82,7 +90,7 @@ class CommandController extends Controller
             ];
         });
 
-        return response()->json([
+        return [
             'pages' => $pages,
             'sections' => $sections,
             'indices' => $indices,
@@ -91,6 +99,6 @@ class CommandController extends Controller
             'strategies' => $strategies,
             'schemes' => $schemes,
             'errata' => $errata,
-        ]);
+        ];
     }
 }

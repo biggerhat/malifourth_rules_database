@@ -2,6 +2,7 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import Card from "@/components/ui/card/Card.vue";
 import CardContent from "@/components/ui/card/CardContent.vue";
 import CardHeader from "@/components/ui/card/CardHeader.vue";
@@ -40,6 +41,13 @@ const props = defineProps({
         required: false,
         default() {
             return '';
+        }
+    },
+    meta_description: {
+        type: String,
+        required: false,
+        default() {
+            return null;
         }
     },
     slug: {
@@ -139,7 +147,7 @@ watch(pageParam, () => {
 </script>
 
 <template>
-    <Head :title="props.title_text || props.title" />
+    <SeoHead :title="props.title_text || props.title" :description="props.meta_description" />
 
     <div class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
         <div v-if="!props.viewing_old_version" class="lg:col-span-2 hidden lg:block">

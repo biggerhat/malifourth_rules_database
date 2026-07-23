@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Rules;
 use App\Enums\FactionEnum;
 use App\Http\Controllers\Controller;
 use App\Models\CardErrata;
+use App\Services\ContentBuilder\ContentBuilder;
 use Illuminate\Http\Request;
 
 class CardErrataController extends Controller
@@ -20,7 +21,10 @@ class CardErrataController extends Controller
                 'faction' => $card->faction,
                 'card_name' => $card->card_name,
                 'slug' => $card->slug,
-                'entry_summaries' => $card->entries->map(fn ($entry) => $entry->what_changed)->filter()->values(),
+                'entry_summaries' => $card->entries
+                    ->map(fn ($entry) => ContentBuilder::toPlainText($entry->what_changed ?? ''))
+                    ->filter()
+                    ->values(),
             ])
             ->groupBy('faction');
 
@@ -75,15 +79,19 @@ class CardErrataController extends Controller
         $cardErrata->loadMissing('entries');
 
         return inertia('Errata/CardErrata/CardErrataView', array_merge([
-            'card' => [
-                'faction' => $cardErrata->faction,
-                'faction_label' => FactionEnum::from($cardErrata->faction)->label(),
-                'card_name' => $cardErrata->card_name,
-                'slug' => $cardErrata->slug,
-                'entries' => $cardErrata->entries,
-                'published_at' => $cardErrata->published_at->format('m-d-Y'),
-                'published_by' => $cardErrata->publishedBy?->name,
-            ],
+            'faction' => $cardErrata->faction,
+            'faction_label' => FactionEnum::from($cardErrata->faction)->label(),
+            'card_name' => $cardErrata->card_name,
+            'slug' => $cardErrata->slug,
+            'image' => $cardErrata->image,
+            'entries' => $cardErrata->entries->map(fn ($entry) => [
+                'id' => $entry->id,
+                'what_changed' => (new ContentBuilder($entry->what_changed ?? ''))->getFullyHydratedContent(),
+                'what_it_was' => (new ContentBuilder($entry->what_it_was ?? ''))->getFullyHydratedContent(),
+                'what_it_is_now' => (new ContentBuilder($entry->what_it_is_now ?? ''))->getFullyHydratedContent(),
+            ]),
+            'published_at' => $cardErrata->published_at?->format('m-d-Y'),
+            'published_by' => $cardErrata->publishedBy?->name,
         ], $extra));
     }
 }

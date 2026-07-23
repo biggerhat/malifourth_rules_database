@@ -1,18 +1,67 @@
 <script setup lang="ts">
+import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
 import SeoHead from "@/components/SeoHead.vue";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-} from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ChevronLeft } from "lucide-vue-next";
 
 const props = defineProps({
-    card: {
-        type: Object,
-        required: true,
+    faction: {
+        type: String,
+        required: false,
+        default() {
+            return '';
+        }
+    },
+    faction_label: {
+        type: String,
+        required: false,
+        default() {
+            return '';
+        }
+    },
+    card_name: {
+        type: String,
+        required: false,
+        default() {
+            return '';
+        }
+    },
+    slug: {
+        type: String,
+        required: false,
+        default() {
+            return '';
+        }
+    },
+    image: {
+        type: String,
+        required: false,
+        default() {
+            return null;
+        }
+    },
+    entries: {
+        type: [Object, Array],
+        required: false,
+        default() {
+            return [];
+        }
+    },
+    published_at: {
+        type: String,
+        required: false,
+        default() {
+            return null;
+        }
+    },
+    published_by: {
+        type: String,
+        required: false,
+        default() {
+            return null;
+        }
     },
     viewing_old_version: {
         type: Boolean,
@@ -32,7 +81,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <SeoHead :title="`${props.card.card_name} Errata`" :description="`Card errata for ${props.card.card_name} (${props.card.faction_label})`" />
+    <SeoHead :title="`${props.card_name} Errata`" :description="`Card errata for ${props.card_name} (${props.faction_label})`" />
 
     <div class="max-w-4xl mx-auto px-2 sm:px-4 text-primary leading-6 text-md">
         <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">
@@ -56,43 +105,44 @@ const props = defineProps({
         <!-- Banner -->
         <div class="w-full text-center text-xl py-4">
             <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-            <span>{{ props.card.card_name }}</span>
+            <span>{{ props.card_name }}</span>
             <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
         </div>
-        <p class="text-center text-sm text-muted-foreground capitalize -mt-2 mb-4">{{ props.card.faction_label }}</p>
+        <p class="text-center text-sm text-muted-foreground capitalize -mt-2 mb-4">{{ props.faction_label }}</p>
 
-        <Card v-for="(entry, index) in props.card.entries" :key="entry.id ?? index" class="mb-6">
-            <CardHeader>
-                <h3 class="font-medium">Errata {{ index + 1 }}</h3>
-            </CardHeader>
+        <Card class="mb-8">
             <CardContent class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                    <div v-if="entry.what_changed">
-                        <div class="text-xs uppercase text-muted-foreground font-semibold mb-1">What Changed</div>
-                        <p>{{ entry.what_changed }}</p>
+                <div class="space-y-6">
+                    <div v-for="(entry, index) in props.entries" :key="entry.id ?? index" :class="index > 0 ? 'pt-6 border-t' : ''">
+                        <h3 class="font-medium mb-2">Errata {{ index + 1 }}</h3>
+                        <div v-if="entry.what_changed?.length" class="mb-3">
+                            <div class="text-xs uppercase text-muted-foreground font-semibold mb-1">What Changed</div>
+                            <ParsedContent :content="entry.what_changed" />
+                        </div>
+                        <div v-if="entry.what_it_was?.length" class="mb-3">
+                            <div class="text-xs uppercase text-muted-foreground font-semibold mb-1">What It Was</div>
+                            <ParsedContent :content="entry.what_it_was" />
+                        </div>
+                        <div v-if="entry.what_it_is_now?.length" class="mb-3">
+                            <div class="text-xs uppercase text-muted-foreground font-semibold mb-1">What It Is Now</div>
+                            <ParsedContent :content="entry.what_it_is_now" />
+                        </div>
                     </div>
-                    <div v-if="entry.what_it_was">
-                        <div class="text-xs uppercase text-muted-foreground font-semibold mb-1">What It Was</div>
-                        <p>{{ entry.what_it_was }}</p>
-                    </div>
-                    <div v-if="entry.what_it_is_now">
-                        <div class="text-xs uppercase text-muted-foreground font-semibold mb-1">What It Is Now</div>
-                        <p>{{ entry.what_it_is_now }}</p>
+                    <div v-if="!props.entries?.length" class="text-sm text-muted-foreground">
+                        No errata entries recorded for this card.
                     </div>
                 </div>
-                <div class="flex flex-col gap-4" v-if="entry.front_image || entry.back_image">
-                    <img v-if="entry.front_image" :src="entry.front_image" :alt="`${props.card.card_name} front`" class="rounded-md border w-full" />
-                    <img v-if="entry.back_image" :src="entry.back_image" :alt="`${props.card.card_name} back`" class="rounded-md border w-full" />
+                <div>
+                    <img v-if="props.image" :src="props.image" :alt="props.card_name" class="rounded-md border w-full" />
+                    <div v-else class="rounded-md border border-dashed h-full min-h-40 flex items-center justify-center text-sm text-muted-foreground">
+                        No card image
+                    </div>
                 </div>
             </CardContent>
         </Card>
 
-        <div v-if="!props.card.entries?.length" class="rounded-lg border border-dashed py-10 text-center mb-6">
-            <p class="text-sm text-muted-foreground">No errata entries recorded for this card.</p>
-        </div>
-
-        <div v-if="!props.viewing_old_version" class="text-xs text-muted-foreground text-right mb-8">
-            Last updated {{ props.card.published_at }} by {{ props.card.published_by }}
+        <div v-if="!props.viewing_old_version && props.published_at" class="text-xs text-muted-foreground text-right mb-8">
+            Last updated {{ props.published_at }} by {{ props.published_by }}
         </div>
 
         <ScrollToTop />

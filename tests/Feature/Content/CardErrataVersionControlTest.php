@@ -206,6 +206,29 @@ it('renders bold and italic markup from entry text as real html, not raw markup 
     );
 });
 
+it('parses game symbol tags in entry text into structured nodes the frontend can render as icons', function () {
+    $attributes = $this->cardAttributes;
+    $attributes['entries'] = [
+        ['what_changed' => 'Gains {{crow /}} and {{ram /}} on this attack', 'what_it_was' => '', 'what_it_is_now' => ''],
+    ];
+
+    $this->actingAs($this->editor)->post(route('admin.card-errata.store'), $attributes);
+    $card = CardErrata::latest('id')->firstOrFail();
+    $card->approval->update(['approved_at' => now(), 'approved_by' => $this->editor->id]);
+    $this->actingAs($this->editor)->post(route('admin.card-errata.publish', $card));
+
+    $response = $this->get(route('errata.cards.view', $card->fresh()));
+
+    $response->assertInertia(fn ($page) => $page
+        ->has('entries.0.what_changed', 5)
+        ->where('entries.0.what_changed.0.text', 'Gains ')
+        ->where('entries.0.what_changed.1.crow.inline', true)
+        ->where('entries.0.what_changed.2.text', ' and ')
+        ->where('entries.0.what_changed.3.ram.inline', true)
+        ->where('entries.0.what_changed.4.text', ' on this attack')
+    );
+});
+
 it('hydrates entry text via the admin preview endpoint without persisting anything', function () {
     $response = $this->actingAs($this->editor)->post(route('admin.card-errata.preview'), [
         'card_name' => 'Lucius Mattheson',

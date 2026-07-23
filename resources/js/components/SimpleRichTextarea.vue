@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { Bold, Italic } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
+import { SymbolBar } from '@/components/editor';
 
 const props = defineProps({
     modelValue: {
@@ -55,17 +56,39 @@ function wrap(openTag, closeTag) {
         el.setSelectionRange(start + openTag.length, start + openTag.length + selected.length);
     });
 }
+
+function insertSymbol(tag) {
+    const el = textareaRef.value;
+    if (!el) return;
+
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const value = props.modelValue ?? '';
+    const insertion = `{{${tag} /}}`;
+    const newValue = value.slice(0, start) + insertion + value.slice(end);
+
+    emit('update:modelValue', newValue);
+
+    requestAnimationFrame(() => {
+        el.focus();
+        const newCaret = start + insertion.length;
+        el.setSelectionRange(newCaret, newCaret);
+    });
+}
 </script>
 
 <template>
     <div>
-        <div class="flex gap-1 mb-1">
-            <Button type="button" size="sm" variant="outline" @click="wrap('{{b}}', '{{/b}}')">
-                <Bold class="h-4 w-4" />
-            </Button>
-            <Button type="button" size="sm" variant="outline" @click="wrap('{{i}}', '{{/i}}')">
-                <Italic class="h-4 w-4" />
-            </Button>
+        <div class="flex items-center gap-2 mb-1 flex-wrap">
+            <div class="flex gap-1">
+                <Button type="button" size="sm" variant="outline" @click="wrap('{{b}}', '{{/b}}')">
+                    <Bold class="h-4 w-4" />
+                </Button>
+                <Button type="button" size="sm" variant="outline" @click="wrap('{{i}}', '{{/i}}')">
+                    <Italic class="h-4 w-4" />
+                </Button>
+            </div>
+            <SymbolBar class="mb-0" @insert-tag="insertSymbol" />
         </div>
         <textarea
             :id="id"

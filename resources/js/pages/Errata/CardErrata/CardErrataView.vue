@@ -111,7 +111,7 @@ const props = defineProps({
         <p class="text-center text-sm text-muted-foreground capitalize -mt-2 mb-4">{{ props.faction_label }}</p>
 
         <Card class="mb-8">
-            <CardContent class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 <div class="space-y-6">
                     <div v-for="(entry, index) in props.entries" :key="entry.id ?? index" :class="index > 0 ? 'pt-6 border-t' : ''">
                         <h3 class="font-medium mb-2">Errata {{ index + 1 }}</h3>
@@ -132,9 +132,9 @@ const props = defineProps({
                         No errata entries recorded for this card.
                     </div>
                 </div>
-                <div>
+                <div class="md:sticky md:top-4">
                     <img v-if="props.image" :src="props.image" :alt="props.card_name" class="rounded-md border w-full" />
-                    <div v-else class="rounded-md border border-dashed h-full min-h-40 flex items-center justify-center text-sm text-muted-foreground">
+                    <div v-else class="rounded-md border border-dashed h-40 flex items-center justify-center text-sm text-muted-foreground">
                         No card image
                     </div>
                 </div>

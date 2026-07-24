@@ -142,7 +142,7 @@ const clearSelection = () => { rowSelection.value = {} };
             <Input class="max-w-sm" placeholder="Search..."
                    v-model="globalFilter" />
             <div class="flex gap-1">
-                <Button @click="router.get(route('admin.pages.order.index'))" v-if="hasPermission('edit_page')" class="bg-blue-500">
+                <Button @click="router.get(route('admin.pages.order.index'))" v-if="hasPermission('edit_page')" variant="outline">
                     Set Page Order
                 </Button>
                 <Button @click="router.get(route('admin.pages.create'))" v-if="hasPermission('add_page')">

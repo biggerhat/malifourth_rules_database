@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ref, onMounted, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -101,7 +102,10 @@ onMounted(() => {
     fetchViewData();
 });
 
+const { markSubmitting } = useUnsavedChangesWarning(form);
+
 const submitErrata = () => {
+    markSubmitting();
     if (props.errata) {
         form.post(route('admin.errata.update', {errata: props.errata.slug}));
     } else {
@@ -213,7 +217,7 @@ const previewData = computed(() => ({
             <div class="flex ml-auto my-auto">
                 <Drawer>
                     <DrawerTrigger as-child>
-                        <Button class="bg-purple-500 mx-2" @click="fetchViewData()">
+                        <Button variant="outline" class="mx-2" @click="fetchViewData()">
                             <Eye class="h-4 w-4" /> Preview
                         </Button>
                     </DrawerTrigger>
@@ -234,7 +238,7 @@ const previewData = computed(() => ({
                 </Drawer>
                 <Drawer>
                     <DrawerTrigger>
-                        <Button class="bg-green-500">{{ props.errata ? 'Update' : 'Create' }} Errata</Button>
+                        <Button>{{ props.errata ? 'Update' : 'Create' }} Errata</Button>
                     </DrawerTrigger>
                     <DrawerContent class="max-w-lg mx-auto">
                         <DrawerHeader>

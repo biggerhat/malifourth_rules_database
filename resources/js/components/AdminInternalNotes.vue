@@ -32,7 +32,7 @@ const props = defineProps({
     <Drawer>
         <DrawerTrigger as-child>
             <div class="w-full hover:cursor-pointer">
-                {{ props.title }} <Info class="inline-block text-green-500 pb-2" />
+                {{ props.title }} <Info class="inline-block text-primary pb-2" />
             </div>
         </DrawerTrigger>
         <DrawerContent>

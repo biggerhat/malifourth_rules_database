@@ -268,8 +268,8 @@ const insertTooltip = () => {
             v-model="text"
         ></textarea>
         <div class="flex justify-end my-1">
-            <Check class="text-green-500 w-6 h-6 p-1 border rounded bg-secondary mr-2" @click="save" />
-            <X class="text-red-500 w-6 h-6 p-1 border rounded bg-secondary" @click="closeEditor" />
+            <Check class="text-primary w-6 h-6 p-1 border border-border rounded bg-secondary mr-2" @click="save" />
+            <X class="text-muted-foreground w-6 h-6 p-1 border border-border rounded bg-secondary" @click="closeEditor" />
         </div>
     </div>
 </template>

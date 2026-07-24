@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ref, onMounted } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -93,7 +94,10 @@ onMounted(() => {
     form.batch_id = props.section?.published_at ? null : props.section?.batch_id ?? null;
 });
 
+const { markSubmitting } = useUnsavedChangesWarning(form);
+
 const submitSection = () => {
+    markSubmitting();
     if (props.section) {
         form.post(route('admin.sections.update', {section: props.section.slug}));
     } else {
@@ -247,7 +251,7 @@ const replaceBrWithNewline = (text) => {
             <div class="flex ml-auto my-auto">
                 <Drawer v-if="hasPermission('view_section')">
                     <DrawerTrigger as-child>
-                        <Button class="bg-purple-500 mx-2" @click="fetchViewData()">
+                        <Button variant="outline" class="mx-2" @click="fetchViewData()">
                             <Eye class="h-4 w-4" /> Preview
                         </Button>
                     </DrawerTrigger>
@@ -272,7 +276,7 @@ const replaceBrWithNewline = (text) => {
                 </Drawer>
                 <Drawer>
                     <DrawerTrigger>
-                        <Button class="bg-green-500">{{ props.section ? 'Update' : 'Create' }} Section</Button>
+                        <Button>{{ props.section ? 'Update' : 'Create' }} Section</Button>
                     </DrawerTrigger>
                     <DrawerContent class="max-w-lg mx-auto">
                         <DrawerHeader>

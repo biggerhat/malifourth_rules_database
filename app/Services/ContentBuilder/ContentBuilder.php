@@ -240,6 +240,9 @@ class ContentBuilder
             '{{/sm}}',
             '{{xs}}',
             '{{/xs}}',
+            '&lt;br /&gt;',
+            '&lt;br/&gt;',
+            '&lt;br&gt;',
         ], [
             '<strong>',
             '</strong>',
@@ -256,6 +259,9 @@ class ContentBuilder
             '</span>',
             '<span class="text-xs">',
             '</span>',
+            '<br />',
+            '<br />',
+            '<br />',
         ], $nl2br);
     }
 

@@ -10,7 +10,7 @@ import UserMenuContent from '@/components/UserMenuContent.vue';
 import { getInitials } from '@/composables/useInitials';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, LayoutGrid, Menu, Search } from 'lucide-vue-next';
+import { LayoutGrid, Menu, Search } from 'lucide-vue-next';
 import {computed, onMounted, onUnmounted, ref} from 'vue';
 import { router } from "@inertiajs/vue3";
 import {
@@ -22,14 +22,6 @@ import {
     CommandList,
     CommandSeparator,
 } from '@/components/ui/command'
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import axios from 'axios';
 
 interface Props {
@@ -42,6 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const open = ref(false);
 const commandSearch = ref({});
+const commandLoading = ref(false);
 
 const commandRoute = (route) => {
     router.get(route);
@@ -51,10 +44,14 @@ const commandRoute = (route) => {
 const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 
 function toggleDialog() {
-    if (!commandSearch.value.length) {
+    if (!Object.keys(commandSearch.value).length) {
+        commandLoading.value = true;
         axios.get(route('command'))
             .then(function (response) {
                 commandSearch.value = response.data;
+            })
+            .finally(function () {
+                commandLoading.value = false;
             });
     }
     open.value = true;
@@ -83,20 +80,6 @@ const isCurrentRoute = computed(() => (url: string) => route().current(url));
 const activeItemStyles = computed(
     () => (url: string) => (isCurrentRoute.value(url) ? 'text-primary bg-accent' : ''),
 );
-
-const queryString = ref('');
-const searchOpen = ref(false);
-const generalSearch = () => {
-    if (queryString.value.length === 0) {
-        return;
-    }
-
-    router.get(route('search'), {q: queryString.value}, {
-        preserveState: true,
-        replace: true,
-    });
-    searchOpen.value = false;
-}
 
 const staticNavItems: NavItem[] = [
     {
@@ -239,33 +222,17 @@ const rightNavItems: NavItem[] = [];
 
                 <div class="ml-auto flex items-center space-x-2">
                     <div class="relative flex items-center space-x-1">
-                        <Dialog v-model:open="searchOpen">
-                            <DialogTrigger as-child>
-                                <Button variant="ghost" size="icon" class="group h-9 w-9 cursor-pointer">
-                                    <Search class="size-5 opacity-80 group-hover:opacity-100" />
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent class="sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Search</DialogTitle>
-<!--                                    <DialogDescription>-->
-<!--                                        Make changes to your profile here. Click save when you're done.-->
-<!--                                    </DialogDescription>-->
-                                </DialogHeader>
-                                <div class="relative w-full max-w-sm items-center">
-                                    <Input id="search" type="text" placeholder="Search..." class="pl-10" @keydown.enter="generalSearch" v-model="queryString" />
-                                    <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2">
-                                        <Search class="size-6 text-muted-foreground" />
-                                    </span>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                        <Button variant="ghost" size="icon" class="group h-9 w-9 cursor-pointer" @click="toggleDialog">
-                            <BookOpen class="size-5 opacity-80 group-hover:opacity-100" />
-                        </Button>
-                        <kbd class="hidden lg:inline-flex items-center rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground" @click="toggleDialog">
-                            {{ isMac ? '⌘K' : 'Ctrl K' }}
-                        </kbd>
+                        <button
+                            type="button"
+                            class="group flex h-9 items-center gap-2 rounded-md border border-border bg-muted/50 px-2.5 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground cursor-pointer"
+                            @click="toggleDialog"
+                        >
+                            <Search class="size-4 opacity-80 group-hover:opacity-100" />
+                            <span class="hidden sm:inline">Search</span>
+                            <kbd class="hidden lg:inline-flex items-center rounded border border-border bg-background px-1.5 font-mono text-[10px] text-muted-foreground">
+                                {{ isMac ? '⌘K' : 'Ctrl K' }}
+                            </kbd>
+                        </button>
 
                         <div class="hidden space-x-1 lg:flex">
 
@@ -323,54 +290,60 @@ const rightNavItems: NavItem[] = [];
         <CommandDialog v-model:open="open">
             <CommandInput placeholder="Search for a topic..." />
             <CommandList>
-                <CommandEmpty>No results found.</CommandEmpty>
+                <div v-if="commandLoading" class="py-6 text-center text-sm text-muted-foreground">Loading&hellip;</div>
+                <CommandEmpty v-else>No results found.</CommandEmpty>
                 <CommandGroup heading="Pages">
-                    <CommandItem v-for="page in commandSearch.pages" v-bind:key="page.slug" @select="commandRoute(page.route)" value="page.slug">
+                    <CommandItem v-for="page in commandSearch.pages" v-bind:key="page.slug" @select="commandRoute(page.route)" :value="page.slug">
                         <span v-html="page.title"></span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Sections">
-                    <CommandItem v-for="section in commandSearch.sections" v-bind:key="section.slug" @select="commandRoute(section.route)" value="section.slug">
+                    <CommandItem v-for="section in commandSearch.sections" v-bind:key="section.slug" @select="commandRoute(section.route)" :value="section.slug">
                         <span v-html="section.title"></span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Indices">
-                    <CommandItem v-for="index in commandSearch.indices" v-bind:key="index.slug" @select="commandRoute(index.route)" value="index.slug">
+                    <CommandItem v-for="index in commandSearch.indices" v-bind:key="index.slug" @select="commandRoute(index.route)" :value="index.slug">
                         <span v-html="index.title"></span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="FAQs">
-                    <CommandItem v-for="faq in commandSearch.faqs" v-bind:key="faq.slug" @select="commandRoute(faq.route)" value="faq.slug">
+                    <CommandItem v-for="faq in commandSearch.faqs" v-bind:key="faq.slug" @select="commandRoute(faq.route)" :value="faq.slug">
                         <span>{{ faq.title }}</span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Gaining Grounds">
-                    <CommandItem v-for="season in commandSearch.seasons" v-bind:key="season.slug" @select="commandRoute(season.route)" value="season.slug">
+                    <CommandItem v-for="season in commandSearch.seasons" v-bind:key="season.slug" @select="commandRoute(season.route)" :value="season.slug">
                         <span>{{ season.title }}</span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Strategies">
-                    <CommandItem v-for="strategy in commandSearch.strategies" v-bind:key="strategy.slug" @select="commandRoute(strategy.route)" value="strategy.slug">
+                    <CommandItem v-for="strategy in commandSearch.strategies" v-bind:key="strategy.slug" @select="commandRoute(strategy.route)" :value="strategy.slug">
                         <span>{{ strategy.title }}</span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Schemes">
-                    <CommandItem v-for="scheme in commandSearch.schemes" v-bind:key="scheme.slug" @select="commandRoute(scheme.route)" value="scheme.slug">
+                    <CommandItem v-for="scheme in commandSearch.schemes" v-bind:key="scheme.slug" @select="commandRoute(scheme.route)" :value="scheme.slug">
                         <span>{{ scheme.title }}</span>
                     </CommandItem>
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup heading="Errata">
-                    <CommandItem v-for="errata in commandSearch.errata" v-bind:key="errata.slug" @select="commandRoute(errata.route)" value="errata.slug">
+                    <CommandItem v-for="errata in commandSearch.errata" v-bind:key="errata.slug" @select="commandRoute(errata.route)" :value="errata.slug">
                         <span>{{ errata.title }}</span>
                     </CommandItem>
                 </CommandGroup>
+                <CommandSeparator />
+                <CommandItem force-mount @select="commandRoute(route('search'))" value="__full-search">
+                    <Search class="size-4" />
+                    <span>Search rules &amp; content in full&hellip;</span>
+                </CommandItem>
             </CommandList>
         </CommandDialog>
     </div>

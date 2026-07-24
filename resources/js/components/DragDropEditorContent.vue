@@ -106,16 +106,16 @@ const changeTextContent = (content) => {
 </script>
 
 <template>
-    <div class="my-1 border border-blue-400" v-if="!editorOpen">
+    <div class="my-1 border border-border" v-if="!editorOpen">
         <div class="bg-background block flex justify-between p-1 text-sm">
             <div>{{ getProps(element).title ?? 'Text' }}</div>
             <div>
                 <CircleMinusIcon v-if="!collapsed" @click="toggleCollapse()" class="text-primary mr-1 inline w-5" />
                 <CirclePlusIcon v-else @click="toggleCollapse()" class="text-primary mr-1 inline w-5" />
-                <CircleEllipsisIcon v-if="element.text !== undefined" @click="openEditor" class="mr-1 inline w-5 text-green-500" />
+                <CircleEllipsisIcon v-if="element.text !== undefined" @click="openEditor" class="mr-1 inline w-5 text-primary" />
                 <AlertDialog>
                     <AlertDialogTrigger as-child>
-                        <CircleXIcon class="inline w-5 text-red-500" />
+                        <CircleXIcon class="inline w-5 text-destructive" />
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>

@@ -125,9 +125,9 @@ const hasImages = computed(() =>
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
                     :class="sections.length > 0 ? 'border-t border-border pt-4 mt-4' : ''"
                 >
-                    <img v-if="props.strategy.front_image" :src="props.strategy.front_image" :alt="props.strategy.title + ' Front'" class="rounded-lg shadow-sm" />
-                    <img v-if="props.strategy.back_image" :src="props.strategy.back_image" :alt="props.strategy.title + ' Back'" class="rounded-lg shadow-sm" />
-                    <img v-if="props.strategy.combination_image" :src="props.strategy.combination_image" :alt="props.strategy.title" class="rounded-lg shadow-sm" />
+                    <img v-if="props.strategy.front_image" :src="props.strategy.front_image" :alt="props.strategy.title + ' Front'" loading="lazy" class="rounded-lg shadow-sm" />
+                    <img v-if="props.strategy.back_image" :src="props.strategy.back_image" :alt="props.strategy.title + ' Back'" loading="lazy" class="rounded-lg shadow-sm" />
+                    <img v-if="props.strategy.combination_image" :src="props.strategy.combination_image" :alt="props.strategy.title" loading="lazy" class="rounded-lg shadow-sm" />
                 </div>
             </div>
 

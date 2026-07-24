@@ -22,7 +22,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <a :href="props.slug" target="_blank" class="text-blue-500 hover:underline">
+    <a :href="props.slug" target="_blank" class="text-primary underline decoration-primary/40 hover:decoration-primary">
         {{ props.text }}
     </a>
 </template>

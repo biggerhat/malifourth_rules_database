@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ref, onMounted } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -111,7 +112,10 @@ onMounted(() => {
     fetchViewData();
 });
 
+const { markSubmitting } = useUnsavedChangesWarning(form);
+
 const submitFaq = () => {
+    markSubmitting();
     if (props.faq) {
         form.post(route('admin.faqs.update', {faq: props.faq.slug}));
     } else {
@@ -259,7 +263,7 @@ const changeNotesNewContent = (content) => {
             <div class="flex ml-auto my-auto">
                 <Drawer>
                     <DrawerTrigger>
-                        <Button class="bg-green-500">{{ props.faq ? 'Update' : 'Create' }} FAQ</Button>
+                        <Button>{{ props.faq ? 'Update' : 'Create' }} FAQ</Button>
                     </DrawerTrigger>
                     <DrawerContent class="max-w-lg mx-auto">
                         <DrawerHeader>

@@ -117,7 +117,7 @@ const submitData = ref({
 <template>
     <Drawer v-if="props.viewRoute && hasPermission('view_' + permissionName)">
         <DrawerTrigger as-child>
-            <Button class="bg-purple-500 mx-2" v-if="props.viewRoute" @click="fetchViewData()">
+            <Button variant="outline" class="mx-2" v-if="props.viewRoute" @click="fetchViewData()">
                 <Eye class="h-4 w-4" />
             </Button>
         </DrawerTrigger>
@@ -144,7 +144,7 @@ const submitData = ref({
     <TooltipProvider v-if="props.editRoute && hasPermission('edit_' + permissionName)">
         <Tooltip>
             <TooltipTrigger>
-                <Button class="dark:bg-[#449e48] mx-2" @click="router.get(props.editRoute)">
+                <Button class="mx-2" @click="router.get(props.editRoute)">
                     <Pencil class="h-4 w-4" />
                 </Button>
             </TooltipTrigger>
@@ -159,7 +159,7 @@ const submitData = ref({
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>
-                        <Button class="bg-destructive mx-2" v-if="props.deleteRoute">
+                        <Button variant="destructive" class="mx-2" v-if="props.deleteRoute">
                             <Trash2 class="h-4 w-4" />
                         </Button>
                     </TooltipTrigger>
@@ -181,7 +181,7 @@ const submitData = ref({
 
             <DialogFooter class="sm:justify-start">
                 <DialogClose as-child>
-                    <Button class="bg-destructive" :disabled="!props.deleteRoute" @click="router.post(props.deleteRoute)">
+                    <Button variant="destructive" :disabled="!props.deleteRoute" @click="router.post(props.deleteRoute)">
                         Delete {{ props.name }}
                     </Button>
                 </DialogClose>
@@ -194,7 +194,7 @@ const submitData = ref({
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>
-                        <Button class="bg-blue-500 mx-2">
+                        <Button variant="outline" class="mx-2">
                             <CheckCheckIcon class="h-4 w-4" />
                         </Button>
                     </TooltipTrigger>
@@ -216,7 +216,7 @@ const submitData = ref({
 
             <DialogFooter class="sm:justify-start">
                 <DialogClose as-child>
-                    <Button class="bg-blue-500" :disabled="!props.approvalRoute" @click="router.post(props.approvalRoute, submitData)">
+                    <Button variant="outline" :disabled="!props.approvalRoute" @click="router.post(props.approvalRoute, submitData)">
                         <CheckCheckIcon class="h-4 w-4" />Approve {{ props.name }}
                     </Button>
                 </DialogClose>
@@ -229,7 +229,7 @@ const submitData = ref({
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>
-                        <Button class="bg-orange-500 mx-2">
+                        <Button class="mx-2">
                             <Send class="h-4 w-4" />
                         </Button>
                     </TooltipTrigger>
@@ -246,14 +246,14 @@ const submitData = ref({
                 </DialogTitle>
                 <DialogDescription>
                     This Action Will Publish This Object And Make It Publicly Viewable. <br />
-                    <span class="text-red-500" v-if="permissionName === 'batch'">If This Is A Batch, All Children Will Also Be Published (If They Are Approved).</span>
-                    <span class="text-red-500" v-else>If this object is part of a batch, it will be taken out and published individually.</span>
+                    <span class="text-destructive" v-if="permissionName === 'batch'">If This Is A Batch, All Children Will Also Be Published (If They Are Approved).</span>
+                    <span class="text-destructive" v-else>If this object is part of a batch, it will be taken out and published individually.</span>
                 </DialogDescription>
             </DialogHeader>
 
             <DialogFooter class="sm:justify-start">
                 <DialogClose as-child>
-                    <Button class="bg-orange-500" :disabled="!props.publishRoute" @click="router.post(props.publishRoute, submitData)">
+                    <Button :disabled="!props.publishRoute" @click="router.post(props.publishRoute, submitData)">
                         <Send class="h-4 w-4" />Publish {{ props.name }}
                     </Button>
                 </DialogClose>

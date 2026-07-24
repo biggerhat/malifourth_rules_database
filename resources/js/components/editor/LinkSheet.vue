@@ -73,13 +73,13 @@ const emit = defineEmits<{
                                     <div @click="emit('update:linkText', props.selectedSection.title)" class="my-auto">{{ props.selectedSection.display_name }}</div>
                                     <SquareMinus class="my-auto" @click="emit('update:selectedSection', null)" />
                                 </div>
-                                <div v-else class="w-full p-2 my-1 text-red-500">
+                                <div v-else class="w-full p-2 my-1 text-muted-foreground">
                                     None
                                 </div>
                             </div>
                             <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
-                                <Button :disabled="!props.selectedSection" class="bg-green-500" @click="emit('insert-section-link')">Add Link</Button>
-                                <Button class="bg-red-500" @click="emit('cancel')">Cancel</Button>
+                                <Button :disabled="!props.selectedSection" @click="emit('insert-section-link')">Add Link</Button>
+                                <Button variant="outline" @click="emit('cancel')">Cancel</Button>
                             </div>
 
                             <div class="flex flex-col w-full mt-12 space-y-1.5">
@@ -105,13 +105,13 @@ const emit = defineEmits<{
                                     <div @click="emit('update:linkText', props.selectedPage.title)" class="my-auto">{{ props.selectedPage.display_name }}</div>
                                     <SquareMinus class="my-auto" @click="emit('update:selectedPage', null)" />
                                 </div>
-                                <div v-else class="w-full p-2 my-1 text-red-500">
+                                <div v-else class="w-full p-2 my-1 text-muted-foreground">
                                     None
                                 </div>
                             </div>
                             <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
-                                <Button :disabled="!props.selectedPage" class="bg-green-500" @click="emit('insert-page-link')">Add Link</Button>
-                                <Button class="bg-red-500" @click="emit('cancel')">Cancel</Button>
+                                <Button :disabled="!props.selectedPage" @click="emit('insert-page-link')">Add Link</Button>
+                                <Button variant="outline" @click="emit('cancel')">Cancel</Button>
                             </div>
 
                             <div class="flex flex-col w-full mt-12 space-y-1.5">
@@ -136,8 +136,8 @@ const emit = defineEmits<{
                                 <Input id="url" type="text" :model-value="props.linkUrl" @update:model-value="emit('update:linkUrl', $event)" placeholder="Add URL" />
                             </div>
                             <div class="flex w-full mt-4 space-y-1.5 justify-end gap-1">
-                                <Button :disabled="!props.linkUrl || !props.linkText" class="bg-green-500" @click="emit('insert-external-link')">Add Link</Button>
-                                <Button class="bg-red-500" @click="emit('cancel')">Cancel</Button>
+                                <Button :disabled="!props.linkUrl || !props.linkText" @click="emit('insert-external-link')">Add Link</Button>
+                                <Button variant="outline" @click="emit('cancel')">Cancel</Button>
                             </div>
                         </TabsContent>
                     </Tabs>

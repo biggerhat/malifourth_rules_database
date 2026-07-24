@@ -57,7 +57,7 @@ const textComponent = computed(() => {
 <template>
     <TooltipProvider>
         <Tooltip>
-            <TooltipTrigger class="border-b border-blue-500 text-blue-500">
+            <TooltipTrigger class="border-b border-primary/50 text-primary">
                 <slot>
                     <component :is="textComponent" />
                 </slot>

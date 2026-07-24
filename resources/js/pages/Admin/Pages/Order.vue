@@ -92,7 +92,7 @@ const saveOrder = () => {
                         <div class="my-auto">
                             <Drawer>
                                 <DrawerTrigger as-child>
-                                    <Button class="bg-purple-500 mx-2" @click="fetchViewData(element.slug)">
+                                    <Button variant="outline" class="mx-2" @click="fetchViewData(element.slug)">
                                         <Eye class="h-4 w-4" />
                                     </Button>
                                 </DrawerTrigger>
@@ -125,7 +125,7 @@ const saveOrder = () => {
                 <Button class="bg-destructive my-auto" @click="resetList()">
                     Reset List
                 </Button>
-                <Button class="bg-green-500 my-auto ml-2" @click="saveOrder()">
+                <Button class="my-auto ml-2" @click="saveOrder()">
                     Save Order
                 </Button>
                 <Button @click="back()" class="bg-destructive my-auto ml-2">

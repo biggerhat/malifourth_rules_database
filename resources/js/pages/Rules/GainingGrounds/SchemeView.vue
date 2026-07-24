@@ -112,9 +112,9 @@ const hasImages = computed(() =>
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
                     :class="sections.length > 0 ? 'border-t border-border pt-4 mt-4' : ''"
                 >
-                    <img v-if="props.scheme.front_image" :src="props.scheme.front_image" :alt="props.scheme.title + ' Front'" class="rounded-lg shadow-sm" />
-                    <img v-if="props.scheme.back_image" :src="props.scheme.back_image" :alt="props.scheme.title + ' Back'" class="rounded-lg shadow-sm" />
-                    <img v-if="props.scheme.combination_image" :src="props.scheme.combination_image" :alt="props.scheme.title" class="rounded-lg shadow-sm" />
+                    <img v-if="props.scheme.front_image" :src="props.scheme.front_image" :alt="props.scheme.title + ' Front'" loading="lazy" class="rounded-lg shadow-sm" />
+                    <img v-if="props.scheme.back_image" :src="props.scheme.back_image" :alt="props.scheme.title + ' Back'" loading="lazy" class="rounded-lg shadow-sm" />
+                    <img v-if="props.scheme.combination_image" :src="props.scheme.combination_image" :alt="props.scheme.title" loading="lazy" class="rounded-lg shadow-sm" />
                 </div>
             </div>
 
@@ -133,7 +133,7 @@ const hasImages = computed(() =>
                     :href="route('rules.gaining-grounds.scheme', next.slug)"
                     class="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 hover:bg-muted/50 transition-colors"
                 >
-                    <img v-if="next.front_image" :src="next.front_image" :alt="next.title" class="size-8 rounded object-cover shrink-0" />
+                    <img v-if="next.front_image" :src="next.front_image" :alt="next.title" loading="lazy" class="size-8 rounded object-cover shrink-0" />
                     <span class="text-sm font-medium">{{ next.title }}</span>
                     <ChevronRight class="size-4 shrink-0 text-muted-foreground ml-auto" />
                 </Link>

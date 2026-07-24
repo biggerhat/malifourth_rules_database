@@ -10,6 +10,7 @@ import AdminActions from '@/components/AdminActions.vue';
 import BulkActionBar from '@/components/BulkActionBar.vue';
 import {Ban, Check} from "lucide-vue-next";
 import { hasPermission } from "@/composables/hasPermission";
+import CardErrataView from "@/pages/Errata/CardErrata/CardErrataView.vue";
 
 import {
     Table,
@@ -104,6 +105,7 @@ const columns: ColumnDef<any>[] = [
                 name: cardErrata.card_name,
                 modelName: 'card_errata',
                 viewRoute: route('admin.card-errata.view', cardErrata.slug),
+                viewComponent: CardErrataView,
                 editRoute: route('admin.card-errata.edit', cardErrata.slug),
                 deleteRoute: cardErrata.published_at ? null : route('admin.card-errata.delete', cardErrata.slug),
                 approvalRoute: cardErrata.approval?.approved_at ? null : route('admin.approvals.update', cardErrata.approval?.id),

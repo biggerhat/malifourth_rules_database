@@ -44,6 +44,22 @@ it('renders a single published card with its entries', function () {
     );
 });
 
+it('exposes front and back image fields independently, including when only one is set', function () {
+    $card = CardErrata::factory()->published()->create([
+        'card_name' => 'Lucius Mattheson',
+        'front_image' => '/storage/card-errata/lucius/front.png',
+        'back_image' => null,
+    ]);
+
+    $response = $this->get(route('errata.cards.view', $card));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->where('front_image', '/storage/card-errata/lucius/front.png')
+        ->where('back_image', null)
+    );
+});
+
 it('returns 404 for an unpublished card', function () {
     $card = CardErrata::factory()->create();
 

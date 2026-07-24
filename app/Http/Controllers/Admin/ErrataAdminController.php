@@ -46,6 +46,7 @@ class ErrataAdminController extends Controller
 
         return [
             'title' => $errata->title,
+            'slug' => $errata->slug,
             'content' => (new ContentBuilder($errata->content ?? ''))->getFullyHydratedContent(),
             'published_at' => $errata->published_at?->format('m-d-Y'),
             'published_by' => $errata->publishedBy?->name,

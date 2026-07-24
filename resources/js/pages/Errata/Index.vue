@@ -23,16 +23,16 @@ const props = defineProps({
 <template>
     <Head title="Errata" />
 
-    <div class="max-w-4xl mx-auto px-2 sm:px-4 text-primary leading-6 text-md">
-        <div class="w-full text-center text-xl py-4">
-            <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-            <span>Errata</span>
-            <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+    <div class="max-w-4xl mx-auto px-2 sm:px-4 text-foreground leading-6 text-md">
+        <div class="w-full max-w-2xl mx-auto text-center py-4">
+            <img src='/Images/page_banner_top.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
+            <h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-medium text-balance my-1">Errata</h1>
+            <img src='/Images/page_banner_bottom.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
         </div>
 
         <!-- Card Errata Section -->
         <div class="mb-8">
-            <h2 class="font-semibold text-lg mb-4 pb-2 border-b">Card Errata</h2>
+            <h2 class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary mb-4 pb-2 border-b border-border">Card Errata</h2>
             <Link
                 :href="route('errata.cards.index')"
                 class="flex items-center justify-between rounded-lg border bg-card px-4 py-3 sm:px-5 sm:py-4 hover:bg-muted/50 transition-colors"
@@ -47,7 +47,7 @@ const props = defineProps({
 
         <!-- Rules Errata Section -->
         <div v-if="props.rulesErrata.length" class="mb-8">
-            <h2 class="font-semibold text-lg mb-4 pb-2 border-b">Rules Errata</h2>
+            <h2 class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary mb-4 pb-2 border-b border-border">Rules Errata</h2>
             <div class="space-y-2">
                 <Link
                     v-for="batch in props.rulesErrata"
@@ -66,7 +66,7 @@ const props = defineProps({
 
         <!-- General Errata Section -->
         <div v-if="props.generalErrata.length" class="mb-8">
-            <h2 class="font-semibold text-lg mb-4 pb-2 border-b">General Errata</h2>
+            <h2 class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary mb-4 pb-2 border-b border-border">General Errata</h2>
             <div class="space-y-2">
                 <Link
                     v-for="errata in props.generalErrata"

@@ -41,14 +41,7 @@ defineProps({
     }
 });
 
-const typeBadgeClass = (type: string) => {
-    switch (type) {
-        case 'Page': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-        case 'Section': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-        case 'Index': return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
-        default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
-};
+const typeBadgeClass = () => 'border border-border text-muted-foreground';
 </script>
 
 <template>
@@ -61,7 +54,7 @@ const typeBadgeClass = (type: string) => {
                 <ul class="space-y-1" v-if="referenced_by.length > 0">
                     <li v-for="(item, idx) in referenced_by" :key="'by-' + idx">
                         <Link :href="item.url" class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted transition-colors">
-                            <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-medium" :class="typeBadgeClass(item.type)">
+                            <span class="shrink-0 rounded-full px-2 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide" :class="typeBadgeClass()">
                                 {{ item.type }}
                             </span>
                             <span v-html="item.title" class="truncate"></span>
@@ -79,7 +72,7 @@ const typeBadgeClass = (type: string) => {
                 <ul class="space-y-1" v-if="references.length > 0">
                     <li v-for="(item, idx) in references" :key="'ref-' + idx">
                         <Link :href="item.url" class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted transition-colors">
-                            <span class="shrink-0 rounded px-1.5 py-0.5 text-xs font-medium" :class="typeBadgeClass(item.type)">
+                            <span class="shrink-0 rounded-full px-2 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide" :class="typeBadgeClass()">
                                 {{ item.type }}
                             </span>
                             <span v-html="item.title" class="truncate"></span>

@@ -68,8 +68,10 @@ function makeEmptyEntry() {
 const form = useForm({
     faction: '',
     card_name: '',
-    image: null,
-    existing_image: null,
+    front_image: null,
+    back_image: null,
+    existing_front_image: null,
+    existing_back_image: null,
     internal_notes: '',
     change_notes: '',
     batch_id: null,
@@ -85,7 +87,8 @@ const back = () => {
 onMounted(() => {
     form.faction = props.cardErrata?.faction ?? '';
     form.card_name = props.cardErrata?.card_name ?? '';
-    form.existing_image = props.cardErrata?.image ?? null;
+    form.existing_front_image = props.cardErrata?.front_image ?? null;
+    form.existing_back_image = props.cardErrata?.back_image ?? null;
     form.internal_notes = props.cardErrata?.internal_notes ?? '';
     form.change_notes = props.cardErrata?.published_at ? '' : props.cardErrata?.approval?.change_notes ?? '';
     form.batch_id = props.cardErrata?.published_at ? null : props.cardErrata?.batch_id ?? null;
@@ -123,7 +126,8 @@ const fetchPreviewData = () => {
             ...JSON.parse(JSON.stringify(response.data)),
             faction: form.faction,
             slug: props.cardErrata?.slug ?? '',
-            image: form.image ? URL.createObjectURL(form.image) : form.existing_image,
+            front_image: form.front_image ? URL.createObjectURL(form.front_image) : form.existing_front_image,
+            back_image: form.back_image ? URL.createObjectURL(form.back_image) : form.existing_back_image,
             published_at: props.cardErrata?.published_at ?? null,
             published_by: props.cardErrata?.published_by ?? null,
         };
@@ -183,14 +187,23 @@ const submitCardErrata = () => {
                                 <Input id="card_name" type="text" required autofocus :tabindex="1" autocomplete="off" v-model="form.card_name" placeholder="Card Name" />
                                 <InputError :message="form.errors.card_name" />
                             </div>
-                            <div class="flex flex-col space-y-1.5" v-if="form.existing_image">
-                                <Label>Current Card Image</Label>
-                                <img :src="form.existing_image" :alt="form.card_name" class="w-75" />
+                            <div class="flex flex-col space-y-1.5" v-if="form.existing_front_image">
+                                <Label>Current Front Image</Label>
+                                <img :src="form.existing_front_image" :alt="form.card_name" class="w-75" />
                             </div>
                             <div class="flex flex-col space-y-1.5">
-                                <Label for="image">{{ form.existing_image ? 'New ' : '' }}Card Image</Label>
-                                <Input id="image" type="file" accept=".jpeg,.jpg,.png,.webp" @input="form.image = $event.target.files[0]" />
-                                <InputError :message="form.errors.image" />
+                                <Label for="front_image">{{ form.existing_front_image ? 'New ' : '' }}Front Image</Label>
+                                <Input id="front_image" type="file" accept=".jpeg,.jpg,.png,.webp" @input="form.front_image = $event.target.files[0]" />
+                                <InputError :message="form.errors.front_image" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5" v-if="form.existing_back_image">
+                                <Label>Current Back Image</Label>
+                                <img :src="form.existing_back_image" :alt="form.card_name" class="w-75" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="back_image">{{ form.existing_back_image ? 'New ' : '' }}Back Image</Label>
+                                <Input id="back_image" type="file" accept=".jpeg,.jpg,.png,.webp" @input="form.back_image = $event.target.files[0]" />
+                                <InputError :message="form.errors.back_image" />
                             </div>
                         </div>
                     </TabsContent>
@@ -248,7 +261,7 @@ const submitCardErrata = () => {
         </CardContent>
         <CardFooter>
             <div class="flex ml-auto my-auto">
-                <Drawer v-if="hasPermission('view_card_errata')">
+                <Drawer>
                     <DrawerTrigger as-child>
                         <Button class="bg-purple-500 mx-2" @click="fetchPreviewData()">
                             <Eye class="h-4 w-4" /> Preview

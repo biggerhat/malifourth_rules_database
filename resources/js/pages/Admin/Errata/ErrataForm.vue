@@ -127,13 +127,11 @@ const changeNotesUpdate = (newOrder) => { form.change_notes = newOrder; };
 const changeNotesNewContent = (content) => { form.change_notes = content; fetchViewData(); };
 
 const previewData = computed(() => ({
-    errata: {
-        title: viewData.value?.title ?? form.title,
-        slug: props.errata?.slug ?? '',
-        content: viewData.value?.content ?? [],
-        published_at: props.errata?.published_at ?? null,
-        published_by: props.errata?.published_by ?? null,
-    },
+    title: viewData.value?.title ?? form.title,
+    slug: props.errata?.slug ?? '',
+    content: viewData.value?.content ?? [],
+    published_at: props.errata?.published_at ?? null,
+    published_by: props.errata?.published_by ?? null,
     references: null,
 }));
 </script>
@@ -213,7 +211,7 @@ const previewData = computed(() => ({
         </CardContent>
         <CardFooter>
             <div class="flex ml-auto my-auto">
-                <Drawer v-if="hasPermission('view_errata')">
+                <Drawer>
                     <DrawerTrigger as-child>
                         <Button class="bg-purple-500 mx-2" @click="fetchViewData()">
                             <Eye class="h-4 w-4" /> Preview

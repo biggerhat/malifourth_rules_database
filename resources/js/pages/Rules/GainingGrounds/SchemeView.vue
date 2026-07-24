@@ -2,11 +2,6 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
-import {
-    Card,
-    CardContent,
-    CardFooter,
-} from '@/components/ui/card'
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ChevronLeft, ChevronRight } from "lucide-vue-next";
 import { computed } from "vue";
@@ -70,7 +65,7 @@ const hasImages = computed(() =>
 <template>
     <Head :title="props.scheme.title" />
 
-    <div class="max-w-4xl mx-auto px-2 sm:px-4 text-primary leading-6 text-md">
+    <div class="max-w-4xl mx-auto px-2 sm:px-4 text-foreground leading-6 text-md">
         <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">
             <AlertDescription>
                 You are viewing an older version of this content.
@@ -91,19 +86,19 @@ const hasImages = computed(() =>
         </div>
 
         <!-- Banner -->
-        <div class="w-full text-center text-xl py-4">
-            <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-            <span>{{ props.scheme.title }}</span>
-            <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+        <div class="w-full max-w-2xl mx-auto text-center py-4">
+            <img src='/Images/page_banner_top.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
+            <h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-medium text-balance my-1">{{ props.scheme.title }}</h1>
+            <img src='/Images/page_banner_bottom.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
         </div>
 
         <!-- Content -->
-        <Card>
-            <CardContent>
+        <div class="rounded-md border-t-2 border-primary bg-card shadow-sm">
+            <div class="p-6">
                 <div
                     v-for="(section, idx) in sections"
                     :key="section.key"
-                    :class="idx > 0 ? 'border-t pt-4 mt-4' : ''"
+                    :class="idx > 0 ? 'border-t border-border pt-4 mt-4' : ''"
                 >
                     <h3 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">{{ section.label }}</h3>
                     <div class="text-sm leading-relaxed">
@@ -115,28 +110,28 @@ const hasImages = computed(() =>
                 <div
                     v-if="hasImages"
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
-                    :class="sections.length > 0 ? 'border-t pt-4 mt-4' : ''"
+                    :class="sections.length > 0 ? 'border-t border-border pt-4 mt-4' : ''"
                 >
                     <img v-if="props.scheme.front_image" :src="props.scheme.front_image" :alt="props.scheme.title + ' Front'" class="rounded-lg shadow-sm" />
                     <img v-if="props.scheme.back_image" :src="props.scheme.back_image" :alt="props.scheme.title + ' Back'" class="rounded-lg shadow-sm" />
                     <img v-if="props.scheme.combination_image" :src="props.scheme.combination_image" :alt="props.scheme.title" class="rounded-lg shadow-sm" />
                 </div>
-            </CardContent>
+            </div>
 
-            <CardFooter class="border-t px-6 py-3 text-xs text-muted-foreground justify-end">
+            <div class="border-t border-border px-6 py-3 text-xs text-muted-foreground text-right">
                 Last updated {{ props.scheme.published_at }} by {{ props.scheme.published_by }}
-            </CardFooter>
-        </Card>
+            </div>
+        </div>
 
         <!-- Next Available Schemes -->
         <div v-if="props.next_schemes.length > 0" class="mt-6">
-            <h2 class="font-semibold text-base mb-3">Next Available Schemes</h2>
+            <h2 class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary mb-3">Next Available Schemes</h2>
             <div class="space-y-2">
                 <Link
                     v-for="next in props.next_schemes"
                     :key="next.id"
                     :href="route('rules.gaining-grounds.scheme', next.slug)"
-                    class="flex items-center gap-3 rounded-lg border bg-card px-4 py-3 hover:bg-muted/50 transition-colors"
+                    class="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 hover:bg-muted/50 transition-colors"
                 >
                     <img v-if="next.front_image" :src="next.front_image" :alt="next.title" class="size-8 rounded object-cover shrink-0" />
                     <span class="text-sm font-medium">{{ next.title }}</span>
@@ -155,3 +150,9 @@ const hasImages = computed(() =>
         <ScrollToTop />
     </div>
 </template>
+
+<style scoped>
+:deep(.font-\[symbolFont\]) {
+    font-size: 1.25rem;
+}
+</style>

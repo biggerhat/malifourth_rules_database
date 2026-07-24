@@ -35,7 +35,8 @@ class CardErrataAdminController extends Controller
             'faction_label' => FactionEnum::from($cardErrata->faction)->label(),
             'card_name' => $cardErrata->card_name,
             'slug' => $cardErrata->slug,
-            'image' => $cardErrata->image,
+            'front_image' => $cardErrata->front_image,
+            'back_image' => $cardErrata->back_image,
             'entries' => $cardErrata->entries->map(fn ($entry) => [
                 'id' => $entry->id,
                 'what_changed' => (new ContentBuilder($entry->what_changed ?? ''))->getFullyHydratedContent(),
@@ -184,15 +185,20 @@ class CardErrataAdminController extends Controller
             'batch_id' => ['nullable', 'int', 'exists:batches,id'],
             'publish_directly' => ['required', 'boolean'],
             'approve_directly' => ['required', 'boolean'],
-            'image' => self::IMAGE_RULES,
-            'existing_image' => ['nullable', 'string'],
+            'front_image' => self::IMAGE_RULES,
+            'back_image' => self::IMAGE_RULES,
+            'existing_front_image' => ['nullable', 'string'],
+            'existing_back_image' => ['nullable', 'string'],
             'entries' => ['required', 'array', 'min:1'],
             'entries.*.what_changed' => ['nullable', 'string'],
             'entries.*.what_it_was' => ['nullable', 'string'],
             'entries.*.what_it_is_now' => ['nullable', 'string'],
         ]);
 
-        $existingImage = $cardErrata?->image;
+        $existingImages = [
+            'front_image' => $cardErrata?->front_image,
+            'back_image' => $cardErrata?->back_image,
+        ];
 
         $publishDirectly = $validated['publish_directly'];
         $approveDirectly = $validated['approve_directly'];
@@ -200,12 +206,14 @@ class CardErrataAdminController extends Controller
         $entries = $validated['entries'];
 
         $nameSlug = Str::slug($validated['card_name']);
-        $image = $this->resolveImage($validated['image'] ?? null, $validated['existing_image'] ?? null, $nameSlug);
+        $frontImage = $this->resolveImage($validated['front_image'] ?? null, $validated['existing_front_image'] ?? null, $nameSlug);
+        $backImage = $this->resolveImage($validated['back_image'] ?? null, $validated['existing_back_image'] ?? null, $nameSlug);
 
         $cardAttributes = [
             'faction' => $validated['faction'],
             'card_name' => $validated['card_name'],
-            'image' => $image,
+            'front_image' => $frontImage,
+            'back_image' => $backImage,
             'internal_notes' => $validated['internal_notes'] ?? null,
             'batch_id' => $validated['batch_id'] ?? null,
         ];
@@ -222,7 +230,9 @@ class CardErrataAdminController extends Controller
             } else {
                 $cardAttributes['previous'] = $cardErrata->id;
                 $cardAttributes['original'] = $cardErrata->original ?? $cardErrata->id;
-                $cardAttributes['image'] = $cardAttributes['image'] ?? $existingImage;
+                foreach ($existingImages as $key => $value) {
+                    $cardAttributes[$key] = $cardAttributes[$key] ?? $value;
+                }
                 $cardErrata = CardErrata::create($cardAttributes);
             }
         }

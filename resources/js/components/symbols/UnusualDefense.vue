@@ -1,22 +1,6 @@
 <script setup lang="ts">
-defineProps({
-    mode: {
-        type: String,
-        required: false,
-        default() {
-            return localStorage.appearance;
-        }
-    },
-    className: {
-        type: String,
-        required: false,
-        default() {
-            return 'h-6 mx-1';
-        }
-    }
-});
 </script>
 
 <template>
-    <span class="font-[symbolFont] text-2xl">v</span>
+    <span class="font-[symbolFont] text-2xl" role="img" aria-label="Unusual Defense">v</span>
 </template>

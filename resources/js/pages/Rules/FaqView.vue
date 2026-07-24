@@ -132,10 +132,10 @@ onMounted(() => {
                         v-for="cat in filteredCategories"
                         :key="cat.key"
                         @click="scrollToCategory(cat.key)"
-                        class="px-2.5 py-1.5 w-full text-left flex items-center justify-between text-sm rounded-md transition-colors hover:bg-muted"
+                        class="px-2.5 py-1.5 w-full text-left flex items-center justify-between text-sm rounded-md transition-colors"
                         :class="activeCategory === cat.key
-                            ? 'bg-primary text-primary-foreground'
-                            : ''"
+                            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                            : 'hover:bg-muted'"
                     >
                         <span class="truncate">{{ cat.label }}</span>
                         <span

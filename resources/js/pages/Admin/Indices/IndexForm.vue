@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ref, onMounted } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -103,7 +104,10 @@ onMounted(() => {
     fetchViewData();
 });
 
+const { markSubmitting } = useUnsavedChangesWarning(form);
+
 const submitIndex = () => {
+    markSubmitting();
     if (props.index) {
         form.post(route('admin.indices.update', {index: props.index.slug}));
     } else {
@@ -243,7 +247,7 @@ const changeNotesNewContent = (content) => {
             <div class="flex ml-auto my-auto">
                 <Drawer>
                     <DrawerTrigger>
-                        <Button class="bg-green-500">{{ props.index ? 'Update' : 'Create' }} Index</Button>
+                        <Button>{{ props.index ? 'Update' : 'Create' }} Index</Button>
                     </DrawerTrigger>
                     <DrawerContent class="max-w-lg mx-auto">
                         <DrawerHeader>

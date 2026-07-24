@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ref, onMounted } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -92,7 +93,10 @@ onMounted(() => {
     form.batch_id = props.season?.published_at ? null : props.season?.batch_id ?? null;
 });
 
+const { markSubmitting } = useUnsavedChangesWarning(form);
+
 const submitSeason = () => {
+    markSubmitting();
     if (props.season) {
         form.post(route('admin.seasons.update', {season: props.season.slug}));
     } else {
@@ -214,7 +218,7 @@ const changeNotesNewContent = (content) => {
             <div class="flex ml-auto my-auto">
                 <Drawer>
                     <DrawerTrigger>
-                        <Button class="bg-green-500">{{ props.season ? 'Update' : 'Create' }} Season</Button>
+                        <Button>{{ props.season ? 'Update' : 'Create' }} Season</Button>
                     </DrawerTrigger>
                     <DrawerContent class="max-w-lg mx-auto">
                         <DrawerHeader>

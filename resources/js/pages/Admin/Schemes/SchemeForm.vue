@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ref, onMounted } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -131,7 +132,10 @@ onMounted(() => {
     fetchViewData();
 });
 
+const { markSubmitting } = useUnsavedChangesWarning(form);
+
 const submitScheme = () => {
+    markSubmitting();
     if (props.scheme) {
         form.post(route('admin.schemes.update', {scheme: props.scheme.slug}));
     } else {
@@ -385,7 +389,7 @@ const changeNotesNewContent = (content) => { form.change_notes = content; fetchV
             <div class="flex ml-auto my-auto">
                 <Drawer>
                     <DrawerTrigger>
-                        <Button class="bg-green-500">{{ props.scheme ? 'Update' : 'Create' }} Scheme</Button>
+                        <Button>{{ props.scheme ? 'Update' : 'Create' }} Scheme</Button>
                     </DrawerTrigger>
                     <DrawerContent class="max-w-lg mx-auto">
                         <DrawerHeader>

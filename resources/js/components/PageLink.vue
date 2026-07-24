@@ -22,7 +22,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <Link :href="route('rules.page.view', props.slug)" class="text-blue-500 hover:underline">
+    <Link :href="route('rules.page.view', props.slug)" class="text-primary underline decoration-primary/40 hover:decoration-primary">
         {{ props.text }}
     </Link>
 </template>

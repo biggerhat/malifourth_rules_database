@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { ref, onMounted } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -92,7 +93,10 @@ onMounted(() => {
     form.batch_id = props.page?.published_at ? null : props.page?.batch_id ?? null;
 });
 
+const { markSubmitting } = useUnsavedChangesWarning(form);
+
 const submitPage = () => {
+    markSubmitting();
     if (props.page) {
         form.post(route('admin.pages.update', {page: props.page.slug}));
     } else {
@@ -209,7 +213,7 @@ const changeNotesNewContent = (content) => {
             <div class="flex ml-auto my-auto">
                 <Drawer>
                     <DrawerTrigger>
-                        <Button class="bg-green-500">{{ props.page ? 'Update' : 'Create' }} Page</Button>
+                        <Button>{{ props.page ? 'Update' : 'Create' }} Page</Button>
                     </DrawerTrigger>
                     <DrawerContent class="max-w-lg mx-auto">
                         <DrawerHeader>

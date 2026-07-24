@@ -37,6 +37,30 @@ it('collects slugs referenced by block tags for hydration lookups', function () 
     ]);
 });
 
+it('converts literal br tags typed into content into real line breaks', function () {
+    $builder = new ContentBuilder('30mm<br />When a friendly model declares an attack.');
+
+    expect($builder->getParsedContent())->toBe([
+        ['text' => '30mm<br />When a friendly model declares an attack.'],
+    ]);
+});
+
+it('converts br tag variants (self-closing, no slash, with space) into real line breaks', function () {
+    $builder = new ContentBuilder('one<br/>two<br>three<br />four');
+
+    expect($builder->getParsedContent())->toBe([
+        ['text' => 'one<br />two<br />three<br />four'],
+    ]);
+});
+
+it('does not let a br tag typed into content smuggle other raw html', function () {
+    $builder = new ContentBuilder('<br /><script>alert(1)</script>');
+
+    expect($builder->getParsedContent())->toBe([
+        ['text' => '<br />&lt;script&gt;alert(1)&lt;/script&gt;'],
+    ]);
+});
+
 it('escapes raw html typed into content so it cannot execute as markup', function () {
     $builder = new ContentBuilder('<script>alert(1)</script>');
 

@@ -156,8 +156,8 @@ watch(pageParam, () => {
                         v-for="page in props.pages"
                         :key="page.slug"
                         :href="route('rules.page.view', page.slug)"
-                        class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
-                        :class="page.slug === props.slug ? 'bg-primary text-primary-foreground' : ''"
+                        class="p-2 block text-sm rounded-md transition-colors"
+                        :class="page.slug === props.slug ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'hover:bg-muted'"
                     ><span v-html="page.title"></span></Link>
                 </div>
             </div>

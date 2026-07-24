@@ -103,8 +103,8 @@ watch(mobilePageSlug, (newSlug) => {
                             v-for="s in props.seasons"
                             :key="s.id"
                             :href="route('rules.gaining-grounds.season', s.slug)"
-                            class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
-                            :class="s.slug === props.season.slug ? 'bg-primary text-primary-foreground' : ''"
+                            class="p-2 block text-sm rounded-md transition-colors"
+                            :class="s.slug === props.season.slug ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'hover:bg-muted'"
                         >{{ s.title }}</Link>
                     </div>
                 </div>
@@ -121,8 +121,8 @@ watch(mobilePageSlug, (newSlug) => {
                             v-for="page in props.seasonPages"
                             :key="page.id"
                             :href="route('rules.gaining-grounds.season-page', [props.season.slug, page.slug])"
-                            class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
-                            :class="page.slug === props.seasonPage.slug ? 'bg-primary text-primary-foreground' : ''"
+                            class="p-2 block text-sm rounded-md transition-colors"
+                            :class="page.slug === props.seasonPage.slug ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'hover:bg-muted'"
                         >{{ page.title }}</Link>
                     </div>
                 </div>

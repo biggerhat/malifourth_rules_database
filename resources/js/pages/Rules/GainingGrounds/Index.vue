@@ -121,8 +121,8 @@ const suitSymbol = (suit: string) => {
                             v-for="s in props.seasons"
                             :key="s.id"
                             :href="route('rules.gaining-grounds.season', s.slug)"
-                            class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
-                            :class="s.slug === props.season.slug ? 'bg-primary text-primary-foreground' : ''"
+                            class="p-2 block text-sm rounded-md transition-colors"
+                            :class="s.slug === props.season.slug ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'hover:bg-muted'"
                         >{{ s.title }}</Link>
                     </div>
                 </div>
@@ -133,7 +133,7 @@ const suitSymbol = (suit: string) => {
                     <div class="px-3 pb-3">
                         <Link
                             :href="route('rules.gaining-grounds.season', props.season.slug)"
-                            class="p-2 block text-sm rounded-md transition-colors hover:bg-muted bg-primary text-primary-foreground"
+                            class="p-2 block text-sm rounded-md transition-colors bg-primary text-primary-foreground hover:bg-primary/90"
                         >Season Overview</Link>
                         <Link
                             v-for="page in props.seasonPages"
@@ -210,7 +210,7 @@ const suitSymbol = (suit: string) => {
                                 class="rounded-lg border border-border border-l-4 bg-card p-3 sm:p-4 h-full transition-colors hover:bg-muted/50"
                                 :class="suitAccent(strategy.suit)"
                             >
-                                <img v-if="strategy.front_image" :src="strategy.front_image" :alt="strategy.title" class="w-full rounded mb-3" />
+                                <img v-if="strategy.front_image" :src="strategy.front_image" :alt="strategy.title" loading="lazy" class="w-full rounded mb-3" />
                                 <div class="text-sm font-medium group-hover:underline">{{ strategy.title }}</div>
                                 <span
                                     v-if="strategy.suit_label"
@@ -235,7 +235,7 @@ const suitSymbol = (suit: string) => {
                             :href="route('rules.gaining-grounds.scheme', scheme.slug)"
                             class="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
                         >
-                            <img v-if="scheme.front_image" :src="scheme.front_image" :alt="scheme.title" class="size-8 rounded object-cover shrink-0" />
+                            <img v-if="scheme.front_image" :src="scheme.front_image" :alt="scheme.title" loading="lazy" class="size-8 rounded object-cover shrink-0" />
                             <span class="text-sm font-medium truncate">{{ scheme.title }}</span>
                             <ChevronRight class="size-3.5 shrink-0 text-muted-foreground ml-auto" />
                         </Link>

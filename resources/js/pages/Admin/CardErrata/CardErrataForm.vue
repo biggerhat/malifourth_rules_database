@@ -1,6 +1,7 @@
 <script setup lang='ts'>
 import { onMounted, ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import {
@@ -134,7 +135,10 @@ const fetchPreviewData = () => {
     });
 };
 
+const { markSubmitting } = useUnsavedChangesWarning(form);
+
 const submitCardErrata = () => {
+    markSubmitting();
     if (props.cardErrata) {
         form.post(route('admin.card-errata.update', { cardErrata: props.cardErrata.slug }));
     } else {
@@ -263,7 +267,7 @@ const submitCardErrata = () => {
             <div class="flex ml-auto my-auto">
                 <Drawer>
                     <DrawerTrigger as-child>
-                        <Button class="bg-purple-500 mx-2" @click="fetchPreviewData()">
+                        <Button variant="outline" class="mx-2" @click="fetchPreviewData()">
                             <Eye class="h-4 w-4" /> Preview
                         </Button>
                     </DrawerTrigger>
@@ -284,7 +288,7 @@ const submitCardErrata = () => {
                 </Drawer>
                 <Drawer>
                     <DrawerTrigger>
-                        <Button class="bg-green-500">{{ props.cardErrata ? 'Update' : 'Create' }} Card Errata</Button>
+                        <Button>{{ props.cardErrata ? 'Update' : 'Create' }} Card Errata</Button>
                     </DrawerTrigger>
                     <DrawerContent class="max-w-lg mx-auto">
                         <DrawerHeader>

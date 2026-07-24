@@ -6,10 +6,10 @@ import { computed, type HTMLAttributes, onMounted, onUnmounted, ref } from 'vue'
 import { cn } from '@/lib/utils'
 import { useCommand, useCommandGroup } from '.'
 
-const props = defineProps<ListboxItemProps & { class?: HTMLAttributes['class'] }>()
+const props = defineProps<ListboxItemProps & { class?: HTMLAttributes['class'], forceMount?: boolean }>()
 const emits = defineEmits<ListboxItemEmits>()
 
-const delegatedProps = reactiveOmit(props, 'class')
+const delegatedProps = reactiveOmit(props, 'class', 'forceMount')
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 
@@ -18,7 +18,10 @@ const { filterState, allItems, allGroups } = useCommand()
 const groupContext = useCommandGroup()
 
 const isRender = computed(() => {
-  if (!filterState.search) {
+  if (props.forceMount) {
+    return true
+  }
+  else if (!filterState.search) {
     return true
   }
   else {

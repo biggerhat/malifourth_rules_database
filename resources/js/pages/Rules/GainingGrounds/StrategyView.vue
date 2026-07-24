@@ -2,11 +2,6 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
-import {
-    Card,
-    CardContent,
-    CardFooter,
-} from '@/components/ui/card'
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ChevronLeft } from "lucide-vue-next";
 import { computed } from "vue";
@@ -48,11 +43,11 @@ const props = defineProps({
 
 const suitBadge = (suit: string) => {
     switch (suit) {
-        case 'rams': return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200';
-        case 'crows': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200';
-        case 'masks': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200';
-        case 'tomes': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200';
-        default: return 'bg-muted text-muted-foreground';
+        case 'rams': return 'border border-border text-rose-700 dark:text-rose-300';
+        case 'crows': return 'border border-border text-emerald-700 dark:text-emerald-300';
+        case 'masks': return 'border border-border text-violet-700 dark:text-violet-300';
+        case 'tomes': return 'border border-border text-sky-700 dark:text-sky-300';
+        default: return 'border border-border text-muted-foreground';
     }
 };
 
@@ -73,7 +68,7 @@ const hasImages = computed(() =>
 <template>
     <Head :title="props.strategy.title" />
 
-    <div class="max-w-4xl mx-auto px-2 sm:px-4 text-primary leading-6 text-md">
+    <div class="max-w-4xl mx-auto px-2 sm:px-4 text-foreground leading-6 text-md">
         <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">
             <AlertDescription>
                 You are viewing an older version of this content.
@@ -94,16 +89,16 @@ const hasImages = computed(() =>
         </div>
 
         <!-- Banner -->
-        <div class="w-full text-center text-xl py-4">
-            <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-            <span>{{ props.strategy.title }}</span>
-            <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+        <div class="w-full max-w-2xl mx-auto text-center py-4">
+            <img src='/Images/page_banner_top.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
+            <h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-medium text-balance my-1">{{ props.strategy.title }}</h1>
+            <img src='/Images/page_banner_bottom.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
         </div>
 
         <!-- Suit badge -->
         <div v-if="props.strategy.suit_label" class="flex justify-center mb-4">
             <span
-                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium uppercase tracking-wide"
                 :class="suitBadge(props.strategy.suit)"
             >
                 {{ props.strategy.suit_label }}
@@ -111,12 +106,12 @@ const hasImages = computed(() =>
         </div>
 
         <!-- Content -->
-        <Card>
-            <CardContent>
+        <div class="rounded-md border-t-2 border-primary bg-card shadow-sm">
+            <div class="p-6">
                 <div
                     v-for="(section, idx) in sections"
                     :key="section.key"
-                    :class="idx > 0 ? 'border-t pt-4 mt-4' : ''"
+                    :class="idx > 0 ? 'border-t border-border pt-4 mt-4' : ''"
                 >
                     <h3 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">{{ section.label }}</h3>
                     <div class="text-sm leading-relaxed">
@@ -128,18 +123,18 @@ const hasImages = computed(() =>
                 <div
                     v-if="hasImages"
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
-                    :class="sections.length > 0 ? 'border-t pt-4 mt-4' : ''"
+                    :class="sections.length > 0 ? 'border-t border-border pt-4 mt-4' : ''"
                 >
                     <img v-if="props.strategy.front_image" :src="props.strategy.front_image" :alt="props.strategy.title + ' Front'" class="rounded-lg shadow-sm" />
                     <img v-if="props.strategy.back_image" :src="props.strategy.back_image" :alt="props.strategy.title + ' Back'" class="rounded-lg shadow-sm" />
                     <img v-if="props.strategy.combination_image" :src="props.strategy.combination_image" :alt="props.strategy.title" class="rounded-lg shadow-sm" />
                 </div>
-            </CardContent>
+            </div>
 
-            <CardFooter class="border-t px-6 py-3 text-xs text-muted-foreground justify-end">
+            <div class="border-t border-border px-6 py-3 text-xs text-muted-foreground text-right">
                 Last updated {{ props.strategy.published_at }} by {{ props.strategy.published_by }}
-            </CardFooter>
-        </Card>
+            </div>
+        </div>
 
         <ContentReferences
             v-if="props.references"
@@ -151,3 +146,9 @@ const hasImages = computed(() =>
         <ScrollToTop />
     </div>
 </template>
+
+<style scoped>
+:deep(.font-\[symbolFont\]) {
+    font-size: 1.25rem;
+}
+</style>

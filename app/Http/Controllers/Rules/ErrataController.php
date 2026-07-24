@@ -115,14 +115,12 @@ class ErrataController extends Controller
     private function renderErrata(Errata $errata, array $extra = [])
     {
         return inertia('Errata/ErrataView', array_merge([
-            'errata' => [
-                'title' => $errata->title,
-                'slug' => $errata->slug,
-                'meta_description' => Str::limit(ContentBuilder::toSearchable($errata->content ?? ''), 155),
-                'content' => (new ContentBuilder($errata->content ?? ''))->getFullyHydratedContent(),
-                'published_at' => $errata->published_at->format('m-d-Y'),
-                'published_by' => $errata->publishedBy?->name,
-            ],
+            'title' => $errata->title,
+            'slug' => $errata->slug,
+            'meta_description' => Str::limit(ContentBuilder::toSearchable($errata->content ?? ''), 155),
+            'content' => (new ContentBuilder($errata->content ?? ''))->getFullyHydratedContent(),
+            'published_at' => $errata->published_at?->format('m-d-Y'),
+            'published_by' => $errata->publishedBy?->name,
             'references' => ContentReferencesService::getForModel($errata),
         ], $extra));
     }

@@ -83,7 +83,8 @@ class CardErrataController extends Controller
             'faction_label' => FactionEnum::from($cardErrata->faction)->label(),
             'card_name' => $cardErrata->card_name,
             'slug' => $cardErrata->slug,
-            'image' => $cardErrata->image,
+            'front_image' => $cardErrata->front_image,
+            'back_image' => $cardErrata->back_image,
             'entries' => $cardErrata->entries->map(fn ($entry) => [
                 'id' => $entry->id,
                 'what_changed' => (new ContentBuilder($entry->what_changed ?? ''))->getFullyHydratedContent(),

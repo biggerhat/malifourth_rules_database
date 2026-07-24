@@ -3,13 +3,6 @@ import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
 import SeoHead from "@/components/SeoHead.vue";
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
     Select,
@@ -123,18 +116,18 @@ onMounted(() => {
     <SeoHead :title="props.faq ? props.faq.title_text : 'FAQ'" :description="props.faq ? props.faq.meta_description : null" />
 
     <div
-        class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md"
+        class="px-2 sm:px-4 lg:px-2 text-foreground leading-6 text-md"
         :class="isListMode && !props.viewing_old_version
             ? 'grid grid-cols-1 lg:grid-cols-8 lg:gap-4'
             : 'max-w-4xl mx-auto'"
     >
         <!-- ─── Sidebar: Category Navigation (desktop) ─── -->
         <div v-if="isListMode && !props.viewing_old_version" class="lg:col-span-2 hidden lg:block">
-            <Card class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                <CardHeader class="pb-2">
-                    <CardTitle class="text-sm">Sections</CardTitle>
-                </CardHeader>
-                <CardContent class="px-2 pb-2">
+            <div class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-md border-t-2 border-primary bg-card shadow-sm">
+                <div class="px-4 pt-4 pb-2">
+                    <span class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary">Sections</span>
+                </div>
+                <div class="px-2 pb-2">
                     <button
                         v-for="cat in filteredCategories"
                         :key="cat.key"
@@ -153,8 +146,8 @@ onMounted(() => {
                                 : 'bg-muted text-muted-foreground'"
                         >{{ cat.items.length }}</span>
                     </button>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
 
         <!-- ─── Main Content Column ─── -->
@@ -187,11 +180,13 @@ onMounted(() => {
             </div>
 
             <!-- Banner -->
-            <div class="w-full text-center text-xl py-4">
-                <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-                <span v-if="!props.faq">Frequently Asked Questions</span>
-                <span v-else class="text-lg sm:text-xl">{{ props.faq.category_label }}</span>
-                <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+            <div class="w-full max-w-2xl mx-auto text-center py-4">
+                <img src='/Images/page_banner_top.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
+                <h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-medium text-balance my-1">
+                    <template v-if="!props.faq">Frequently Asked Questions</template>
+                    <template v-else>{{ props.faq.category_label }}</template>
+                </h1>
+                <img src='/Images/page_banner_bottom.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
             </div>
 
             <!-- ═══ Listing mode ═══ -->
@@ -214,7 +209,7 @@ onMounted(() => {
                     :id="`faq-category-${cat.key}`"
                     class="mb-10 scroll-mt-20"
                 >
-                    <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">
+                    <h2 class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary mb-4 pb-2 border-b border-border">
                         {{ cat.label }}
                     </h2>
 
@@ -223,7 +218,7 @@ onMounted(() => {
                         <div
                             v-for="(item) in cat.items"
                             :key="item.id"
-                            class="rounded-lg border bg-card"
+                            class="rounded-md border-t-2 border-primary bg-card shadow-sm"
                         >
                             <!-- Question -->
                             <div class="px-4 py-3 sm:px-5 sm:py-4">
@@ -280,18 +275,18 @@ onMounted(() => {
                     </Link>
                 </div>
 
-                <Card>
-                    <CardContent class="px-4 pt-5 pb-5 sm:px-6 sm:pt-6 sm:pb-6">
+                <div class="rounded-md border-t-2 border-primary bg-card shadow-sm">
+                    <div class="px-4 pt-5 pb-5 sm:px-6 sm:pt-6 sm:pb-6">
                         <!-- Question -->
                         <div class="flex gap-3 mb-4">
                             <span class="text-primary font-bold text-sm mt-0.5 shrink-0 select-none">Q:</span>
-                            <h1 class="text-sm sm:text-base font-semibold leading-relaxed min-w-0">
+                            <h2 class="text-sm sm:text-base font-semibold leading-relaxed min-w-0">
                                 <ParsedContent :content="props.faq.title" />
-                            </h1>
+                            </h2>
                         </div>
 
                         <!-- Divider -->
-                        <div class="border-t my-4"></div>
+                        <div class="border-t border-border my-4"></div>
 
                         <!-- Answer -->
                         <div class="flex gap-3">
@@ -300,12 +295,12 @@ onMounted(() => {
                                 <ParsedContent :content="props.faq.answer" />
                             </div>
                         </div>
-                    </CardContent>
+                    </div>
 
-                    <CardFooter class="border-t px-4 sm:px-6 py-3 text-xs text-muted-foreground justify-end gap-1">
+                    <div class="border-t border-border px-4 sm:px-6 py-3 text-xs text-muted-foreground text-right">
                         Last updated {{ props.faq.published_at }}
-                    </CardFooter>
-                </Card>
+                    </div>
+                </div>
 
                 <ContentReferences
                     v-if="props.references"

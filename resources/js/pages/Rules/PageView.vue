@@ -3,10 +3,6 @@ import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
 import SeoHead from "@/components/SeoHead.vue";
-import Card from "@/components/ui/card/Card.vue";
-import CardContent from "@/components/ui/card/CardContent.vue";
-import CardHeader from "@/components/ui/card/CardHeader.vue";
-import CardTitle from "@/components/ui/card/CardTitle.vue";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
@@ -149,13 +145,13 @@ watch(pageParam, () => {
 <template>
     <SeoHead :title="props.title_text || props.title" :description="props.meta_description" />
 
-    <div class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
+    <div class="px-2 sm:px-4 lg:px-2 text-foreground leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
         <div v-if="!props.viewing_old_version" class="lg:col-span-2 hidden lg:block">
-            <Card class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                <CardHeader class="pb-0">
-                    <CardTitle class="text-sm">Table of Contents</CardTitle>
-                </CardHeader>
-                <CardContent class="px-3">
+            <div class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-md border-t-2 border-primary bg-card shadow-sm">
+                <div class="px-4 pt-4 pb-2">
+                    <span class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary">Table of Contents</span>
+                </div>
+                <div class="px-3 pb-3">
                     <Link
                         v-for="page in props.pages"
                         :key="page.slug"
@@ -163,8 +159,8 @@ watch(pageParam, () => {
                         class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
                         :class="page.slug === props.slug ? 'bg-primary text-primary-foreground' : ''"
                     ><span v-html="page.title"></span></Link>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
         <div :class="props.viewing_old_version ? '' : 'lg:col-span-6'">
             <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">
@@ -188,10 +184,13 @@ watch(pageParam, () => {
                     </SelectContent>
                 </Select>
             </div>
-            <div class="w-full text-center text-xl py-4">
-                <img src='/Images/page_banner_top.png' alt="Banner Top" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-                <span v-html="props.title"></span>
-                <img src='/Images/page_banner_bottom.png' alt="Banner Bottom" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+            <div class="w-full max-w-2xl mx-auto text-center py-4">
+                <img src='/Images/page_banner_top.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
+                <h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-medium text-balance my-1" v-html="props.title"></h1>
+                <img src='/Images/page_banner_bottom.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
+                <div v-if="props.book_page_numbers" class="mt-2 text-[0.65rem] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                    {{ props.book_page_numbers }}
+                </div>
             </div>
             <div class="py-2">
                 <ParsedContent :content="props.content" />
@@ -233,3 +232,9 @@ watch(pageParam, () => {
         <ScrollToTop />
     </div>
 </template>
+
+<style scoped>
+:deep(.font-\[symbolFont\]) {
+    font-size: 1.25rem;
+}
+</style>

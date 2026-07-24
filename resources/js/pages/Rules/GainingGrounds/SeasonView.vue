@@ -2,11 +2,6 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
-import Card from "@/components/ui/card/Card.vue";
-import CardContent from "@/components/ui/card/CardContent.vue";
-import CardFooter from "@/components/ui/card/CardFooter.vue";
-import CardHeader from "@/components/ui/card/CardHeader.vue";
-import CardTitle from "@/components/ui/card/CardTitle.vue";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ChevronRight } from "lucide-vue-next";
 import {
@@ -93,21 +88,21 @@ watch(mobilePageSlug, (newSlug) => {
 
 const suitAccent = (suit: string) => {
     switch (suit) {
-        case 'rams': return 'border-l-red-500 dark:border-l-red-400';
-        case 'crows': return 'border-l-green-500 dark:border-l-green-400';
-        case 'masks': return 'border-l-purple-500 dark:border-l-purple-400';
-        case 'tomes': return 'border-l-blue-500 dark:border-l-blue-400';
+        case 'rams': return 'border-l-rose-800/60 dark:border-l-rose-400/50';
+        case 'crows': return 'border-l-emerald-800/60 dark:border-l-emerald-400/50';
+        case 'masks': return 'border-l-violet-800/60 dark:border-l-violet-400/50';
+        case 'tomes': return 'border-l-sky-800/60 dark:border-l-sky-400/50';
         default: return '';
     }
 };
 
 const suitBadge = (suit: string) => {
     switch (suit) {
-        case 'rams': return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200';
-        case 'crows': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200';
-        case 'masks': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200';
-        case 'tomes': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200';
-        default: return 'bg-muted text-muted-foreground';
+        case 'rams': return 'border border-border text-rose-700 dark:text-rose-300';
+        case 'crows': return 'border border-border text-emerald-700 dark:text-emerald-300';
+        case 'masks': return 'border border-border text-violet-700 dark:text-violet-300';
+        case 'tomes': return 'border border-border text-sky-700 dark:text-sky-300';
+        default: return 'border border-border text-muted-foreground';
     }
 };
 
@@ -125,15 +120,15 @@ const suitSymbol = (suit: string) => {
 <template>
     <Head :title="props.season.title" />
 
-    <div class="px-2 sm:px-4 lg:px-2 text-primary leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
+    <div class="px-2 sm:px-4 lg:px-2 text-foreground leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
         <!-- Sidebar: Season list (desktop) -->
         <div v-if="!props.viewing_old_version" class="lg:col-span-2 hidden lg:block">
             <div class="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto space-y-2">
-                <Card>
-                    <CardHeader class="pb-0">
-                        <CardTitle class="text-sm">Seasons</CardTitle>
-                    </CardHeader>
-                    <CardContent class="px-3">
+                <div class="rounded-md border-t-2 border-primary bg-card shadow-sm">
+                    <div class="px-4 pt-4 pb-2">
+                        <span class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary">Seasons</span>
+                    </div>
+                    <div class="px-3 pb-3">
                         <Link
                             v-for="s in props.seasons"
                             :key="s.id"
@@ -141,13 +136,13 @@ const suitSymbol = (suit: string) => {
                             class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
                             :class="s.slug === props.season.slug ? 'bg-primary text-primary-foreground' : ''"
                         >{{ s.title }}</Link>
-                    </CardContent>
-                </Card>
-                <Card v-if="props.seasonPages.length > 0">
-                    <CardHeader class="pb-0">
-                        <CardTitle class="text-sm">Pages</CardTitle>
-                    </CardHeader>
-                    <CardContent class="px-3">
+                    </div>
+                </div>
+                <div v-if="props.seasonPages.length > 0" class="rounded-md border-t-2 border-primary bg-card shadow-sm">
+                    <div class="px-4 pt-4 pb-2">
+                        <span class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary">Pages</span>
+                    </div>
+                    <div class="px-3 pb-3">
                         <Link
                             :href="route('rules.gaining-grounds.season', props.season.slug)"
                             class="p-2 block text-sm rounded-md transition-colors hover:bg-muted bg-primary text-primary-foreground"
@@ -158,8 +153,8 @@ const suitSymbol = (suit: string) => {
                             :href="route('rules.gaining-grounds.season-page', [props.season.slug, page.slug])"
                             class="p-2 block text-sm rounded-md transition-colors hover:bg-muted"
                         >{{ page.title }}</Link>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -203,25 +198,25 @@ const suitSymbol = (suit: string) => {
             </div>
 
             <!-- Banner -->
-            <div class="w-full text-center text-xl py-4">
-                <img src='/Images/page_banner_top.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
-                <span>{{ props.season.title }}</span>
-                <img src='/Images/page_banner_bottom.png' alt="" class="w-3/4 sm:w-1/2 lg:w-1/3 mx-auto" />
+            <div class="w-full max-w-2xl mx-auto text-center py-4">
+                <img src='/Images/page_banner_top.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
+                <h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-medium text-balance my-1">{{ props.season.title }}</h1>
+                <img src='/Images/page_banner_bottom.png' alt="" class="w-40 sm:w-48 mx-auto opacity-90" />
             </div>
 
             <!-- Season Content -->
-            <Card v-if="props.season.content && props.season.content.length > 0" class="mb-8">
-                <CardContent>
+            <div v-if="props.season.content && props.season.content.length > 0" class="mb-8 rounded-md border-t-2 border-primary bg-card shadow-sm">
+                <div class="p-6 season-content">
                     <ParsedContent :content="props.season.content" />
-                </CardContent>
-                <CardFooter v-if="!props.viewing_old_version" class="border-t px-6 py-3 text-xs text-muted-foreground justify-end">
+                </div>
+                <div v-if="!props.viewing_old_version" class="border-t border-border px-6 py-3 text-xs text-muted-foreground text-right">
                     Last updated {{ props.season.published_at }} by {{ props.season.published_by }}
-                </CardFooter>
-            </Card>
+                </div>
+            </div>
 
             <!-- Strategies -->
             <div v-if="props.strategies.length > 0" class="mb-8">
-                <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Strategies</h2>
+                <h2 class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary mb-4 pb-2 border-b border-border">Strategies</h2>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <Link
                         v-for="strategy in props.strategies"
@@ -230,14 +225,14 @@ const suitSymbol = (suit: string) => {
                         class="group block"
                     >
                         <div
-                            class="rounded-lg border border-l-4 bg-card p-3 sm:p-4 h-full transition-colors hover:bg-muted/50"
+                            class="rounded-lg border border-border border-l-4 bg-card p-3 sm:p-4 h-full transition-colors hover:bg-muted/50"
                             :class="suitAccent(strategy.suit)"
                         >
                             <img v-if="strategy.front_image" :src="strategy.front_image" :alt="strategy.title" class="w-full rounded mb-3" />
                             <div class="text-sm font-medium group-hover:underline">{{ strategy.title }}</div>
                             <span
                                 v-if="strategy.suit_label"
-                                class="inline-flex items-center gap-1 mt-1.5 text-[11px] px-1.5 py-0.5 rounded font-medium"
+                                class="inline-flex items-center gap-1 mt-1.5 text-[11px] px-1.5 py-0.5 rounded-full font-medium"
                                 :class="suitBadge(strategy.suit)"
                             >
                                 <span class="font-[symbolFont] text-sm">{{ suitSymbol(strategy.suit) }}</span>
@@ -250,13 +245,13 @@ const suitSymbol = (suit: string) => {
 
             <!-- Schemes -->
             <div v-if="props.schemes.length > 0" class="mb-8">
-                <h2 class="font-semibold text-base sm:text-lg mb-4 pb-2 border-b">Schemes</h2>
+                <h2 class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary mb-4 pb-2 border-b border-border">Schemes</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                     <Link
                         v-for="scheme in props.schemes"
                         :key="scheme.id"
                         :href="route('rules.gaining-grounds.scheme', scheme.slug)"
-                        class="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
+                        class="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 hover:bg-muted/50 transition-colors"
                     >
                         <img v-if="scheme.front_image" :src="scheme.front_image" :alt="scheme.title" class="size-8 rounded object-cover shrink-0" />
                         <span class="text-sm font-medium truncate">{{ scheme.title }}</span>
@@ -276,3 +271,9 @@ const suitSymbol = (suit: string) => {
         <ScrollToTop />
     </div>
 </template>
+
+<style scoped>
+.season-content :deep(.font-\[symbolFont\]) {
+    font-size: 1.25rem;
+}
+</style>

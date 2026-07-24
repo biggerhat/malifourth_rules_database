@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { computed } from "vue"
 
 const props = defineProps({
@@ -189,7 +188,7 @@ function highlightSnippet(snippet: string): string {
     for (const term of props.queryTerms) {
         const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         const regex = new RegExp(`(${escaped})`, 'gi')
-        result = result.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800 rounded px-0.5">$1</mark>')
+        result = result.replace(regex, '<mark class="bg-primary/25 text-inherit rounded px-0.5">$1</mark>')
     }
 
     return result
@@ -199,7 +198,7 @@ function highlightSnippet(snippet: string): string {
 <template>
     <div class="max-w-4xl mx-auto px-2 sm:px-4 py-6 space-y-6">
         <div>
-            <h1 class="text-xl sm:text-2xl font-bold">Search results for "{{ props.query }}"</h1>
+            <h1 class="font-[family-name:var(--font-display)] text-2xl sm:text-3xl font-medium text-balance">Search results for &ldquo;{{ props.query }}&rdquo;</h1>
             <p class="text-sm text-muted-foreground mt-1">{{ totalResults }} result{{ totalResults !== 1 ? 's' : '' }} found</p>
         </div>
 
@@ -208,22 +207,18 @@ function highlightSnippet(snippet: string): string {
         </div>
 
         <div v-for="group in groups" :key="group.label" class="space-y-3">
-            <h2 class="text-lg font-semibold text-muted-foreground">{{ group.label }}</h2>
+            <h2 class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary pb-2 border-b border-border">{{ group.label }}</h2>
             <div class="grid gap-3">
-                <Card v-for="item in group.items" :key="item.id" class="shadow-md py-4 gap-2">
-                    <CardHeader>
-                        <CardTitle class="text-base flex items-center gap-2">
-                            <span class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground shrink-0">{{ item.type }}</span>
-                            <Link :href="item.href">
-                                <span v-if="item.htmlTitle" v-html="item.title"></span>
-                                <template v-else>{{ item.title }}</template>
-                            </Link>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent v-if="item.snippet" class="text-sm text-muted-foreground">
-                        <p v-html="highlightSnippet(item.snippet)" />
-                    </CardContent>
-                </Card>
+                <div v-for="item in group.items" :key="item.id" class="rounded-md border-t-2 border-primary bg-card shadow-sm px-4 py-3">
+                    <div class="text-base font-medium flex items-center gap-2">
+                        <span class="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide text-muted-foreground shrink-0">{{ item.type }}</span>
+                        <Link :href="item.href" class="hover:text-primary transition-colors">
+                            <span v-if="item.htmlTitle" v-html="item.title"></span>
+                            <template v-else>{{ item.title }}</template>
+                        </Link>
+                    </div>
+                    <p v-if="item.snippet" class="text-sm text-muted-foreground mt-1.5" v-html="highlightSnippet(item.snippet)" />
+                </div>
             </div>
         </div>
     </div>

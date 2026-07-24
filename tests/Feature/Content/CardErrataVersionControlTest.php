@@ -154,25 +154,30 @@ it('throws when publishing a card errata that was never submitted for approval',
     $card->publish($this->editor);
 });
 
-it('uploads a single card-level image and stores it on the card, not the entries', function () {
+it('uploads front and back card-level images and stores them on the card, not the entries', function () {
     Storage::fake('public');
 
     $attributes = $this->cardAttributes;
-    $attributes['image'] = UploadedFile::fake()->image('lucius.png');
+    $attributes['front_image'] = UploadedFile::fake()->image('lucius-front.png');
+    $attributes['back_image'] = UploadedFile::fake()->image('lucius-back.png');
 
     $this->actingAs($this->editor)->post(route('admin.card-errata.store'), $attributes)->assertRedirect();
     $card = CardErrata::with('entries')->latest('id')->firstOrFail();
 
-    expect($card->image)->not->toBeNull();
-    Storage::disk('public')->assertExists(str_replace('/storage/', '', $card->image));
+    expect($card->front_image)->not->toBeNull();
+    expect($card->back_image)->not->toBeNull();
+    expect($card->front_image)->not->toBe($card->back_image);
+    Storage::disk('public')->assertExists(str_replace('/storage/', '', $card->front_image));
+    Storage::disk('public')->assertExists(str_replace('/storage/', '', $card->back_image));
     expect($card->entries->first()->getAttributes())->not->toHaveKeys(['front_image', 'back_image']);
 });
 
-it('preserves the existing card image when a new version is created without a new upload', function () {
+it('preserves the existing card images when a new version is created without new uploads', function () {
     Storage::fake('public');
 
     $attributes = $this->cardAttributes;
-    $attributes['image'] = UploadedFile::fake()->image('lucius.png');
+    $attributes['front_image'] = UploadedFile::fake()->image('lucius-front.png');
+    $attributes['back_image'] = UploadedFile::fake()->image('lucius-back.png');
     $this->actingAs($this->editor)->post(route('admin.card-errata.store'), $attributes);
     $card = CardErrata::latest('id')->firstOrFail();
     $card->approval->update(['approved_at' => now(), 'approved_by' => $this->editor->id]);
@@ -180,12 +185,14 @@ it('preserves the existing card image when a new version is created without a ne
     $card->refresh();
 
     $updatedAttributes = $this->cardAttributes;
-    $updatedAttributes['existing_image'] = $card->image;
+    $updatedAttributes['existing_front_image'] = $card->front_image;
+    $updatedAttributes['existing_back_image'] = $card->back_image;
 
     $this->actingAs($this->editor)->post(route('admin.card-errata.update', $card), $updatedAttributes);
 
     $draft = CardErrata::where('id', '!=', $card->id)->latest('id')->firstOrFail();
-    expect($draft->image)->toBe($card->image);
+    expect($draft->front_image)->toBe($card->front_image);
+    expect($draft->back_image)->toBe($card->back_image);
 });
 
 it('renders bold and italic markup from entry text as real html, not raw markup or escaped text', function () {

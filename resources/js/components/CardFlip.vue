@@ -52,7 +52,7 @@ const flip = () => {
                         :alt="props.alt"
                         loading="lazy"
                         decoding="async"
-                        class="h-full w-full rounded-md border object-cover"
+                        class="h-full w-full rounded-md border bg-muted object-contain"
                     />
                     <div v-else class="h-full w-full rounded-md border border-dashed flex items-center justify-center text-sm text-muted-foreground">
                         No card image
@@ -65,7 +65,7 @@ const flip = () => {
                         :alt="`${props.alt} back`"
                         loading="lazy"
                         decoding="async"
-                        class="h-full w-full rounded-md border object-cover"
+                        class="h-full w-full rounded-md border bg-muted object-contain"
                     />
                 </div>
             </div>

@@ -15,7 +15,6 @@ enum FaqCategoryEnum: string
     case Actions = 'actions';
     case Terrain = 'terrain';
     case Encounters = 'encounters';
-    case Campaign = 'campaign';
     #[EnumLabel('Specific Abilities, Actions, and Triggers')]
     case SpecificAbilities = 'specific_abilities';
     case Arcanists = 'arcanists';
@@ -28,6 +27,7 @@ enum FaqCategoryEnum: string
     case Resurrectionists = 'resurrectionists';
     #[EnumLabel('Ten Thunders')]
     case TenThunders = 'ten_thunders';
+    case Campaign = 'campaign';
 
     public function sortOrder(): int
     {
@@ -36,16 +36,16 @@ enum FaqCategoryEnum: string
             self::Actions => 2,
             self::Terrain => 3,
             self::Encounters => 4,
-            self::Campaign => 5,
-            self::SpecificAbilities => 6,
-            self::Arcanists => 7,
-            self::Bayou => 8,
-            self::ExplorersSociety => 9,
-            self::Guild => 10,
-            self::Neverborn => 11,
-            self::Outcasts => 12,
-            self::Resurrectionists => 13,
-            self::TenThunders => 14,
+            self::SpecificAbilities => 5,
+            self::Arcanists => 6,
+            self::Bayou => 7,
+            self::ExplorersSociety => 8,
+            self::Guild => 9,
+            self::Neverborn => 10,
+            self::Outcasts => 11,
+            self::Resurrectionists => 12,
+            self::TenThunders => 13,
+            self::Campaign => 14,
         };
     }
 }

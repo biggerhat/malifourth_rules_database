@@ -191,7 +191,7 @@ class FaqAdminController extends Controller
     public function bulkDelete(Request $request): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validate(['ids' => ['required', 'array'], 'ids.*' => ['integer']]);
-        $count = Faq::whereIn('id', $validated['ids'])->whereNull('published_at')->delete();
+        $count = Faq::whereIn('id', $validated['ids'])->delete();
 
         return redirect()->back()->withMessage("{$count} FAQ(s) deleted.");
     }

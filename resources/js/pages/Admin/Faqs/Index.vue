@@ -103,7 +103,7 @@ const columns: ColumnDef<any>[] = [
                 viewRoute: route('admin.faqs.view', faq.slug),
                 viewComponent: FaqView,
                 editRoute: route('admin.faqs.edit', faq.slug),
-                deleteRoute: faq.published_at ? null : route('admin.faqs.delete', faq.slug),
+                deleteRoute: route('admin.faqs.delete', faq.slug),
                 approvalRoute: faq.approval?.approved_at ? null : route('admin.approvals.update', faq.approval?.id),
                 publishRoute: publishable ? route('admin.faqs.publish', faq.slug) : null,
             }))

@@ -5,6 +5,7 @@ namespace App\Services\ContentBuilder;
 use App\Models\Index;
 use App\Models\Page;
 use App\Models\Section;
+use Illuminate\Support\Facades\Cache;
 
 class ContentBuilder
 {
@@ -70,8 +71,14 @@ class ContentBuilder
         'section',
     ];
 
-    public function __construct(public string $stringContent)
-    {
+    private ContentHydrationContext $hydrationContext;
+
+    public function __construct(
+        public string $stringContent,
+        private int $depth = 0,
+        ?ContentHydrationContext $hydrationContext = null,
+    ) {
+        $this->hydrationContext = $hydrationContext ?? new ContentHydrationContext;
         $this->parsedContent = $this->parseTaggedTextRecursive();
         $this->jsonContent = json_encode($this->parsedContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
@@ -127,36 +134,76 @@ class ContentBuilder
         return str_replace($search, $replace, $content);
     }
 
+    /**
+     * Cache the (potentially expensive, recursive) hydration of published content.
+     *
+     * The cache key embeds `$version` (typically the row's `published_at` timestamp), so a new
+     * publish naturally produces a new key instead of requiring explicit invalidation — stale
+     * entries just age out. Only cache published content: unpublished/draft previews change on
+     * every keystroke in the admin editor and shouldn't be cached at all.
+     */
+    public static function hydrateCached(string $content, string $cacheKeyPrefix, \DateTimeInterface|string|null $version): array
+    {
+        if ($version === null) {
+            return (new self($content))->getFullyHydratedContent();
+        }
+
+        $versionKey = $version instanceof \DateTimeInterface ? $version->getTimestamp() : $version;
+        $cacheKey = "content-hydrated:{$cacheKeyPrefix}:{$versionKey}";
+
+        // A short TTL (matching SitemapController's precedent) bounds staleness from cross-references:
+        // this key only changes when the row itself republishes, not when a page/section *it links to*
+        // is edited, so content embedded via {{pageLink=}}/{{section=}} can lag up to an hour.
+        return Cache::remember($cacheKey, now()->addHour(), fn () => (new self($content))->getFullyHydratedContent());
+    }
+
     public function getFullyHydratedContent(): array
     {
         $content = $this->getParsedContent();
         $slugs = $this->getTagSlugs();
+        $atMaxDepth = $this->depth >= ContentHydrationContext::MAX_DEPTH;
+        $nextDepth = $this->depth + 1;
+
+        $this->hydrationContext->resolved[$this->depth] ??= [];
+
         $modelMap = [];
-        foreach ($slugs as $key => $slug) {
+        foreach ($slugs as $key => $slugList) {
             if (! isset($this->slugModelMap[$key])) {
                 continue;
             }
 
-            $modelMap[$key] = $this->slugModelMap[$key]::whereIn('slug', $slug)
-                ->with('newestVersion')
-                ->withTrashed()
-                ->get()
-                ->keyBy('slug')
-                ->map(function ($model) use ($key) {
-                    $title = $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null;
+            $this->hydrationContext->resolved[$this->depth][$key] ??= [];
+            $cached = $this->hydrationContext->resolved[$this->depth][$key];
 
-                    return [
-                        'slug' => $model->newestVersion->slug ?? $model->slug,
-                        'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,
-                        'inline' => ! in_array($key, $this->blockTags),
-                        'image' => $model->newestVersion->image ?? $model->image ?? null,
-                        'title' => $title ? ContentBuilder::parseTitleTags($title) : $title,
-                        'content' => (new ContentBuilder($model->newestVersion->content ?? $model->content ?? ''))->getFullyHydratedContent(),
-                        'left_column' => (new ContentBuilder($model->newestVersion->left_column ?? $model->left_column ?? ''))->getFullyHydratedContent(),
-                        'right_column' => (new ContentBuilder($model->newestVersion->right_column ?? $model->right_column ?? ''))->getFullyHydratedContent(),
-                    ];
-                })
-                ->toArray();
+            $uncachedSlugs = array_values(array_diff($slugList, array_keys($cached)));
+
+            if ($uncachedSlugs !== []) {
+                $resolved = $this->slugModelMap[$key]::whereIn('slug', $uncachedSlugs)
+                    ->with('newestVersion')
+                    ->withTrashed()
+                    ->get()
+                    ->keyBy('slug')
+                    ->map(function ($model) use ($key, $atMaxDepth, $nextDepth) {
+                        $title = $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null;
+
+                        return [
+                            'slug' => $model->newestVersion->slug ?? $model->slug,
+                            'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,
+                            'inline' => ! in_array($key, $this->blockTags),
+                            'image' => $model->newestVersion->image ?? $model->image ?? null,
+                            'title' => $title ? ContentBuilder::parseTitleTags($title) : $title,
+                            'content' => $atMaxDepth ? [] : (new ContentBuilder($model->newestVersion->content ?? $model->content ?? '', $nextDepth, $this->hydrationContext))->getFullyHydratedContent(),
+                            'left_column' => $atMaxDepth ? [] : (new ContentBuilder($model->newestVersion->left_column ?? $model->left_column ?? '', $nextDepth, $this->hydrationContext))->getFullyHydratedContent(),
+                            'right_column' => $atMaxDepth ? [] : (new ContentBuilder($model->newestVersion->right_column ?? $model->right_column ?? '', $nextDepth, $this->hydrationContext))->getFullyHydratedContent(),
+                        ];
+                    })
+                    ->toArray();
+
+                $cached = array_merge($cached, $resolved);
+                $this->hydrationContext->resolved[$this->depth][$key] = $cached;
+            }
+
+            $modelMap[$key] = array_intersect_key($cached, array_flip($slugList));
         }
 
         return $this->hydrateParsedTags($content, $modelMap);

@@ -45,7 +45,7 @@ class IndexController extends Controller
 
     private function renderIndex(Index $index, array $extra = [])
     {
-        $content = (new ContentBuilder($index->content ?? ''))->getFullyHydratedContent();
+        $content = ContentBuilder::hydrateCached($index->content ?? '', "index:{$index->id}", $index->published_at);
 
         return inertia('Rules/IndexView', array_merge([
             'title' => ContentBuilder::parseTitleTags($index->title),

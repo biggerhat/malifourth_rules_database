@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Actions\Content\SyncContentReferencesAction;
+use App\Jobs\SyncContentReferencesJob;
 use App\Models\Errata;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;
@@ -23,7 +23,7 @@ class ErrataObserver
             'slug' => $errata->id.'-'.Str::slug($errata->title),
         ]);
 
-        SyncContentReferencesAction::handle($errata);
+        SyncContentReferencesJob::dispatch($errata);
     }
 
     public function updating(Errata $errata): void
@@ -36,7 +36,7 @@ class ErrataObserver
 
     public function updated(Errata $errata): void
     {
-        SyncContentReferencesAction::handle($errata);
+        SyncContentReferencesJob::dispatch($errata);
     }
 
     public function deleted(Errata $errata): void

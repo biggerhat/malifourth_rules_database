@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Actions\Content\SyncContentReferencesAction;
+use App\Jobs\SyncContentReferencesJob;
 use App\Models\Scheme;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;
@@ -21,7 +21,7 @@ class SchemeObserver
             'slug' => $scheme->id.'-'.Str::slug($scheme->title),
         ]);
 
-        SyncContentReferencesAction::handle($scheme);
+        SyncContentReferencesJob::dispatch($scheme);
     }
 
     public function updating(Scheme $scheme): void
@@ -32,7 +32,7 @@ class SchemeObserver
 
     public function updated(Scheme $scheme): void
     {
-        SyncContentReferencesAction::handle($scheme);
+        SyncContentReferencesJob::dispatch($scheme);
     }
 
     public function deleted(Scheme $scheme): void

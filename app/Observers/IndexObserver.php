@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Actions\Content\SyncContentReferencesAction;
+use App\Jobs\SyncContentReferencesJob;
 use App\Models\Index;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;
@@ -23,12 +23,12 @@ class IndexObserver
             'slug' => $index->id.'-'.Str::slug($index->title),
         ]);
 
-        SyncContentReferencesAction::handle($index);
+        SyncContentReferencesJob::dispatch($index);
     }
 
     public function updated(Index $index): void
     {
-        SyncContentReferencesAction::handle($index);
+        SyncContentReferencesJob::dispatch($index);
     }
 
     public function updating(Index $index): void

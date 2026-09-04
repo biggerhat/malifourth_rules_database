@@ -22,14 +22,14 @@ class FaqController extends Controller
             ->map(function (Faq $faq) {
                 return [
                     'id' => $faq->id,
-                    'title' => (new ContentBuilder($faq->title))->getFullyHydratedContent(),
+                    'title' => ContentBuilder::hydrateCached($faq->title, "faq:{$faq->id}:title", $faq->published_at),
                     'title_text' => ContentBuilder::toPlainText($faq->title),
                     'slug' => $faq->slug,
                     'category' => $faq->category->value,
                     'category_label' => $faq->category->label(),
                     'category_sort' => $faq->category->sortOrder(),
                     'sort_order' => $faq->sort_order,
-                    'answer' => (new ContentBuilder($faq->answer ?? ''))->getFullyHydratedContent(),
+                    'answer' => ContentBuilder::hydrateCached($faq->answer ?? '', "faq:{$faq->id}:answer", $faq->published_at),
                     'answer_text' => ContentBuilder::toSearchable($faq->answer ?? ''),
                 ];
             })
@@ -60,7 +60,7 @@ class FaqController extends Controller
             return response('', 404);
         }
 
-        $answer = (new ContentBuilder($faq->answer ?? ''))->getFullyHydratedContent();
+        $answer = ContentBuilder::hydrateCached($faq->answer ?? '', "faq:{$faq->id}:answer", $faq->published_at);
 
         return inertia('Rules/FaqView', [
             'faq' => $this->serializeFaq($faq, $answer),
@@ -82,7 +82,7 @@ class FaqController extends Controller
             return response('', 404);
         }
 
-        $answer = (new ContentBuilder($faq->answer ?? ''))->getFullyHydratedContent();
+        $answer = ContentBuilder::hydrateCached($faq->answer ?? '', "faq:{$faq->id}:answer", $faq->published_at);
 
         return inertia('Rules/FaqView', [
             'faq' => $this->serializeFaq($faq, $answer),
@@ -95,7 +95,7 @@ class FaqController extends Controller
     private function serializeFaq(Faq $faq, array $answer): array
     {
         return [
-            'title' => (new ContentBuilder($faq->title))->getFullyHydratedContent(),
+            'title' => ContentBuilder::hydrateCached($faq->title, "faq:{$faq->id}:title", $faq->published_at),
             'title_text' => ContentBuilder::toPlainText($faq->title),
             'meta_description' => Str::limit(ContentBuilder::toSearchable($faq->answer ?? ''), 155),
             'slug' => $faq->slug,

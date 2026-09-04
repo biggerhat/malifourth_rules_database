@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Actions\Content\SyncContentReferencesAction;
+use App\Jobs\SyncContentReferencesJob;
 use App\Models\Strategy;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;
@@ -21,7 +21,7 @@ class StrategyObserver
             'slug' => $strategy->id.'-'.Str::slug($strategy->title),
         ]);
 
-        SyncContentReferencesAction::handle($strategy);
+        SyncContentReferencesJob::dispatch($strategy);
     }
 
     public function updating(Strategy $strategy): void
@@ -32,7 +32,7 @@ class StrategyObserver
 
     public function updated(Strategy $strategy): void
     {
-        SyncContentReferencesAction::handle($strategy);
+        SyncContentReferencesJob::dispatch($strategy);
     }
 
     public function deleted(Strategy $strategy): void

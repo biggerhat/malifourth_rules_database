@@ -87,9 +87,9 @@ class CardErrataController extends Controller
             'back_image' => $cardErrata->back_image,
             'entries' => $cardErrata->entries->map(fn ($entry) => [
                 'id' => $entry->id,
-                'what_changed' => (new ContentBuilder($entry->what_changed ?? ''))->getFullyHydratedContent(),
-                'what_it_was' => (new ContentBuilder($entry->what_it_was ?? ''))->getFullyHydratedContent(),
-                'what_it_is_now' => (new ContentBuilder($entry->what_it_is_now ?? ''))->getFullyHydratedContent(),
+                'what_changed' => ContentBuilder::hydrateCached($entry->what_changed ?? '', "card-errata-entry:{$entry->id}:what_changed", $cardErrata->published_at),
+                'what_it_was' => ContentBuilder::hydrateCached($entry->what_it_was ?? '', "card-errata-entry:{$entry->id}:what_it_was", $cardErrata->published_at),
+                'what_it_is_now' => ContentBuilder::hydrateCached($entry->what_it_is_now ?? '', "card-errata-entry:{$entry->id}:what_it_is_now", $cardErrata->published_at),
             ]),
             'published_at' => $cardErrata->published_at?->format('m-d-Y'),
             'published_by' => $cardErrata->publishedBy?->name,

@@ -45,8 +45,8 @@ class SectionController extends Controller
 
     private function renderSection(Section $section, array $extra = [])
     {
-        $leftColumn = (new ContentBuilder($section->left_column ?? ''))->getFullyHydratedContent();
-        $rightColumn = (new ContentBuilder($section->right_column ?? ''))->getFullyHydratedContent();
+        $leftColumn = ContentBuilder::hydrateCached($section->left_column ?? '', "section:{$section->id}:left", $section->published_at);
+        $rightColumn = ContentBuilder::hydrateCached($section->right_column ?? '', "section:{$section->id}:right", $section->published_at);
 
         $description = Str::limit(
             ContentBuilder::toSearchable(($section->left_column ?? '').' '.($section->right_column ?? '')),

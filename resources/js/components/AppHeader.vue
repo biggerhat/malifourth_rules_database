@@ -101,9 +101,27 @@ const staticNavItems: NavItem[] = [
         icon: LayoutGrid,
         external: false,
     },{
+        title: 'Glossary',
+        href: route('rules.glossary'),
+        route: 'rules.glossary',
+        icon: LayoutGrid,
+        external: false,
+    },{
         title: 'Errata',
         href: route('errata.index'),
         route: 'errata.index',
+        icon: LayoutGrid,
+        external: false,
+    },{
+        title: 'Changelog',
+        href: route('changelog.index'),
+        route: 'changelog.index',
+        icon: LayoutGrid,
+        external: false,
+    },{
+        title: 'Transparency',
+        href: route('transparency.index'),
+        route: 'transparency.index',
         icon: LayoutGrid,
         external: false,
     },
@@ -121,8 +139,21 @@ const dynamicNavItems = computed<NavItem[]>(() => {
         }));
 });
 
+const favoritesNavItem = computed<NavItem[]>(() =>
+    auth.value.user
+        ? [{
+            title: 'Favorites',
+            href: route('favorites.index'),
+            route: 'favorites.index',
+            icon: LayoutGrid,
+            external: false,
+        }]
+        : [],
+);
+
 const mainNavItems = computed<NavItem[]>(() => [
     ...staticNavItems,
+    ...favoritesNavItem.value,
     ...dynamicNavItems.value,
 ]);
 
@@ -131,7 +162,7 @@ const rightNavItems: NavItem[] = [];
 
 <template>
     <div>
-        <div class="border-b border-sidebar-border/80">
+        <div class="border-b border-sidebar-border/80 print:hidden">
             <div class="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                 <!-- Mobile Menu -->
                 <div class="lg:hidden">

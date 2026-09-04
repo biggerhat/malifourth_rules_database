@@ -44,9 +44,24 @@ it('includes published card errata urls in the sitemap', function () {
     $response->assertSee(route('errata.cards.view', $card->slug), false);
 });
 
-it('serves a robots.txt that points at the sitemap', function () {
+it('serves a robots.txt that points at the sitemap and disallows the api docs', function () {
     $response = $this->get('/robots.txt');
 
     $response->assertOk();
     $response->assertSee(route('sitemap'), false);
+    $response->assertSee('Disallow: /docs/');
+});
+
+it('includes changefreq and priority for each url in the sitemap', function () {
+    $page = Page::factory()->published()->create(['page_number' => 1]);
+
+    $response = $this->get('/sitemap.xml');
+
+    $response->assertOk();
+    $content = $response->getContent();
+    $urlBlock = substr($content, (int) strpos($content, '<loc>'.route('rules.page.view', $page->slug).'</loc>'));
+
+    expect($urlBlock)->toContain('<lastmod>')
+        ->toContain('<changefreq>monthly</changefreq>')
+        ->toContain('<priority>0.9</priority>');
 });

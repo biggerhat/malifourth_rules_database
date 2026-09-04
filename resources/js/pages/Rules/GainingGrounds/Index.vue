@@ -2,6 +2,7 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import { ChevronRight } from "lucide-vue-next";
 import {
     Select,
@@ -106,7 +107,10 @@ const suitSymbol = (suit: string) => {
 </script>
 
 <template>
-    <Head title="Gaining Grounds" />
+    <SeoHead
+        title="Gaining Grounds"
+        :description="props.season ? `Tournament strategies, schemes, and rules for the ${props.season.title} season of Malifaux Gaining Grounds.` : 'Tournament strategies, schemes, and rules for Malifaux Gaining Grounds.'"
+    />
 
     <div class="px-2 sm:px-4 lg:px-2 text-foreground leading-6 text-md" :class="props.season ? 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2' : 'max-w-4xl mx-auto'">
         <!-- Sidebar: Season list (desktop) -->
@@ -247,6 +251,8 @@ const suitSymbol = (suit: string) => {
                     :references="props.references.references"
                     :referenced_by="props.references.referenced_by"
                     :revision_history="props.references.revision_history"
+                    :favorite="props.references.favorite"
+                    :suggestion="props.references.suggestion"
                 />
             </template>
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import { ChevronLeft, ChevronRight } from "lucide-vue-next";
 
 const props = defineProps({
@@ -25,7 +26,10 @@ const factionLogos: Record<string, string> = {
 </script>
 
 <template>
-    <Head title="Card Errata" />
+    <SeoHead
+        title="Card Errata"
+        description="Browse Malifaux 4th Edition card errata by faction."
+    />
 
     <div class="max-w-4xl mx-auto px-2 sm:px-4 text-foreground leading-6 text-md">
         <!-- Back link -->

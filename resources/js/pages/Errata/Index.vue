@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import { ChevronRight } from "lucide-vue-next";
 
 const props = defineProps({
@@ -21,7 +22,10 @@ const props = defineProps({
 </script>
 
 <template>
-    <Head title="Errata" />
+    <SeoHead
+        title="Errata"
+        description="Official card errata and rules errata for Malifaux 4th Edition, organized by faction and release."
+    />
 
     <div class="max-w-4xl mx-auto px-2 sm:px-4 text-foreground leading-6 text-md">
         <div class="w-full max-w-2xl mx-auto text-center py-4">

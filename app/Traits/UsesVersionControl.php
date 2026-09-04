@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Models\Favorite;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -82,5 +83,56 @@ trait UsesVersionControl
         }
 
         return $this;
+    }
+
+    /**
+     * The id that stays stable for this piece of content across every edit —
+     * the first ("original") row in its version chain, or its own id if it is that row.
+     */
+    public function stableContentId(): int
+    {
+        // Inside the model class, `$this->original` resolves to Eloquent's internal
+        // dirty-tracking snapshot (a protected array), not the `original` DB column —
+        // that magic only kicks in for property access from outside the model class.
+        // getAttribute() reads the actual column value regardless of call-site scope.
+        return $this->getAttribute('original') ?? $this->id;
+    }
+
+    public function isFavoritedBy(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        return Favorite::query()
+            ->where('user_id', $user->id)
+            ->where('favoritable_type', static::class)
+            ->where('favoritable_id', $this->stableContentId())
+            ->exists();
+    }
+
+    /**
+     * @return bool true if now favorited, false if the favorite was removed.
+     */
+    public function toggleFavorite(User $user): bool
+    {
+        $query = Favorite::query()
+            ->where('user_id', $user->id)
+            ->where('favoritable_type', static::class)
+            ->where('favoritable_id', $this->stableContentId());
+
+        if ($existing = $query->first()) {
+            $existing->delete();
+
+            return false;
+        }
+
+        Favorite::create([
+            'user_id' => $user->id,
+            'favoritable_type' => static::class,
+            'favoritable_id' => $this->stableContentId(),
+        ]);
+
+        return true;
     }
 }

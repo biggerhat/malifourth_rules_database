@@ -182,11 +182,6 @@ enum PermissionEnum: string
     #[PermissionGroup(PermissionGroupEnum::NavigationItem)]
     case DeleteNavigationItem = 'delete_navigation_item';
 
-    #[PermissionGroup(PermissionGroupEnum::Suggestion)]
-    case ViewSuggestion = 'view_suggestion';
-    #[PermissionGroup(PermissionGroupEnum::Suggestion)]
-    case ReviewSuggestion = 'review_suggestion';
-
     //    case View = 'view_';
     //    case Add = 'add_';
     //    case Edit = 'edit_';

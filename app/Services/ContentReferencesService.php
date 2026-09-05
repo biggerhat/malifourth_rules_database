@@ -34,27 +34,6 @@ class ContentReferencesService
             'references' => self::formatReferences($model),
             'referenced_by' => self::formatReferencedBy($model),
             'revision_history' => self::getRevisionHistory($model),
-            'favorite' => self::getFavoriteState($model),
-            'suggestion' => self::getSuggestionState($model),
-        ];
-    }
-
-    private static function getFavoriteState(Model $model): array
-    {
-        $user = auth()->user();
-
-        return [
-            'type' => $model::class,
-            'id' => $model->stableContentId(),
-            'is_favorited' => $model->isFavoritedBy($user),
-        ];
-    }
-
-    private static function getSuggestionState(Model $model): array
-    {
-        return [
-            'type' => $model::class,
-            'id' => $model->stableContentId(),
         ];
     }
 

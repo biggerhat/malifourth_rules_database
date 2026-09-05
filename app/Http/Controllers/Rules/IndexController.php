@@ -11,6 +11,30 @@ use Illuminate\Support\Str;
 
 class IndexController extends Controller
 {
+    public function glossary(Request $request)
+    {
+        $entries = Index::query()
+            ->published()
+            ->whereNull('newest')
+            ->orderBy('title')
+            ->get()
+            ->map(fn (Index $index) => [
+                'slug' => $index->slug,
+                'title' => ContentBuilder::parseTitleTags($index->title),
+                'title_text' => ContentBuilder::toPlainText($index->title),
+                'type' => $index->type->value,
+                'image' => $index->image,
+                'content' => $index->type->value === 'text'
+                    ? (new ContentBuilder($index->content ?? ''))->getFullyHydratedContent()
+                    : null,
+            ])
+            ->values();
+
+        return inertia('Rules/Glossary', [
+            'entries' => $entries,
+        ]);
+    }
+
     public function view(Request $request, Index $index)
     {
         $index->loadMissing('newestVersion', 'publishedBy');

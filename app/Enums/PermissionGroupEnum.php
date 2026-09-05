@@ -24,5 +24,4 @@ enum PermissionGroupEnum: string
     case Errata = 'errata';
     case CardErrata = 'card_errata';
     case NavigationItem = 'navigation_item';
-    case Suggestion = 'suggestion';
 }

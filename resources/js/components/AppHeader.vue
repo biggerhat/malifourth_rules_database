@@ -139,21 +139,8 @@ const dynamicNavItems = computed<NavItem[]>(() => {
         }));
 });
 
-const favoritesNavItem = computed<NavItem[]>(() =>
-    auth.value.user
-        ? [{
-            title: 'Favorites',
-            href: route('favorites.index'),
-            route: 'favorites.index',
-            icon: LayoutGrid,
-            external: false,
-        }]
-        : [],
-);
-
 const mainNavItems = computed<NavItem[]>(() => [
     ...staticNavItems,
-    ...favoritesNavItem.value,
     ...dynamicNavItems.value,
 ]);
 

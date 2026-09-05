@@ -5,10 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import FavoriteButton from '@/components/FavoriteButton.vue'
-import SuggestEditButton from '@/components/SuggestEditButton.vue'
-import { usePage } from '@inertiajs/vue3'
-import { computed, type PropType } from 'vue'
+import { type PropType } from 'vue'
 
 interface ReferenceItem {
     title: string;
@@ -26,18 +23,7 @@ interface RevisionItem {
     url: string;
 }
 
-interface FavoriteState {
-    type: string;
-    id: number;
-    is_favorited: boolean;
-}
-
-interface SuggestionState {
-    type: string;
-    id: number;
-}
-
-const props = defineProps({
+defineProps({
     references: {
         type: Array as PropType<ReferenceItem[]>,
         required: false,
@@ -53,30 +39,12 @@ const props = defineProps({
         required: false,
         default() { return []; }
     },
-    favorite: {
-        type: Object as PropType<FavoriteState | null>,
-        required: false,
-        default: null,
-    },
-    suggestion: {
-        type: Object as PropType<SuggestionState | null>,
-        required: false,
-        default: null,
-    }
 });
-
-const page = usePage();
-const isLoggedIn = computed(() => Boolean(page.props.auth?.user));
 
 const typeBadgeClass = () => 'border border-border text-muted-foreground';
 </script>
 
 <template>
-    <div class="flex justify-end gap-2 mt-6 print:hidden" v-if="(props.favorite || props.suggestion) && isLoggedIn">
-        <SuggestEditButton v-if="props.suggestion" :type="props.suggestion.type" :id="props.suggestion.id" />
-        <FavoriteButton v-if="props.favorite" :type="props.favorite.type" :id="props.favorite.id" :is-favorited="props.favorite.is_favorited" />
-    </div>
-
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 print:hidden" v-if="references.length > 0 || referenced_by.length > 0">
         <Card>
             <CardHeader class="pb-3">

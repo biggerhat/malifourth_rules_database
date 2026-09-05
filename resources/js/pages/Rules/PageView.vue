@@ -231,8 +231,6 @@ watch(pageParam, () => {
                 :references="props.references.references"
                 :referenced_by="props.references.referenced_by"
                 :revision_history="props.references.revision_history"
-                :favorite="props.references.favorite"
-                :suggestion="props.references.suggestion"
             />
         </div>
 

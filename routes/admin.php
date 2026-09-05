@@ -15,7 +15,6 @@ use App\Http\Controllers\Admin\SeasonAdminController;
 use App\Http\Controllers\Admin\SeasonPageAdminController;
 use App\Http\Controllers\Admin\SectionAdminController;
 use App\Http\Controllers\Admin\StrategyAdminController;
-use App\Http\Controllers\Admin\SuggestionAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 
 Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(function () {
@@ -162,12 +161,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
         Route::post('/bulk-approve', 'bulkApprove')->name('bulk-approve')->middleware(['permission:approve_strategy']);
         Route::post('/bulk-publish', 'bulkPublish')->name('bulk-publish')->middleware(['permission:publish_strategy']);
         Route::post('/bulk-delete', 'bulkDelete')->name('bulk-delete')->middleware(['permission:delete_strategy']);
-    });
-
-    Route::controller(SuggestionAdminController::class)->prefix('suggestions')->name('suggestions.')->group(function () {
-        Route::get('/', 'index')->name('index')->middleware(['permission:view_suggestion']);
-        Route::post('/review/{suggestion}', 'markReviewed')->name('review')->middleware(['permission:review_suggestion']);
-        Route::post('/dismiss/{suggestion}', 'dismiss')->name('dismiss')->middleware(['permission:review_suggestion']);
     });
 
     Route::controller(FaqAdminController::class)->prefix('faqs')->name('faqs.')->group(function () {

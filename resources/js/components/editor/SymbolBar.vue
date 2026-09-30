@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
-    Crow, Fortitude, Magic, Mask, Melee, Missile, Negative,
-    Positive, Pulse, Ram, SignatureAction, Soulstone, Tome,
+    Crow, EndOfActivation, EndOfTurn, Fortitude, Magic, Mask, Melee, Missile, Negative,
+    Positive, Pulse, Ram, SignatureAction, SpecificTime, Soulstone, Tome,
     UnusualDefense, Warding,
 } from '@/components/symbols';
 import { SYMBOL_TAGS } from '@/lib/content-tags';
@@ -23,6 +23,9 @@ const symbolComponents: Record<string, Component> = {
     soulstone: Soulstone,
     tome: Tome,
     unusualdefense: UnusualDefense,
+    endofactivation: EndOfActivation,
+    endofturn: EndOfTurn,
+    specifictime: SpecificTime,
 };
 
 const emit = defineEmits<{

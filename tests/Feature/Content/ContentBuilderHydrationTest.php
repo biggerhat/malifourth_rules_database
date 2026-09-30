@@ -1,10 +1,12 @@
 <?php
 
 use App\Models\Page;
+use App\Models\User;
 use App\Services\ContentBuilder\ContentBuilder;
 use App\Services\ContentBuilder\ContentHydrationContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 
 uses(RefreshDatabase::class);
 
@@ -71,4 +73,48 @@ it('does not re-query a slug already resolved by a sibling at the same depth', f
     // 1 query resolves [branchOne, branchTwo] at depth 0, and 1 more resolves [target] once at
     // depth 1 — not twice, even though both branches reference it.
     expect($pageQueries->count())->toBe(2);
+});
+
+it('caps total items hydrated across the whole tree, not just per depth', function () {
+    Queue::fake();
+
+    $user = User::factory()->create();
+    $leafCount = ContentHydrationContext::MAX_TOTAL_RESOLVED + 20;
+
+    // Bypass the factory here (its page_number faker only has a 1-100 unique range) — a wide,
+    // non-cyclic fan-out of distinct pages under one branch is what the total-item budget guards
+    // against, since the depth cap alone doesn't limit how much work happens at a single depth.
+    $leaves = collect(range(0, $leafCount - 1))->map(fn ($i) => Page::create([
+        'title' => "Leaf {$i}",
+        'content' => "Rules text {$i}.",
+        'page_number' => 1000 + $i,
+        'published_at' => now(),
+        'published_by' => $user->id,
+    ]));
+
+    $branchContent = $leaves->map(fn ($leaf) => "{{pageLink={$leaf->slug}}}leaf{{/pageLink}}")->implode('');
+    $branch = Page::create([
+        'title' => 'Branch',
+        'content' => $branchContent,
+        'page_number' => 999,
+        'published_at' => now(),
+        'published_by' => $user->id,
+    ]);
+    $root = Page::create([
+        'title' => 'Root',
+        'content' => "{{pageLink={$branch->slug}}}branch{{/pageLink}}",
+        'page_number' => 998,
+        'published_at' => now(),
+        'published_by' => $user->id,
+    ]);
+
+    $hydrated = (new ContentBuilder($root->fresh()->content))->getFullyHydratedContent();
+    $leafContents = collect($hydrated[0]['pageLink']['content'])->pluck('pageLink.content');
+
+    // Some leaves fall within the budget and get their own content hydrated; once the shared
+    // budget is exhausted, the rest are truncated to [] even though they're all at the same depth.
+    expect($leafContents->filter(fn ($c) => $c !== [])->count())
+        ->toBeLessThanOrEqual(ContentHydrationContext::MAX_TOTAL_RESOLVED)
+        ->toBeGreaterThan(0);
+    expect($leafContents->filter(fn ($c) => $c === [])->count())->toBeGreaterThan(0);
 });

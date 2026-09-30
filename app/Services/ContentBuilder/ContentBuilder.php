@@ -13,6 +13,7 @@ class ContentBuilder
         'crow', 'magic', 'warding', 'mask', 'melee',
         'missile', 'negative', 'fortitude', 'positive', 'pulse',
         'ram', 'signatureaction', 'soulstone', 'tome', 'unusualdefense',
+        'endofactivation', 'endofturn', 'specifictime',
     ];
 
     public const SYMBOL_FONT_MAP = [
@@ -49,6 +50,9 @@ class ContentBuilder
         'soulstone' => '[soulstone]',
         'tome' => '[tome]',
         'unusualdefense' => '[unusual defense]',
+        'endofactivation' => '[end of activation]',
+        'endofturn' => '[end of turn]',
+        'specifictime' => '[specific time]',
     ];
 
     public array $parsedContent = [];
@@ -186,15 +190,18 @@ class ContentBuilder
                     ->map(function ($model) use ($key, $atMaxDepth, $nextDepth) {
                         $title = $model->newestVersion->title ?? $model->newestVersion->name ?? $model->title ?? $model->name ?? null;
 
+                        $this->hydrationContext->totalResolved++;
+                        $skipNested = $atMaxDepth || $this->hydrationContext->totalResolved > ContentHydrationContext::MAX_TOTAL_RESOLVED;
+
                         return [
                             'slug' => $model->newestVersion->slug ?? $model->slug,
                             'type' => $model->newestVersion->type->value ?? $model->type->value ?? null,
                             'inline' => ! in_array($key, $this->blockTags),
                             'image' => $model->newestVersion->image ?? $model->image ?? null,
                             'title' => $title ? ContentBuilder::parseTitleTags($title) : $title,
-                            'content' => $atMaxDepth ? [] : (new ContentBuilder($model->newestVersion->content ?? $model->content ?? '', $nextDepth, $this->hydrationContext))->getFullyHydratedContent(),
-                            'left_column' => $atMaxDepth ? [] : (new ContentBuilder($model->newestVersion->left_column ?? $model->left_column ?? '', $nextDepth, $this->hydrationContext))->getFullyHydratedContent(),
-                            'right_column' => $atMaxDepth ? [] : (new ContentBuilder($model->newestVersion->right_column ?? $model->right_column ?? '', $nextDepth, $this->hydrationContext))->getFullyHydratedContent(),
+                            'content' => $skipNested ? [] : (new ContentBuilder($model->newestVersion->content ?? $model->content ?? '', $nextDepth, $this->hydrationContext))->getFullyHydratedContent(),
+                            'left_column' => $skipNested ? [] : (new ContentBuilder($model->newestVersion->left_column ?? $model->left_column ?? '', $nextDepth, $this->hydrationContext))->getFullyHydratedContent(),
+                            'right_column' => $skipNested ? [] : (new ContentBuilder($model->newestVersion->right_column ?? $model->right_column ?? '', $nextDepth, $this->hydrationContext))->getFullyHydratedContent(),
                         ];
                     })
                     ->toArray();

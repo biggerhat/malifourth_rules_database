@@ -20,6 +20,16 @@ it('parses self-closing symbol tags with inline flag', function () {
     ]);
 });
 
+it('parses the new scheme timing symbol tags with inline flag', function () {
+    $builder = new ContentBuilder('{{endofactivation /}}{{endofturn /}}{{specifictime /}}');
+
+    expect($builder->getParsedContent())->toBe([
+        ['endofactivation' => ['inline' => true]],
+        ['endofturn' => ['inline' => true]],
+        ['specifictime' => ['inline' => true]],
+    ]);
+});
+
 it('parses block reference tags with a slug and nested text', function () {
     $builder = new ContentBuilder('{{section=line-of-sight}}some text{{/section}}');
 

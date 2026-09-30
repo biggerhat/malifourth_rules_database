@@ -1,7 +1,8 @@
 export type SymbolTag =
     | 'crow' | 'magic' | 'warding' | 'mask' | 'melee'
     | 'missile' | 'negative' | 'fortitude' | 'positive' | 'pulse'
-    | 'ram' | 'signatureaction' | 'soulstone' | 'tome' | 'unusualdefense';
+    | 'ram' | 'signatureaction' | 'soulstone' | 'tome' | 'unusualdefense'
+    | 'endofactivation' | 'endofturn' | 'specifictime';
 
 export type FormattingTag = 'b' | 'strong' | 'i' | 'em' | 'u' | 'xl' | 'lg' | 'sm' | 'xs';
 

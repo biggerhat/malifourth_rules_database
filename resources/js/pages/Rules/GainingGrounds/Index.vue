@@ -200,6 +200,13 @@ const suitSymbol = (suit: string) => {
                     </div>
                 </div>
 
+                <div v-if="props.strategies.length > 0 || props.schemes.length > 0" class="flex justify-end print:hidden -mb-2">
+                    <a
+                        :href="route('rules.gaining-grounds.season.print', props.season.slug)"
+                        class="text-xs font-medium text-primary hover:underline"
+                    >Print strategy &amp; scheme pool &rarr;</a>
+                </div>
+
                 <!-- Strategies -->
                 <div v-if="props.strategies.length > 0" class="mb-8">
                     <h2 class="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-primary mb-4 pb-2 border-b border-border">Strategies</h2>

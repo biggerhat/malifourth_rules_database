@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Actions\Content\SyncContentReferencesAction;
+use App\Jobs\SyncContentReferencesJob;
 use App\Models\Page;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;
@@ -23,12 +23,12 @@ class PageObserver
             'slug' => $page->id.'-'.Str::slug($page->title),
         ]);
 
-        SyncContentReferencesAction::handle($page);
+        SyncContentReferencesJob::dispatch($page);
     }
 
     public function updated(Page $page): void
     {
-        SyncContentReferencesAction::handle($page);
+        SyncContentReferencesJob::dispatch($page);
     }
 
     public function updating(Page $page): void

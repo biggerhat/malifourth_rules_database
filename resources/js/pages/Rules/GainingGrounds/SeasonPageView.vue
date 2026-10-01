@@ -2,6 +2,7 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
     Select,
@@ -88,7 +89,12 @@ watch(mobilePageSlug, (newSlug) => {
 </script>
 
 <template>
-    <Head :title="`${props.season?.title} - ${props.seasonPage.title}`" />
+    <SeoHead
+        :title="`${props.season?.title} - ${props.seasonPage.title}`"
+        :description="`${props.seasonPage.title}, part of the ${props.season?.title} season of Malifaux Gaining Grounds tournament rules.`"
+        :canonical="props.viewing_old_version ? props.current_version_url : null"
+        :noindex="props.viewing_old_version"
+    />
 
     <div class="px-2 sm:px-4 lg:px-2 text-foreground leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
         <!-- Sidebar: Season pages (desktop) -->

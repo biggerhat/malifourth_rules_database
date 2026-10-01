@@ -3,6 +3,7 @@
 use App\Http\Controllers\CommandController;
 use App\Http\Controllers\IndexController as IndexPageController;
 use App\Http\Controllers\Rules\CardErrataController;
+use App\Http\Controllers\Rules\ChangelogController;
 use App\Http\Controllers\Rules\ErrataController;
 use App\Http\Controllers\Rules\FaqController;
 use App\Http\Controllers\Rules\GainingGroundsController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Rules\IndexController;
 use App\Http\Controllers\Rules\PageController;
 use App\Http\Controllers\Rules\SearchController;
 use App\Http\Controllers\Rules\SectionController;
+use App\Http\Controllers\Rules\TransparencyController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +20,7 @@ Route::get('/command', CommandController::class)->name('command');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
 Route::get('/robots.txt', function () {
-    return response("User-agent: *\nDisallow:\nSitemap: ".route('sitemap')."\n")
+    return response("User-agent: *\nDisallow: /docs/\nSitemap: ".route('sitemap')."\n")
         ->header('Content-Type', 'text/plain');
 })->name('robots');
 
@@ -34,6 +36,7 @@ Route::prefix('rules')->name('rules.')->group(function () {
     Route::get('/pages/{page}/history', [PageController::class, 'viewHistory'])->name('page.history')->withTrashed();
     Route::get('/sections/{section}/history', [SectionController::class, 'viewHistory'])->name('section.history')->withTrashed();
     Route::get('/indices/{index}/history', [IndexController::class, 'viewHistory'])->name('index.history')->withTrashed();
+    Route::get('/glossary', [IndexController::class, 'glossary'])->name('glossary');
 
     Route::prefix('gaining-grounds')->name('gaining-grounds.')->group(function () {
         Route::get('/', [GainingGroundsController::class, 'index'])->name('index');
@@ -42,6 +45,7 @@ Route::prefix('rules')->name('rules.')->group(function () {
         Route::get('/schemes/{scheme}', [GainingGroundsController::class, 'viewScheme'])->name('scheme')->withTrashed();
         Route::get('/schemes/{scheme}/history', [GainingGroundsController::class, 'viewSchemeHistory'])->name('scheme.history')->withTrashed();
         Route::get('/{season}/history', [GainingGroundsController::class, 'viewSeasonHistory'])->name('season.history')->withTrashed();
+        Route::get('/{season}/print', [GainingGroundsController::class, 'printPool'])->name('season.print')->withTrashed();
         Route::get('/{season}/{seasonPage}', [GainingGroundsController::class, 'viewSeasonPage'])->name('season-page')->withTrashed();
         Route::get('/{season}/{seasonPage}/history', [GainingGroundsController::class, 'viewSeasonPageHistory'])->name('season-page.history')->withTrashed();
         Route::get('/{season}', [GainingGroundsController::class, 'viewSeason'])->name('season')->withTrashed();
@@ -55,6 +59,11 @@ Route::get('/faq', function () {
 })->name('faq.index');
 
 Route::get('/search', [SearchController::class, 'view'])->name('search');
+
+Route::get('/changelog', [ChangelogController::class, 'index'])->name('changelog.index');
+Route::get('/changelog.rss', [ChangelogController::class, 'feed'])->name('changelog.feed');
+
+Route::get('/transparency', [TransparencyController::class, 'index'])->name('transparency.index');
 
 Route::get('/errata', [ErrataController::class, 'index'])->name('errata.index');
 Route::get('/errata/batch/{batch}', [ErrataController::class, 'viewBatch'])->name('errata.batch');

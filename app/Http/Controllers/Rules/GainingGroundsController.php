@@ -269,6 +269,50 @@ class GainingGroundsController extends Controller
         ]);
     }
 
+    public function printPool(Request $request, Season $season)
+    {
+        $season->loadMissing('newestVersion');
+        $season = $season->newestVersion ?? $season;
+
+        if (! $season->published_at) {
+            return response('', 404);
+        }
+
+        $strategies = Strategy::where('season_id', $season->id)
+            ->whereNotNull('published_at')
+            ->whereNull('newest')
+            ->orderBy('title')
+            ->get()
+            ->map(fn (Strategy $strategy) => [
+                'id' => $strategy->id,
+                'title' => $strategy->title,
+                'slug' => $strategy->slug,
+                'suit_label' => $strategy->suit?->label(),
+                'front_image' => $strategy->front_image,
+            ]);
+
+        $schemes = Scheme::where('season_id', $season->id)
+            ->whereNotNull('published_at')
+            ->whereNull('newest')
+            ->orderBy('title')
+            ->get()
+            ->map(fn (Scheme $scheme) => [
+                'id' => $scheme->id,
+                'title' => $scheme->title,
+                'slug' => $scheme->slug,
+                'front_image' => $scheme->front_image,
+            ]);
+
+        return inertia('Rules/GainingGrounds/PoolPrint', [
+            'season' => [
+                'title' => $season->title,
+                'slug' => $season->slug,
+            ],
+            'strategies' => $strategies,
+            'schemes' => $schemes,
+        ]);
+    }
+
     public function viewSeasonHistory(Request $request, Season $season)
     {
         $season->loadMissing('newestVersion', 'publishedBy');

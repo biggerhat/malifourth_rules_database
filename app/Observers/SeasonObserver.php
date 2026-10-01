@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Actions\Content\SyncContentReferencesAction;
+use App\Jobs\SyncContentReferencesJob;
 use App\Models\Season;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;
@@ -23,7 +23,7 @@ class SeasonObserver
             'slug' => $season->id.'-'.Str::slug($season->title),
         ]);
 
-        SyncContentReferencesAction::handle($season);
+        SyncContentReferencesJob::dispatch($season);
     }
 
     public function updating(Season $season): void
@@ -36,7 +36,7 @@ class SeasonObserver
 
     public function updated(Season $season): void
     {
-        SyncContentReferencesAction::handle($season);
+        SyncContentReferencesJob::dispatch($season);
     }
 
     public function deleted(Season $season): void

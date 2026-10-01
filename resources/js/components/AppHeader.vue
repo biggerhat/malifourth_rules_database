@@ -3,14 +3,14 @@ import AppLogo from '@/components/AppLogo.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import UserMenuContent from '@/components/UserMenuContent.vue';
 import { getInitials } from '@/composables/useInitials';
 import type { BreadcrumbItem, NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Menu, Search } from 'lucide-vue-next';
+import { ChevronDown, LayoutGrid, Menu, Search } from 'lucide-vue-next';
 import {computed, onMounted, onUnmounted, ref} from 'vue';
 import { router } from "@inertiajs/vue3";
 import {
@@ -101,6 +101,12 @@ const staticNavItems: NavItem[] = [
         icon: LayoutGrid,
         external: false,
     },{
+        title: 'Glossary',
+        href: route('rules.glossary'),
+        route: 'rules.glossary',
+        icon: LayoutGrid,
+        external: false,
+    },{
         title: 'Errata',
         href: route('errata.index'),
         route: 'errata.index',
@@ -109,21 +115,14 @@ const staticNavItems: NavItem[] = [
     },
 ];
 
-const dynamicNavItems = computed<NavItem[]>(() => {
+// Admin-configured custom nav items are grouped under one "Quick Reference" dropdown so they only ever cost one nav slot.
+const quickReferenceItems = computed(() => {
     const items = (page.props.navigationItems as Array<{ title: string; href: string | null }>) ?? [];
-    return items
-        .filter((item) => item.href)
-        .map((item) => ({
-            title: item.title,
-            href: item.href!,
-            icon: LayoutGrid,
-            external: false,
-        }));
+    return items.filter((item) => item.href);
 });
 
 const mainNavItems = computed<NavItem[]>(() => [
     ...staticNavItems,
-    ...dynamicNavItems.value,
 ]);
 
 const rightNavItems: NavItem[] = [];
@@ -131,7 +130,7 @@ const rightNavItems: NavItem[] = [];
 
 <template>
     <div>
-        <div class="border-b border-sidebar-border/80">
+        <div class="border-b border-sidebar-border/80 print:hidden">
             <div class="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                 <!-- Mobile Menu -->
                 <div class="lg:hidden">
@@ -166,6 +165,17 @@ const rightNavItems: NavItem[] = [];
                                             <component v-if="item.icon" :is="item.icon" class="mr-2 h-4 w-4" />
                                             {{ item.title }}
                                         </a>
+                                    </div>
+                                    <div v-if="quickReferenceItems.length" class="pt-2">
+                                        <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quick Reference</p>
+                                        <Link
+                                            v-for="item in quickReferenceItems"
+                                            :key="item.href!"
+                                            :href="item.href!"
+                                            class="flex items-center gap-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
+                                        >
+                                            {{ item.title }}
+                                        </Link>
                                     </div>
                                 </nav>
                                 <div class="flex flex-col space-y-4">
@@ -215,6 +225,21 @@ const rightNavItems: NavItem[] = [];
                                     v-if="item.route && route().current(item.route)"
                                     class="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-primary"
                                 ></div>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem v-if="quickReferenceItems.length" class="relative flex h-full items-center">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger :as-child="true">
+                                        <button type="button" :class="[navigationMenuTriggerStyle(), 'h-9 cursor-pointer px-3']">
+                                            Quick Reference
+                                            <ChevronDown class="ml-1 h-4 w-4 opacity-70" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start" class="w-56">
+                                        <DropdownMenuItem v-for="item in quickReferenceItems" :key="item.href!" :as-child="true">
+                                            <Link :href="item.href!" class="block w-full cursor-pointer">{{ item.title }}</Link>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </NavigationMenuItem>
                         </NavigationMenuList>
                     </NavigationMenu>

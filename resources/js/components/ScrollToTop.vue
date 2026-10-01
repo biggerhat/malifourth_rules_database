@@ -26,7 +26,7 @@ onUnmounted(() => {
         <button
             v-if="showButton"
             @click="scrollToTop"
-            class="fixed bottom-6 right-4 sm:bottom-8 sm:right-6 z-50 size-10 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg opacity-70 hover:opacity-100 transition"
+            class="fixed bottom-6 right-4 sm:bottom-8 sm:right-6 z-50 size-10 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg opacity-70 hover:opacity-100 transition print:hidden"
             aria-label="Scroll to Top"
         >
             <ArrowUp class="size-4" />

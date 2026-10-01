@@ -52,7 +52,7 @@ class ErrataController extends Controller
         }
 
         $releaseNotes = $batch->release_notes
-            ? (new ContentBuilder($batch->release_notes))->getFullyHydratedContent()
+            ? ContentBuilder::hydrateCached($batch->release_notes, "batch:{$batch->id}:release_notes", $batch->published_at)
             : [];
 
         $batch->loadMissing($batch->batchables);
@@ -63,7 +63,11 @@ class ErrataController extends Controller
                 if ($item->approval?->change_notes) {
                     $itemChangeNotes[] = [
                         'title' => ContentBuilder::parseTitleTags($item->title),
-                        'change_notes' => (new ContentBuilder($item->approval->change_notes))->getFullyHydratedContent(),
+                        'change_notes' => ContentBuilder::hydrateCached(
+                            $item->approval->change_notes,
+                            'batch-item:'.class_basename($item).":{$item->id}:change_notes",
+                            $batch->published_at,
+                        ),
                     ];
                 }
             }
@@ -118,7 +122,7 @@ class ErrataController extends Controller
             'title' => $errata->title,
             'slug' => $errata->slug,
             'meta_description' => Str::limit(ContentBuilder::toSearchable($errata->content ?? ''), 155),
-            'content' => (new ContentBuilder($errata->content ?? ''))->getFullyHydratedContent(),
+            'content' => ContentBuilder::hydrateCached($errata->content ?? '', "errata:{$errata->id}:content", $errata->published_at),
             'published_at' => $errata->published_at?->format('m-d-Y'),
             'published_by' => $errata->publishedBy?->name,
             'references' => ContentReferencesService::getForModel($errata),

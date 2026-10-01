@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Actions\Content\SyncContentReferencesAction;
+use App\Jobs\SyncContentReferencesJob;
 use App\Models\Faq;
 use App\Services\ContentBuilder\ContentBuilder;
 use Str;
@@ -25,7 +25,7 @@ class FaqObserver
             'slug' => $faq->id.'-'.Str::slug($faq->category?->value ?? 'faq'),
         ]);
 
-        SyncContentReferencesAction::handle($faq);
+        SyncContentReferencesJob::dispatch($faq);
     }
 
     public function updating(Faq $faq): void
@@ -40,7 +40,7 @@ class FaqObserver
 
     public function updated(Faq $faq): void
     {
-        SyncContentReferencesAction::handle($faq);
+        SyncContentReferencesJob::dispatch($faq);
     }
 
     public function deleted(Faq $faq): void

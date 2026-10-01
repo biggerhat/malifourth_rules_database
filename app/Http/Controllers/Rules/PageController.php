@@ -58,7 +58,7 @@ class PageController extends Controller
 
     private function renderPage(Page $page, array $extra = [])
     {
-        $content = (new ContentBuilder($page->content ?? ''))->getFullyHydratedContent();
+        $content = ContentBuilder::hydrateCached($page->content ?? '', "page:{$page->id}", $page->published_at);
 
         return inertia('Rules/PageView', array_merge([
             'pages' => Page::orderBy('page_number', 'ASC')->published()->get()->map(function (Page $p) {

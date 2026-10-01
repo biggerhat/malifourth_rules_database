@@ -114,7 +114,7 @@ class ContentReferencesService
         ])->all();
     }
 
-    private static function getRevisionUrl(Model $version, Model $currentVersion): string
+    public static function getRevisionUrl(Model $version, Model $currentVersion): string
     {
         $isCurrent = $version->id === $currentVersion->id;
 

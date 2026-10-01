@@ -5,7 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import type { PropType } from 'vue'
+import { type PropType } from 'vue'
 
 interface ReferenceItem {
     title: string;
@@ -38,14 +38,14 @@ defineProps({
         type: Array as PropType<RevisionItem[]>,
         required: false,
         default() { return []; }
-    }
+    },
 });
 
 const typeBadgeClass = () => 'border border-border text-muted-foreground';
 </script>
 
 <template>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6" v-if="references.length > 0 || referenced_by.length > 0">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 print:hidden" v-if="references.length > 0 || referenced_by.length > 0">
         <Card>
             <CardHeader class="pb-3">
                 <CardTitle class="text-base">Referenced By</CardTitle>
@@ -84,7 +84,7 @@ const typeBadgeClass = () => 'border border-border text-muted-foreground';
         </Card>
     </div>
 
-    <Card class="mt-4" v-if="revision_history.length > 1">
+    <Card class="mt-4 print:hidden" v-if="revision_history.length > 1">
         <CardHeader class="pb-3">
             <CardTitle class="text-base">Revision History</CardTitle>
         </CardHeader>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import { ChevronLeft } from "lucide-vue-next";
 
 const props = defineProps({
@@ -12,7 +13,10 @@ const props = defineProps({
 </script>
 
 <template>
-    <Head :title="props.batch.title" />
+    <SeoHead
+        :title="props.batch.title"
+        :description="`Errata and rule changes published in ${props.batch.title}.`"
+    />
 
     <div class="max-w-4xl mx-auto px-2 sm:px-4 text-foreground leading-6 text-md">
         <!-- Back link -->

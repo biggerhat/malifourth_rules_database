@@ -1,8 +1,8 @@
 import type { Component } from 'vue';
 import type { SymbolTag } from '@/types/content';
 import {
-    Crow, Fortitude, Magic, Mask, Melee, Missile, Negative,
-    Positive, Pulse, Ram, SignatureAction, Soulstone, Tome,
+    Crow, EndOfActivation, EndOfTurn, Fortitude, Magic, Mask, Melee, Missile, Negative,
+    Positive, Pulse, Ram, SignatureAction, SpecificTime, Soulstone, Tome,
     UnusualDefense, Warding,
 } from '@/components/symbols';
 import IndexTooltip from '@/components/IndexTooltip.vue';
@@ -16,6 +16,7 @@ export const SYMBOL_TAGS: SymbolTag[] = [
     'crow', 'magic', 'warding', 'mask', 'melee',
     'missile', 'negative', 'fortitude', 'positive', 'pulse',
     'ram', 'signatureaction', 'soulstone', 'tome', 'unusualdefense',
+    'endofactivation', 'endofturn', 'specifictime',
 ];
 
 export const COMPONENT_MAP: Record<string, Component> = {
@@ -40,6 +41,9 @@ export const COMPONENT_MAP: Record<string, Component> = {
     soulstone: Soulstone,
     tome: Tome,
     unusualdefense: UnusualDefense,
+    endofactivation: EndOfActivation,
+    endofturn: EndOfTurn,
+    specifictime: SpecificTime,
 };
 
 export function isSymbolTag(tag: string): tag is SymbolTag {

@@ -2,6 +2,7 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ChevronLeft } from "lucide-vue-next";
 import { computed } from "vue";
@@ -66,7 +67,12 @@ const hasImages = computed(() =>
 </script>
 
 <template>
-    <Head :title="props.strategy.title" />
+    <SeoHead
+        :title="`${props.strategy.title} - Gaining Grounds Strategy`"
+        :description="`${props.strategy.title} is a Gaining Grounds strategy${props.strategy.suit_label ? ` (${props.strategy.suit_label} suit)` : ''}${props.season?.title ? ` for the ${props.season.title} season` : ''} of Malifaux.`"
+        :canonical="props.viewing_old_version ? props.current_version_url : null"
+        :noindex="props.viewing_old_version"
+    />
 
     <div class="max-w-4xl mx-auto px-2 sm:px-4 text-foreground leading-6 text-md">
         <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">

@@ -20,8 +20,9 @@ class SectionResource extends JsonResource
             'slug' => $this->slug,
             'title' => $this->title,
             'title_text' => ContentBuilder::toPlainText($this->title),
-            'content' => $this->content,
-            'content_text' => ContentBuilder::toSearchable($this->content ?? ''),
+            'left_column' => $this->left_column,
+            'right_column' => $this->right_column,
+            'content_text' => ContentBuilder::toSearchable(($this->left_column ?? '').' '.($this->right_column ?? '')),
             'published_at' => $this->published_at?->toIso8601String(),
         ];
     }

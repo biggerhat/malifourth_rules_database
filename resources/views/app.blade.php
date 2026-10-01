@@ -39,6 +39,8 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600|cormorant-garamond:500,600,700&display=swap" rel="stylesheet" />
 
+        <link rel="alternate" type="application/rss+xml" title="{{ config('app.name') }} — Changelog" href="{{ route('changelog.feed') }}">
+
         @routes
         @vite(['resources/js/app.ts'])
         @inertiaHead

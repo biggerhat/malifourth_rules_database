@@ -1,0 +1,985 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:referencedFaqs\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Content/SyncContentReferencesAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:referencedIndices\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Content/SyncContentReferencesAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:referencedPages\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Content/SyncContentReferencesAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:referencedSections\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Content/SyncContentReferencesAction.php
+
+		-
+			message: '#^Cannot call method advance\(\) on null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Console/Commands/SyncContentReferencesCommand.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/API/V1/SearchController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$season\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/API/V1/SearchController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/API/V1/SearchController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/CardErrataAdminController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Admin/CardErrataAdminController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/ErrataAdminController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Admin/ErrataAdminController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/FaqAdminController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Admin/SchemeAdminController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Admin/SeasonAdminController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/SeasonPageAdminController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Admin/SeasonPageAdminController.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Admin/StrategyAdminController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Admin/StrategyAdminController.php
+
+		-
+			message: '#^Cannot call method label\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Admin/StrategyAdminController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/IndexController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Controllers/Rules/CardErrataController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$change_notes\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Rules/ChangelogController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 4
+			path: app/Http/Controllers/Rules/ErrataController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/Rules/GainingGroundsController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/Rules/GainingGroundsController.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 4
+			path: app/Http/Controllers/Rules/GainingGroundsController.php
+
+		-
+			message: '#^Cannot call method format\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 9
+			path: app/Http/Controllers/Rules/GainingGroundsController.php
+
+		-
+			message: '#^Cannot call method label\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 5
+			path: app/Http/Controllers/Rules/GainingGroundsController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>slug" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Http/Controllers/Rules/GainingGroundsController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approval\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Rules/TransparencyController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$publishedBy\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Rules/TransparencyController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$published_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Rules/TransparencyController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/SitemapController.php
+
+		-
+			message: '#^Anonymous function should return Illuminate\\Support\\Collection\<int, array\{title\: string, href\: string\|null\}\> but returns Illuminate\\Support\\Collection\<int, array\{title\: string, href\: string\|null\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Middleware/HandleInertiaRequests.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/API/V1/BatchResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/API/V1/ErrataResource.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/API/V1/ErrataResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Http/Resources/API/V1/SchemeResource.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/API/V1/SchemeResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/API/V1/SeasonPageResource.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/API/V1/SeasonPageResource.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/API/V1/SeasonResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/API/V1/StrategyResource.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/API/V1/StrategyResource.php
+
+		-
+			message: '#^Cannot call method label\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/API/V1/StrategyResource.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Resources/API/V1/StrategyResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/CardErrataListResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ErrataListResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/FaqListResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/SeasonPageListResource.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Resources/StrategyListResource.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/CardErrata.php
+
+		-
+			message: '#^PHPDoc tag @mixin contains unknown class App\\Models\\IdeHelperCardErrata\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/CardErrata.php
+
+		-
+			message: '#^PHPDoc tag @mixin contains unknown class App\\Models\\IdeHelperCardErrataEntry\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/CardErrataEntry.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Errata\)\> and ''App\\\\Models\\\\Faq'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Errata\)\> and ''App\\\\Models\\\\Index'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Errata\)\> and ''App\\\\Models\\\\Page'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Errata\)\> and ''App\\\\Models\\\\Scheme'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Errata\)\> and ''App\\\\Models\\\\Season'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Errata\)\> and ''App\\\\Models\\\\SeasonPage'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Errata\)\> and ''App\\\\Models\\\\Section'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Errata\)\> and ''App\\\\Models\\\\Strategy'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: class\-string\<static\(App\\Models\\Errata\)\>$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^PHPDoc tag @mixin contains unknown class App\\Models\\IdeHelperErrata\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/Errata.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Faq\)\> and ''App\\\\Models\\\\Errata'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Faq\)\> and ''App\\\\Models\\\\Index'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Faq\)\> and ''App\\\\Models\\\\Page'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Faq\)\> and ''App\\\\Models\\\\Scheme'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Faq\)\> and ''App\\\\Models\\\\Season'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Faq\)\> and ''App\\\\Models\\\\SeasonPage'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Faq\)\> and ''App\\\\Models\\\\Section'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Faq\)\> and ''App\\\\Models\\\\Strategy'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: class\-string\<static\(App\\Models\\Faq\)\>$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^PHPDoc tag @mixin contains unknown class App\\Models\\IdeHelperFaq\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^The @use tag of class App\\Models\\Faq describes Illuminate\\Database\\Eloquent\\Factories\\HasFactory but the class uses App\\Traits\\HasContentReferences\.$#'
+			identifier: generics.wrongParent
+			count: 1
+			path: app/Models/Faq.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Index\)\> and ''App\\\\Models\\\\Errata'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Index\)\> and ''App\\\\Models\\\\Faq'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Index\)\> and ''App\\\\Models\\\\Page'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Index\)\> and ''App\\\\Models\\\\Scheme'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Index\)\> and ''App\\\\Models\\\\Season'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Index\)\> and ''App\\\\Models\\\\SeasonPage'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Index\)\> and ''App\\\\Models\\\\Section'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Index\)\> and ''App\\\\Models\\\\Strategy'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: class\-string\<static\(App\\Models\\Index\)\>$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^The @use tag of class App\\Models\\Index describes Illuminate\\Database\\Eloquent\\Factories\\HasFactory but the class uses App\\Traits\\HasContentReferences\.$#'
+			identifier: generics.wrongParent
+			count: 1
+			path: app/Models/Index.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Models/NavigationItem.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Page\)\> and ''App\\\\Models\\\\Errata'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Page\)\> and ''App\\\\Models\\\\Faq'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Page\)\> and ''App\\\\Models\\\\Index'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Page\)\> and ''App\\\\Models\\\\Scheme'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Page\)\> and ''App\\\\Models\\\\Season'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Page\)\> and ''App\\\\Models\\\\SeasonPage'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Page\)\> and ''App\\\\Models\\\\Section'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Page\)\> and ''App\\\\Models\\\\Strategy'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: class\-string\<static\(App\\Models\\Page\)\>$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^The @use tag of class App\\Models\\Page describes Illuminate\\Database\\Eloquent\\Factories\\HasFactory but the class uses App\\Traits\\HasContentReferences\.$#'
+			identifier: generics.wrongParent
+			count: 1
+			path: app/Models/Page.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Scheme\)\> and ''App\\\\Models\\\\Errata'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Scheme.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Scheme\)\> and ''App\\\\Models\\\\Faq'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Scheme.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Scheme\)\> and ''App\\\\Models\\\\Index'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Scheme.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Scheme\)\> and ''App\\\\Models\\\\Page'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Scheme.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Scheme\)\> and ''App\\\\Models\\\\Season'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Scheme.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Scheme\)\> and ''App\\\\Models\\\\SeasonPage'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Scheme.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Scheme\)\> and ''App\\\\Models\\\\Section'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Scheme.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Scheme\)\> and ''App\\\\Models\\\\Strategy'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Scheme.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: class\-string\<static\(App\\Models\\Scheme\)\>$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Models/Scheme.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Season\)\> and ''App\\\\Models\\\\Errata'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Season.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Season\)\> and ''App\\\\Models\\\\Faq'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Season.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Season\)\> and ''App\\\\Models\\\\Index'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Season.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Season\)\> and ''App\\\\Models\\\\Page'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Season.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Season\)\> and ''App\\\\Models\\\\Scheme'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Season.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Season\)\> and ''App\\\\Models\\\\SeasonPage'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Season.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Season\)\> and ''App\\\\Models\\\\Section'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Season.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Season\)\> and ''App\\\\Models\\\\Strategy'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Season.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: class\-string\<static\(App\\Models\\Season\)\>$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Models/Season.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$approved_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\SeasonPage\)\> and ''App\\\\Models\\\\Errata'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\SeasonPage\)\> and ''App\\\\Models\\\\Faq'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\SeasonPage\)\> and ''App\\\\Models\\\\Index'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\SeasonPage\)\> and ''App\\\\Models\\\\Page'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\SeasonPage\)\> and ''App\\\\Models\\\\Scheme'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\SeasonPage\)\> and ''App\\\\Models\\\\Season'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\SeasonPage\)\> and ''App\\\\Models\\\\Section'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\SeasonPage\)\> and ''App\\\\Models\\\\Strategy'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: class\-string\<static\(App\\Models\\SeasonPage\)\>$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^PHPDoc tag @mixin contains unknown class App\\Models\\IdeHelperSeasonPage\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/SeasonPage.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Section\)\> and ''App\\\\Models\\\\Errata'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Section\)\> and ''App\\\\Models\\\\Faq'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Section\)\> and ''App\\\\Models\\\\Index'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Section\)\> and ''App\\\\Models\\\\Page'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Section\)\> and ''App\\\\Models\\\\Scheme'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Section\)\> and ''App\\\\Models\\\\Season'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Section\)\> and ''App\\\\Models\\\\SeasonPage'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Section\)\> and ''App\\\\Models\\\\Strategy'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: class\-string\<static\(App\\Models\\Section\)\>$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^The @use tag of class App\\Models\\Section describes Illuminate\\Database\\Eloquent\\Factories\\HasFactory but the class uses App\\Traits\\HasContentReferences\.$#'
+			identifier: generics.wrongParent
+			count: 1
+			path: app/Models/Section.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Strategy\)\> and ''App\\\\Models\\\\Errata'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Strategy.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Strategy\)\> and ''App\\\\Models\\\\Faq'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Strategy.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Strategy\)\> and ''App\\\\Models\\\\Index'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Strategy.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Strategy\)\> and ''App\\\\Models\\\\Page'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Strategy.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Strategy\)\> and ''App\\\\Models\\\\Scheme'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Strategy.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Strategy\)\> and ''App\\\\Models\\\\Season'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Strategy.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Strategy\)\> and ''App\\\\Models\\\\SeasonPage'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Strategy.php
+
+		-
+			message: '#^Match arm comparison between class\-string\<static\(App\\Models\\Strategy\)\> and ''App\\\\Models\\\\Section'' is always false\.$#'
+			identifier: match.alwaysFalse
+			count: 1
+			path: app/Models/Strategy.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: class\-string\<static\(App\\Models\\Strategy\)\>$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Models/Strategy.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>value" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 3
+			path: app/Observers/FaqObserver.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$referencedByFaqs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$referencedByIndices\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$referencedByPages\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$referencedBySections\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$referencedFaqs\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$referencedIndices\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$referencedPages\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$referencedSections\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 17
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Database\\Eloquent\\Model\:\:withTrashed\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: string$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: true$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Property Illuminate\\Database\\Eloquent\\Model\:\:\$original \(array\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
+			count: 1
+			path: app/Services/ContentReferencesService.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>slug" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Services/ContentReferencesService.php

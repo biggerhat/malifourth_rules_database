@@ -4,7 +4,9 @@ import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
 import SeoHead from "@/components/SeoHead.vue";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ChevronLeft } from "lucide-vue-next";
+import { ChevronLeft, Printer } from "lucide-vue-next";
+
+const printPage = () => window.print();
 
 const factionLogos: Record<string, string> = {
     arcanists: '/Images/Logos/M4E-Logo_Arcanists-B.png',
@@ -99,7 +101,12 @@ const props = defineProps({
 </script>
 
 <template>
-    <SeoHead :title="`${props.card_name} Errata`" :description="`Card errata for ${props.card_name} (${props.faction_label})`" />
+    <SeoHead
+        :title="`${props.card_name} Errata`"
+        :description="`Card errata for ${props.card_name} (${props.faction_label})`"
+        :canonical="props.viewing_old_version ? props.current_version_url : null"
+        :noindex="props.viewing_old_version"
+    />
 
     <div class="max-w-4xl mx-auto px-2 sm:px-4 text-foreground leading-6 text-md">
         <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">
@@ -110,7 +117,7 @@ const props = defineProps({
         </Alert>
 
         <!-- Back link -->
-        <div class="pt-4 mb-2">
+        <div class="pt-4 mb-2 flex items-center justify-between print:hidden">
             <Link
                 :href="route('errata.cards.index')"
                 class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -118,6 +125,14 @@ const props = defineProps({
                 <ChevronLeft class="size-4" />
                 Card Errata
             </Link>
+            <button
+                type="button"
+                class="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium hover:bg-muted/50 transition-colors"
+                @click="printPage"
+            >
+                <Printer class="size-4" />
+                Print
+            </button>
         </div>
 
         <!-- Banner -->
@@ -153,8 +168,12 @@ const props = defineProps({
                         No errata entries recorded for this card.
                     </div>
                 </div>
-                <div class="md:sticky md:top-4">
+                <div class="md:sticky md:top-4 print:hidden">
                     <CardFlip :front-image="props.front_image" :back-image="props.back_image" :alt="props.card_name" />
+                </div>
+                <div class="hidden print:grid print:grid-cols-2 print:gap-2">
+                    <img v-if="props.front_image" :src="props.front_image" :alt="`${props.card_name} Front`" class="w-full rounded-md border" />
+                    <img v-if="props.back_image" :src="props.back_image" :alt="`${props.card_name} Back`" class="w-full rounded-md border" />
                 </div>
             </div>
         </div>

@@ -2,6 +2,7 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ChevronRight } from "lucide-vue-next";
 import {
@@ -118,7 +119,12 @@ const suitSymbol = (suit: string) => {
 </script>
 
 <template>
-    <Head :title="props.season.title" />
+    <SeoHead
+        :title="props.season.title"
+        :description="`Gaining Grounds tournament rules, strategies, and schemes for the ${props.season.title} season of Malifaux.`"
+        :canonical="props.viewing_old_version ? props.current_version_url : null"
+        :noindex="props.viewing_old_version"
+    />
 
     <div class="px-2 sm:px-4 lg:px-2 text-foreground leading-6 text-md" :class="props.viewing_old_version ? 'max-w-5xl mx-auto' : 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2'">
         <!-- Sidebar: Season list (desktop) -->
@@ -212,6 +218,13 @@ const suitSymbol = (suit: string) => {
                 <div v-if="!props.viewing_old_version" class="border-t border-border px-6 py-3 text-xs text-muted-foreground text-right">
                     Last updated {{ props.season.published_at }} by {{ props.season.published_by }}
                 </div>
+            </div>
+
+            <div v-if="!props.viewing_old_version && (props.strategies.length > 0 || props.schemes.length > 0)" class="flex justify-end print:hidden -mb-2">
+                <a
+                    :href="route('rules.gaining-grounds.season.print', props.season.slug)"
+                    class="text-xs font-medium text-primary hover:underline"
+                >Print strategy &amp; scheme pool &rarr;</a>
             </div>
 
             <!-- Strategies -->

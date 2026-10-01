@@ -2,6 +2,7 @@
 import ContentReferences from "@/components/ContentReferences.vue";
 import ParsedContent from "@/components/ParsedContent.vue";
 import ScrollToTop from "@/components/ScrollToTop.vue";
+import SeoHead from "@/components/SeoHead.vue";
 import { ChevronRight } from "lucide-vue-next";
 import {
     Select,
@@ -106,7 +107,10 @@ const suitSymbol = (suit: string) => {
 </script>
 
 <template>
-    <Head title="Gaining Grounds" />
+    <SeoHead
+        title="Gaining Grounds"
+        :description="props.season ? `Tournament strategies, schemes, and rules for the ${props.season.title} season of Malifaux Gaining Grounds.` : 'Tournament strategies, schemes, and rules for Malifaux Gaining Grounds.'"
+    />
 
     <div class="px-2 sm:px-4 lg:px-2 text-foreground leading-6 text-md" :class="props.season ? 'grid grid-cols-1 lg:grid-cols-8 lg:gap-2' : 'max-w-4xl mx-auto'">
         <!-- Sidebar: Season list (desktop) -->
@@ -194,6 +198,13 @@ const suitSymbol = (suit: string) => {
                     <div class="border-t border-border px-6 py-3 text-xs text-muted-foreground text-right">
                         Last updated {{ props.season.published_at }} by {{ props.season.published_by }}
                     </div>
+                </div>
+
+                <div v-if="props.strategies.length > 0 || props.schemes.length > 0" class="flex justify-end print:hidden -mb-2">
+                    <a
+                        :href="route('rules.gaining-grounds.season.print', props.season.slug)"
+                        class="text-xs font-medium text-primary hover:underline"
+                    >Print strategy &amp; scheme pool &rarr;</a>
                 </div>
 
                 <!-- Strategies -->

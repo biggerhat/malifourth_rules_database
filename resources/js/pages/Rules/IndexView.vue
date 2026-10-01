@@ -87,7 +87,12 @@ const props = defineProps({
 </script>
 
 <template>
-    <SeoHead :title="props.title_text || props.title" :description="props.meta_description" />
+    <SeoHead
+        :title="props.title_text || props.title"
+        :description="props.meta_description"
+        :canonical="props.viewing_old_version ? props.current_version_url : null"
+        :noindex="props.viewing_old_version"
+    />
 
     <div class="max-w-4xl mx-auto px-2 sm:px-4 text-foreground leading-6 text-md">
         <Alert v-if="props.viewing_old_version" variant="destructive" class="mb-4">

@@ -113,7 +113,12 @@ onMounted(() => {
 </script>
 
 <template>
-    <SeoHead :title="props.faq ? props.faq.title_text : 'FAQ'" :description="props.faq ? props.faq.meta_description : null" />
+    <SeoHead
+        :title="props.faq ? props.faq.title_text : 'FAQ'"
+        :description="props.faq ? props.faq.meta_description : null"
+        :canonical="props.viewing_old_version ? props.current_version_url : null"
+        :noindex="props.viewing_old_version"
+    />
 
     <div
         class="px-2 sm:px-4 lg:px-2 text-foreground leading-6 text-md"

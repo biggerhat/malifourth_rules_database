@@ -21,6 +21,7 @@ class GainingGroundsController extends Controller
             ->get();
 
         $latestSeason = $seasons->first();
+        $latestSeason?->loadMissing('publishedBy');
 
         if (! $latestSeason) {
             return inertia('Rules/GainingGrounds/Index', [

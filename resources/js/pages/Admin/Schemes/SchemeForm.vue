@@ -105,6 +105,7 @@ const form = useForm({
     next_scheme_1: null,
     next_scheme_2: null,
     next_scheme_3: null,
+    next_scheme_4: null,
     internal_notes: '',
     change_notes: '',
     batch_id: null,
@@ -126,6 +127,7 @@ onMounted(() => {
     form.next_scheme_1 = props.scheme?.next_scheme_1 ?? null;
     form.next_scheme_2 = props.scheme?.next_scheme_2 ?? null;
     form.next_scheme_3 = props.scheme?.next_scheme_3 ?? null;
+    form.next_scheme_4 = props.scheme?.next_scheme_4 ?? null;
     form.internal_notes = props.scheme?.internal_notes ?? '';
     form.change_notes = props.scheme?.published_at ? '' : props.scheme?.approval?.change_notes ?? '';
     form.batch_id = props.scheme?.published_at ? null : props.scheme?.batch_id ?? null;
@@ -265,6 +267,23 @@ const changeNotesNewContent = (content) => { form.change_notes = content; fetchV
                                     <CircleX class="text-destructive my-auto ml-2" v-if="form.next_scheme_3" @click="form.next_scheme_3 = null" />
                                 </div>
                                 <InputError :message="form.errors.next_scheme_3" />
+                            </div>
+                            <div class="flex flex-col space-y-1.5">
+                                <Label for="next_scheme_4">Next Available Scheme 4</Label>
+                                <div class="flex">
+                                    <Select id="next_scheme_4" v-model="form.next_scheme_4">
+                                        <SelectTrigger class="w-full">
+                                            <SelectValue placeholder="Select Next Scheme 4" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem v-for="s in props.schemes" :value="s.id" :key="s.id">
+                                                {{ s.display_name }}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <CircleX class="text-destructive my-auto ml-2" v-if="form.next_scheme_4" @click="form.next_scheme_4 = null" />
+                                </div>
+                                <InputError :message="form.errors.next_scheme_4" />
                             </div>
                         </div>
                     </TabsContent>

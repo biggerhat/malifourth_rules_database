@@ -46,7 +46,7 @@ class SchemeController extends Controller
     {
         abort_if($scheme->published_at === null || $scheme->newest !== null, 404);
 
-        $scheme->load(['season', 'nextScheme1', 'nextScheme2', 'nextScheme3']);
+        $scheme->load(['season', 'nextScheme1', 'nextScheme2', 'nextScheme3', 'nextScheme4']);
 
         return new SchemeResource($scheme);
     }

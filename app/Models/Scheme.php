@@ -64,6 +64,11 @@ class Scheme extends Model implements HasBatching, HasPublisher
         return $this->belongsTo(Scheme::class, 'next_scheme_3');
     }
 
+    public function nextScheme4(): BelongsTo
+    {
+        return $this->belongsTo(Scheme::class, 'next_scheme_4');
+    }
+
     public function getActivityLogOptions(): LogOptions
     {
         return LogOptions::defaults();

@@ -31,6 +31,7 @@ class SchemeResource extends JsonResource
                 $this->whenLoaded('nextScheme1', fn () => $this->nextScheme1?->slug),
                 $this->whenLoaded('nextScheme2', fn () => $this->nextScheme2?->slug),
                 $this->whenLoaded('nextScheme3', fn () => $this->nextScheme3?->slug),
+                $this->whenLoaded('nextScheme4', fn () => $this->nextScheme4?->slug),
             ],
             'season_slug' => $this->whenLoaded('season', fn () => $this->season?->slug),
             'published_at' => $this->published_at?->toIso8601String(),

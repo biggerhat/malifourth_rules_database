@@ -226,6 +226,7 @@ class SchemeAdminController extends Controller
             'next_scheme_1' => ['nullable', 'integer', 'exists:schemes,id'],
             'next_scheme_2' => ['nullable', 'integer', 'exists:schemes,id'],
             'next_scheme_3' => ['nullable', 'integer', 'exists:schemes,id'],
+            'next_scheme_4' => ['nullable', 'integer', 'exists:schemes,id'],
             'internal_notes' => ['nullable', 'string'],
             'change_notes' => ['nullable', 'string'],
             'batch_id' => ['nullable', 'int', 'exists:batches,id'],

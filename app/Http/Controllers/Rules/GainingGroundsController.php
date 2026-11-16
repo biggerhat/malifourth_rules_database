@@ -227,7 +227,7 @@ class GainingGroundsController extends Controller
 
     public function viewScheme(Request $request, Scheme $scheme)
     {
-        $scheme->loadMissing(['newestVersion', 'publishedBy', 'nextScheme1', 'nextScheme2', 'nextScheme3', 'season' => fn ($q) => $q->withTrashed()]);
+        $scheme->loadMissing(['newestVersion', 'publishedBy', 'nextScheme1', 'nextScheme2', 'nextScheme3', 'nextScheme4', 'season' => fn ($q) => $q->withTrashed()]);
         $scheme = $scheme->newestVersion ?? $scheme;
 
         if (! $scheme->published_at) {
@@ -236,7 +236,7 @@ class GainingGroundsController extends Controller
 
         $scheme->loadMissing(['season' => fn ($q) => $q->withTrashed()]);
 
-        $nextSchemes = collect([$scheme->nextScheme1, $scheme->nextScheme2, $scheme->nextScheme3])
+        $nextSchemes = collect([$scheme->nextScheme1, $scheme->nextScheme2, $scheme->nextScheme3, $scheme->nextScheme4])
             ->filter()
             ->map(fn (Scheme $next) => [
                 'id' => $next->id,

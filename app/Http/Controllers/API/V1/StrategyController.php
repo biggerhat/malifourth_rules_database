@@ -20,7 +20,7 @@ class StrategyController extends Controller
      * Returns a paginated list of published Gaining Grounds strategies.
      *
      * @queryParam season string Filter by season slug. Example: gaining-grounds-5
-     * @queryParam suit string Filter by suit (rams, crows, masks, tomes). Example: masks
+     * @queryParam suit string Filter by suit (rams, crows, masks, tomes, red_joker, black_joker). Example: masks
      * @queryParam per_page int Results per page (max 100). Example: 25
      */
     public function index(Request $request): AnonymousResourceCollection

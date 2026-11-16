@@ -48,6 +48,8 @@ const suitBadge = (suit: string) => {
         case 'crows': return 'border border-border text-emerald-700 dark:text-emerald-300';
         case 'masks': return 'border border-border text-violet-700 dark:text-violet-300';
         case 'tomes': return 'border border-border text-sky-700 dark:text-sky-300';
+        case 'red_joker': return 'border border-border text-red-600 dark:text-red-400';
+        case 'black_joker': return 'border border-border text-zinc-800 dark:text-zinc-200';
         default: return 'border border-border text-muted-foreground';
     }
 };

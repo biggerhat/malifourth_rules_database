@@ -81,6 +81,8 @@ const suitAccent = (suit: string) => {
         case 'crows': return 'border-l-emerald-800/60 dark:border-l-emerald-400/50';
         case 'masks': return 'border-l-violet-800/60 dark:border-l-violet-400/50';
         case 'tomes': return 'border-l-sky-800/60 dark:border-l-sky-400/50';
+        case 'red_joker': return 'border-l-red-700/60 dark:border-l-red-400/50';
+        case 'black_joker': return 'border-l-zinc-800/60 dark:border-l-zinc-300/50';
         default: return '';
     }
 };
@@ -91,6 +93,8 @@ const suitBadge = (suit: string) => {
         case 'crows': return 'border border-border text-emerald-700 dark:text-emerald-300';
         case 'masks': return 'border border-border text-violet-700 dark:text-violet-300';
         case 'tomes': return 'border border-border text-sky-700 dark:text-sky-300';
+        case 'red_joker': return 'border border-border text-red-600 dark:text-red-400';
+        case 'black_joker': return 'border border-border text-zinc-800 dark:text-zinc-200';
         default: return 'border border-border text-muted-foreground';
     }
 };

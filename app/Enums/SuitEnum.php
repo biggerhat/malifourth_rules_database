@@ -14,4 +14,6 @@ enum SuitEnum: string
     case Crows = 'crows';
     case Masks = 'masks';
     case Tomes = 'tomes';
+    case RedJoker = 'red_joker';
+    case BlackJoker = 'black_joker';
 }

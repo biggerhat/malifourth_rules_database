@@ -41,9 +41,9 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'flash' => [
-                'message' => fn () => $request->session()->get('message'),
-                'messageTitle' => fn () => $request->session()->get('messageTitle'),
-                'messageType' => fn () => $request->session()->get('messageType'),
+                'message' => fn () => $request->hasSession() ? $request->session()->get('message') : null,
+                'messageTitle' => fn () => $request->hasSession() ? $request->session()->get('messageTitle') : null,
+                'messageType' => fn () => $request->hasSession() ? $request->session()->get('messageType') : null,
             ],
             'auth' => [
                 'user' => $request->user(),
